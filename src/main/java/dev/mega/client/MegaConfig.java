@@ -19,6 +19,9 @@ public final class MegaConfig {
     public int hudX = 8;
     public int hudY = 8;
     public int maxLines = 8;
+    /** "Blocks seen" panel in the top-right corner: how many of each block type are in range. */
+    public boolean blockCountPanel = true;
+    public int blockCountLines = 15;
 
     // Players
     public boolean playerWarning = true;
@@ -130,6 +133,7 @@ public final class MegaConfig {
         hudX = Math.max(0, hudX);
         hudY = Math.max(0, hudY);
         maxLines = Math.clamp(maxLines, 1, 30);
+        blockCountLines = Math.clamp(blockCountLines, 1, 40);
         playerRange = Math.clamp(playerRange, 8, 1250);
         maxDistance = Math.clamp(maxDistance, 8, 1250);
         scanIntervalTicks = Math.clamp(scanIntervalTicks, 5, 200);

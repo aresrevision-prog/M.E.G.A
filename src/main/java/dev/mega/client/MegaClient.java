@@ -53,6 +53,9 @@ public final class MegaClient implements ClientModInitializer {
     static List<Target> xrayBlocks = List.of();
     static List<PlayerInfo> players = List.of();
     static final Map<Category, Integer> counts = new EnumMap<>(Category.class);
+    /** Per block type counts for the "Blocks seen" corner panel: label, count, colour. Sorted biggest first. */
+    record BlockCount(String label, int count, int color) {}
+    static List<BlockCount> blockCounts = List.of();
     static boolean playerVisible;
 
     /** Farm alert: moving dropped items near you. */
@@ -114,6 +117,7 @@ public final class MegaClient implements ClientModInitializer {
             farmCount = 0;
             lastItemPos.clear();
             xrayBlocks = List.of();
+            blockCounts = List.of();
             job = null;
             return;
         }
@@ -234,6 +238,7 @@ public final class MegaClient implements ClientModInitializer {
         final List<Target> xray = new ArrayList<>();
         final Map<Category, Integer> counts = new EnumMap<>(Category.class);
         final Set<Long> seenVeins = new HashSet<>();
+        final Map<String, BlockCount> blockCounts = new java.util.HashMap<>();
         ChunkPos center;
         double maxSq, oreSq, farmSq;
         int oreChunkRadius, farmChunkRadius;
@@ -295,6 +300,7 @@ public final class MegaClient implements ClientModInitializer {
                 j.found.add(bt);
                 if (config.xray && config.xrayEdges) j.xray.add(bt);
                 j.counts.merge(category, 1, Integer::sum);
+                countBlock(bt.label(), category);
             }
             if (j.scanOres && dx <= j.oreChunkRadius && dz <= j.oreChunkRadius)
                 scanOres(client, chunk, j.oreSq, j.found, j.counts, j.seenVeins, config.xray && config.xrayEdges ? j.xray : null);
@@ -308,6 +314,9 @@ public final class MegaClient implements ClientModInitializer {
             xrayBlocks = j.xray.size() > config.xrayMax ? new ArrayList<>(j.xray.subList(0, config.xrayMax)) : j.xray;
             counts.clear();
             counts.putAll(j.counts);
+            List<BlockCount> bc = new ArrayList<>(j.blockCounts.values());
+            bc.sort(Comparator.comparingInt(BlockCount::count).reversed().thenComparing(BlockCount::label));
+            blockCounts = bc;
             job = null;
             scanFarm(client);
         }
@@ -342,6 +351,7 @@ public final class MegaClient implements ClientModInitializer {
                 double sq = dx * dx + dy * dy + dz * dz;
                 if (sq > maxSq) continue;
                 if (xrayOut != null) xrayOut.add(new Target(cat, "", new BlockPos(wx, wy, wz), Math.sqrt(sq)));
+                countBlock(label(block, cat == Category.ORE), cat); // every block, not per vein
                 // one entry per vein: group ores of the same type in 4x4x4 cells
                 long cell = (((long) (wx >> 2) & 0x3FFFFF) << 42) | (((long) (wy >> 2) & 0xFFFFF) << 22)
                     | ((long) (wz >> 2) & 0x3FFFFF);
@@ -409,7 +419,16 @@ public final class MegaClient implements ClientModInitializer {
             if (sq > maxSq) continue;
             found.add(new Target(Category.FARM, label + (baseY < 0 && key.equals("plant_farm") ? " (y<0)" : ""), pos, Math.sqrt(sq)));
             counts.merge(Category.FARM, 1, Integer::sum);
+            countBlock(label, Category.FARM);
         }
+    }
+
+    /** Adds one to the corner-panel count for this block type (only while a scan is running). */
+    private static void countBlock(String label, Category cat) {
+        ScanJob j = job;
+        if (j == null) return;
+        j.blockCounts.merge(label, new BlockCount(label, 1, cat.color),
+            (a, b) -> new BlockCount(a.label(), a.count() + 1, a.color()));
     }
 
     /** Nearest built farm from the last scan, or null. */

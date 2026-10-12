@@ -58,6 +58,32 @@ final class MegaHud {
             ctx.drawTextWithShadow(tr, msg, bx + 8, by + 5, 0xFFFF8800);
         }
 
+        // "Blocks seen" panel, top-right corner
+        if (cfg.blockCountPanel) {
+            List<MegaClient.BlockCount> bc = MegaClient.blockCounts;
+            int sw = ctx.getScaledWindowWidth();
+            String title = "Blocks seen";
+            int total = 0;
+            for (MegaClient.BlockCount b : bc) total += b.count();
+            title += " (" + total + ")";
+            int w = tr.getWidth(title);
+            int n = Math.min(bc.size(), cfg.blockCountLines);
+            for (int i = 0; i < n; i++) w = Math.max(w, tr.getWidth("■ " + bc.get(i).label() + "  " + bc.get(i).count()));
+            int rx = sw - w - 8, ry = 6;
+            ctx.fill(rx - 4, ry - 2, sw - 4, ry + 11 + Math.max(n, 1) * 10 + 2, PANEL);
+            ctx.drawTextWithShadow(tr, title, rx, ry, WHITE);
+            ry += 11;
+            if (n == 0) ctx.drawTextWithShadow(tr, "nothing yet", rx, ry, GRAY);
+            for (int i = 0; i < n; i++) {
+                MegaClient.BlockCount b = bc.get(i);
+                String cnt = String.valueOf(b.count());
+                ctx.drawTextWithShadow(tr, "■", rx, ry, b.color());
+                ctx.drawTextWithShadow(tr, b.label(), rx + tr.getWidth("■ "), ry, WHITE);
+                ctx.drawTextWithShadow(tr, cnt, sw - 8 - tr.getWidth(cnt), ry, b.color());
+                ry += 10;
+            }
+        }
+
         // Player warning banner
         if (cfg.playerWarning && MegaClient.playerVisible) {
             String warn = "WARNING: PLAYER VISIBLE";

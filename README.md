@@ -6,7 +6,7 @@ Client-side info HUD + tracers. **Info only — no automation, no combat aids, n
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. This mod shows its version on the HUD (`M.E.G.A v0.16.0`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. This mod shows its version on the HUD (`M.E.G.A v0.17.0`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 
 ## Features & colours
@@ -21,6 +21,7 @@ Client-side info HUD + tracers. **Info only — no automation, no combat aids, n
 | Cyan | Ores: diamond (+deepslate), emerald, gold (+deepslate). No coal, copper, iron, redstone or lapis. |
 
 - **Farm alert**: orange `FARM DETECTED` banner at the top centre for (a) the nearest built farm (e.g. `KELP FARM 40m ↗`, `UNDERGROUND FARM`) and/or (b) more than 32 dropped items moving within render distance. Natural kelp/cane is ignored: a plant farm needs observers or pistons with it. Farms also appear in the list with orange tracers.
+- **Blocks seen** panel (top-right): how many of each block type are in range (every block, e.g. `DIAMOND 23`, `CHEST 41`), coloured by group, biggest first. Panel button: *Blocks seen panel*.
 - **Player warning** banner when another player is in line of sight.
 - **Sneaky player outlines**: box outline through walls round **crouching** players (yellow) and **invisible** players (magenta). Panel button: *Outline sneaky players*.
 - **M.E.G.A X-ray** (panel button): every other block turns invisible; ores, valuable blocks, spawners, shulkers and storage stay solid with their real textures (like quartz and ores). Hidden blocks next to caves/air within 12 blocks keep an **outline in their own colour** (stone grey, dirt brown, deepslate dark grey…) so you can see the terrain shape (panel: *X-ray outlines*). Optional coloured edges round X-ray blocks: `xrayEdges` (off). Client-side night vision keeps them bright. Toggling rebuilds chunks (brief stutter). Header shows `X-RAY`. Block hiding doesn't work with Sodium (edges still do). Water/lava still show.
@@ -40,6 +41,8 @@ Client-side info HUD + tracers. **Info only — no automation, no combat aids, n
 | hudEnabled | true | |
 | hudX / hudY | 8 / 8 | HUD position |
 | maxLines | 8 | rows per list (1–30) |
+| blockCountPanel | true | Blocks seen corner panel |
+| blockCountLines | 15 | rows in that panel (1–40) |
 | playerWarning / playerList | true / true | |
 | showInvisiblePlayers | false | |
 | outlineSneaky | true | outline crouching / invisible players |

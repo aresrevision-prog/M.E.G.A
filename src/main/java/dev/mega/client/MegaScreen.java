@@ -51,6 +51,7 @@ final class MegaScreen extends Screen {
             {"Outline sneaky players", (Supplier<Boolean>) () -> c.outlineSneaky, (Consumer<Boolean>) v -> c.outlineSneaky = v},
             {"M.E.G.A X-ray", (Supplier<Boolean>) () -> c.xray, (Consumer<Boolean>) v -> { c.xray = v; MegaClient.applyConfig(); }},
             {"X-ray outlines", (Supplier<Boolean>) () -> c.xrayGhost, (Consumer<Boolean>) v -> c.xrayGhost = v},
+            {"Blocks seen panel", (Supplier<Boolean>) () -> c.blockCountPanel, (Consumer<Boolean>) v -> c.blockCountPanel = v},
         };
         for (int i = 0; i < toggles.length; i++) {
             @SuppressWarnings("unchecked") Supplier<Boolean> get = (Supplier<Boolean>) toggles[i][1];
