@@ -12,6 +12,11 @@ Client-side ESP, tracers, X-ray, farm alerts and block counter for the server.
 
 [Full video (32 s, MP4)](docs/video/scenario-flight.mp4)
 
+## Real footage: finding a stash 100 blocks down, digging to it, placing a banner
+![Dig preview](docs/video/dig-preview.gif)
+
+[Full video (15 s, MP4)](docs/video/dig-to-stash.mp4)
+
 ## Real in-game screenshots (Minecraft 1.21.11)
 Taken automatically on every build by the in-game test, which launches the real 1.21.11 client with the mod, builds a test world and checks that everything works. A release is only published if it passes.
 
