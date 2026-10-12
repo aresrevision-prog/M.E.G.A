@@ -70,6 +70,7 @@ public final class MegaClient implements ClientModInitializer {
 
     private static KeyBinding reloadKey;
     private static KeyBinding settingsKey;
+    private static KeyBinding waypointKey;
     private static int tickCounter;
 
     @Override
@@ -83,6 +84,7 @@ public final class MegaClient implements ClientModInitializer {
         // Names are plain text because without Fabric API the game doesn't load mod language files.
         settingsKey = new KeyBinding("M.E.G.A settings panel", GLFW.GLFW_KEY_0, KeyBinding.Category.MISC);
         reloadKey = new KeyBinding("M.E.G.A refresh", GLFW.GLFW_KEY_R, KeyBinding.Category.MISC);
+        waypointKey = new KeyBinding("M.E.G.A add waypoint here", GLFW.GLFW_KEY_B, KeyBinding.Category.MISC);
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc != null && mc.options != null) mc.options.allKeys = addKeys(mc.options.allKeys); // options already made
 
@@ -93,9 +95,10 @@ public final class MegaClient implements ClientModInitializer {
     public static KeyBinding[] addKeys(KeyBinding[] keys) {
         if (settingsKey == null) return keys;
         for (KeyBinding k : keys) if (k == settingsKey) return keys;
-        KeyBinding[] out = java.util.Arrays.copyOf(keys, keys.length + 2);
+        KeyBinding[] out = java.util.Arrays.copyOf(keys, keys.length + 3);
         out[keys.length] = settingsKey;
         out[keys.length + 1] = reloadKey;
+        out[keys.length + 2] = waypointKey;
         return out;
     }
 
@@ -104,6 +107,13 @@ public final class MegaClient implements ClientModInitializer {
             if (client.currentScreen == null) client.setScreen(new MegaScreen(null));
         }
         while (reloadKey.wasPressed()) refresh(client);
+        while (waypointKey.wasPressed()) {
+            if (client.player != null && client.world != null) {
+                MegaWaypoints.Waypoint w = MegaWaypoints.addHere(client, null);
+                message(client, "Added " + w.name + " at " + w.x + ", " + w.y + ", " + w.z + " (press 0 > Waypoints to rename)", Formatting.GREEN);
+            }
+        }
+        MegaWaypoints.tick(client);
 
         MegaXray.tick(client);
         MegaXray.scanGhosts(client);
@@ -193,7 +203,7 @@ public final class MegaClient implements ClientModInitializer {
         }
     }
 
-    private static void message(MinecraftClient client, String msg, Formatting color) {
+    static void message(MinecraftClient client, String msg, Formatting color) {
         if (client.player != null) {
             client.player.sendMessage(Text.literal("[M.E.G.A] ").formatted(Formatting.GOLD)
                 .append(Text.literal(msg).formatted(color)), true);

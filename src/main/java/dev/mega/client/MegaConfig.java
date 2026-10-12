@@ -45,6 +45,10 @@ public final class MegaConfig {
     public java.util.List<String> ignoredPlayers = new java.util.ArrayList<>(java.util.List.of("IzzosBro2013"));
     public int playerRange = 1250;
 
+    // Waypoints (B adds one where you stand) and your last deaths
+    public boolean waypoints = true;
+    public int deathsKept = 3;
+
     // Block targets
     public boolean spawners = true;
     public boolean shulkers = true;
@@ -213,6 +217,7 @@ public final class MegaConfig {
         if (spawnerBlocks == null) spawnerBlocks = new java.util.ArrayList<>(DEFAULT_SPAWNERS);
         if (shulkerBlocks == null) shulkerBlocks = new java.util.ArrayList<>(DEFAULT_SHULKERS);
         if (storageBlocks == null) storageBlocks = new java.util.ArrayList<>(DEFAULT_STORAGE);
+        deathsKept = Math.clamp(deathsKept, 1, 20);
         if (farmPlants == null) farmPlants = new java.util.ArrayList<>(DEFAULT_FARM_PLANTS);
     }
 }

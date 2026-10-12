@@ -22,7 +22,7 @@ import java.util.function.Supplier;
  */
 final class MegaScreen extends Screen {
     static final int BTN_H = 20, GAP = 3;
-    private static final String[] TABS = {"Colours & blocks", "Display", "Players"};
+    private static final String[] TABS = {"Colours", "Display", "Players", "Waypoints"};
     /** Remembered while the game runs, so the panel reopens on the tab you used last. */
     static int tab = 0;
     private final Screen parent;
@@ -45,7 +45,7 @@ final class MegaScreen extends Screen {
         int colW = (w - GAP) / 2;
 
         // Tabs
-        int tabW = (w - 2 * GAP) / 3;
+        int tabW = (w - (TABS.length - 1) * GAP) / TABS.length;
         for (int i = 0; i < TABS.length; i++) {
             final int t = i;
             ButtonWidget b = ButtonWidget.builder(Text.literal(i == tab ? "§e" + TABS[i] : TABS[i]), btn -> {
@@ -91,6 +91,11 @@ final class MegaScreen extends Screen {
             addDrawableChild(new IntSlider(x0, y, colW, "Block range", 8, 1250, () -> c.maxDistance, v -> c.maxDistance = v));
             addDrawableChild(new IntSlider(x0 + colW + GAP, y, colW, "Ore range", 8, 1250, () -> c.oreRange, v -> c.oreRange = v));
             y += BTN_H + GAP;
+        } else if (tab == 3) {
+            waypointsTab(c, x0, w);
+            box = new int[]{x0 - 6, 1, x0 + w + 6, height - 1};
+            contentEnd = height;
+            return;
         } else {
             List<Object[]> toggles = List.of(
                 t("Player warning", () -> c.playerWarning, v -> c.playerWarning = v),
@@ -115,6 +120,105 @@ final class MegaScreen extends Screen {
         addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close())
             .dimensions(x0, doneY, w, BTN_H).build());
         box = new int[]{x0 - 6, 1, x0 + w + 6, doneY + BTN_H + 5};
+    }
+
+    // ---- Waypoints tab ----
+    private static int wpPage, selected = -1;
+    private TextFieldWidget nameField;
+    private String wpStatus = "";
+
+    /** Rows: [● name 123m] (click to select) [X]. Bottom: name box, Add here, Rename, Show/Hide; < Done >. */
+    private void waypointsTab(MegaConfig c, int x0, int w) {
+        nameField = null;
+        if (client.player == null || client.world == null) {
+            addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close()).dimensions(x0, height - BTN_H - 4, w, BTN_H).build());
+            wpStatus = "Join a world or server to use waypoints";
+            return;
+        }
+        List<MegaWaypoints.Waypoint> list = MegaWaypoints.list(client);
+        if (selected >= list.size()) selected = -1;
+        int navY = height - BTN_H - 4, fieldY = navY - BTN_H - 14, top = 48;
+        int rows = Math.max(1, (fieldY - GAP - top) / (BTN_H + GAP));
+        int pages = Math.max(1, (list.size() + rows - 1) / rows);
+        wpPage = Math.clamp(wpPage, 0, pages - 1);
+        String dim = MegaWaypoints.dim(client);
+        double px = client.player.getX(), py = client.player.getY(), pz = client.player.getZ();
+        int xW = 20, mainW = w - xW - GAP;
+
+        for (int i = wpPage * rows, n = 0; i < list.size() && n < rows; i++, n++) {
+            MegaWaypoints.Waypoint wp = list.get(i);
+            final int idx = i;
+            int y = top + n * (BTN_H + GAP);
+            String where = dim.equals(wp.dim) ? Math.round(wp.distanceTo(px, py, pz)) + "m"
+                : wp.dim.replace("minecraft:", "").replace("the_", "");
+            String label = (idx == selected ? "§e» " : "") + (wp.death ? "☠ " : "") + wp.name + "  §7" + where + "  " + wp.x + ", " + wp.y + ", " + wp.z;
+            MutableText text = Text.literal("● ").withColor(MegaClient.readable(wp.color) & 0xFFFFFF)
+                .append(Text.literal(wp.visible ? label : "§8" + label.replaceAll("§.", "") + " (hidden)"));
+            addDrawableChild(ButtonWidget.builder(text, b -> {
+                selected = idx == selected ? -1 : idx;
+                wpStatus = "";
+                clearAndInit();
+            }).dimensions(x0, y, mainW, BTN_H).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("§cX"), b -> {
+                list.remove(wp);
+                MegaWaypoints.save();
+                selected = -1;
+                wpStatus = "Deleted " + wp.name;
+                clearAndInit();
+            }).dimensions(x0 + w - xW, y, xW, BTN_H).build());
+        }
+
+        // Name box + Add here / Rename / Show-Hide
+        int bW = 58;
+        MegaWaypoints.Waypoint sel = selected >= 0 ? list.get(selected) : null;
+        nameField = new TextFieldWidget(textRenderer, x0, fieldY, w - 3 * (bW + GAP), BTN_H, Text.literal("Name"));
+        nameField.setMaxLength(40);
+        if (sel != null) nameField.setText(sel.name);
+        nameField.setPlaceholder(Text.literal(sel != null ? "New name" : "Name (optional)"));
+        addDrawableChild(nameField);
+        int bx = x0 + w - 3 * bW - 2 * GAP;
+        addDrawableChild(ButtonWidget.builder(Text.literal("§aAdd here"), b -> {
+            MegaWaypoints.Waypoint nw = MegaWaypoints.addHere(client, sel != null ? null : nameField.getText());
+            wpStatus = "Added " + nw.name;
+            selected = list.indexOf(nw);
+            wpPage = Integer.MAX_VALUE;
+            clearAndInit();
+        }).dimensions(bx, fieldY, bW, BTN_H).build());
+        ButtonWidget rename = ButtonWidget.builder(Text.literal("Rename"), b -> {
+            if (sel == null || nameField.getText().isBlank()) return;
+            sel.name = nameField.getText().trim();
+            MegaWaypoints.save();
+            wpStatus = "Renamed";
+            clearAndInit();
+        }).dimensions(bx + bW + GAP, fieldY, bW, BTN_H).build();
+        rename.active = sel != null;
+        addDrawableChild(rename);
+        ButtonWidget hide = ButtonWidget.builder(Text.literal(sel != null && !sel.visible ? "Show" : "Hide"), b -> {
+            if (sel == null) return;
+            sel.visible = !sel.visible;
+            MegaWaypoints.save();
+            clearAndInit();
+        }).dimensions(bx + 2 * (bW + GAP), fieldY, bW, BTN_H).build();
+        hide.active = sel != null;
+        addDrawableChild(hide);
+
+        // < [Waypoints ON] [Done] >
+        int arrowW = 30, midW = (w - 2 * arrowW - 3 * GAP) / 2;
+        ButtonWidget prev = ButtonWidget.builder(Text.literal("<"), b -> { wpPage--; clearAndInit(); })
+            .dimensions(x0, navY, arrowW, BTN_H).build();
+        prev.active = wpPage > 0;
+        addDrawableChild(prev);
+        addDrawableChild(ButtonWidget.builder(onOff("Show waypoints", c.waypoints), b -> {
+            c.waypoints = !c.waypoints;
+            b.setMessage(onOff("Show waypoints", c.waypoints));
+        }).dimensions(x0 + arrowW + GAP, navY, midW, BTN_H).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close())
+            .dimensions(x0 + arrowW + 2 * GAP + midW, navY, midW, BTN_H).build());
+        ButtonWidget next = ButtonWidget.builder(Text.literal(">"), b -> { wpPage++; clearAndInit(); })
+            .dimensions(x0 + w - arrowW, navY, arrowW, BTN_H).build();
+        next.active = wpPage < pages - 1;
+        addDrawableChild(next);
+        if (list.isEmpty()) wpStatus = wpStatus.isEmpty() ? "No waypoints yet: press B in game, or Add here" : wpStatus;
     }
 
     /** Blurred game behind, then one dark panel holding everything. */
@@ -166,6 +270,12 @@ final class MegaScreen extends Screen {
         if (ignoredField != null) {
             ctx.drawTextWithShadow(textRenderer, "Ignored players (never detected):",
                 ignoredField.getX(), ignoredField.getY() - 11, 0xFFAAAAAA);
+        }
+        if (tab == 3) {
+            String hint = !wpStatus.isEmpty() ? wpStatus : "Click a waypoint to select it  ·  B adds one where you stand";
+            int hy = nameField != null ? nameField.getY() + BTN_H + 3 : height / 2;
+            ctx.drawCenteredTextWithShadow(textRenderer, textRenderer.trimToWidth(hint, box[2] - box[0] - 8), width / 2, hy, 0xFF9A9A9A);
+            return;
         }
         // Footer hint, just above Done
         int hy = box[3] - BTN_H - 17;

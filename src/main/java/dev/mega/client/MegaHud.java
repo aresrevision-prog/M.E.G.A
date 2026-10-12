@@ -122,10 +122,7 @@ public final class MegaHud {
         }
         y = header(ctx, tr, head.toString(), x, y);
 
-        if (targets.isEmpty()) {
-            line(ctx, tr, "No targets within " + cfg.maxDistance + "m", x, y, GRAY);
-            return;
-        }
+        if (targets.isEmpty()) y = line(ctx, tr, "No targets within " + cfg.maxDistance + "m", x, y, GRAY);
         int shown = 0;
         for (Target t : targets) {
             if (shown++ >= cfg.maxLines) break;
@@ -136,6 +133,20 @@ public final class MegaHud {
             String line = String.format("%s %s  %dm  %d, %d, %d", arrow(px, pz, yaw, tx, tz),
                 t.label(), Math.round(dist), t.pos().getX(), t.pos().getY(), t.pos().getZ());
             y = line(ctx, tr, line, x, y, MegaClient.readable(t.category().color));
+        }
+
+        // Waypoints and deaths in this dimension, nearest first
+        List<MegaWaypoints.Waypoint> wps = new java.util.ArrayList<>(MegaWaypoints.here(client));
+        if (!wps.isEmpty()) {
+            double py = client.player.getY();
+            wps.sort(java.util.Comparator.comparingDouble(w -> w.distanceTo(px, py, pz)));
+            y = header(ctx, tr, "Waypoints", x, y + 4);
+            for (int i = 0; i < Math.min(5, wps.size()); i++) {
+                MegaWaypoints.Waypoint w = wps.get(i);
+                String line = String.format("%s %s%s  %dm  %d, %d, %d", arrow(px, pz, yaw, w.x + 0.5, w.z + 0.5),
+                    w.death ? "☠ " : "", w.name, Math.round(w.distanceTo(px, py, pz)), w.x, w.y, w.z);
+                y = line(ctx, tr, line, x, y, MegaClient.readable(w.color));
+            }
         }
     }
 

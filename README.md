@@ -43,8 +43,9 @@ Taken automatically on every build by the in-game test, which launches the real 
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.24.0`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.25.0`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
+6. Teleporting is allowed (M.E.G.A itself has no teleport: it can't be done client-side without cheating).
 
 ## Install (Windows, automatic)
 1. Download **[Install-MEGA.bat](https://github.com/aresrevision-prog/M.E.G.A/releases/latest/download/Install-MEGA.bat)** and double-click it. If Windows shows "Windows protected your PC", click **More info → Run anyway**.
@@ -93,8 +94,14 @@ Outlines show within 12 blocks of you, only where a block touches air. Small sha
 
 **Lava and water** (panel button: *X-ray lava & water*): within 12 blocks, lava hidden inside rock shows as **see-through orange** with orange edges, so you can see the whole pool. Water keeps its normal texture, with blue edges.
 
+## Waypoints and deaths
+- Press **B** to drop a waypoint where you stand. Your last 3 deaths are saved automatically (☠, red).
+- Each one shows as a tall beam and a box in the world, and in a **Waypoints** list on the HUD (nearest 5, with arrow and distance). With lines on, a line points to it too.
+- Panel (press 0) → **Waypoints** tab: click one to select it, then Rename / Hide / X to delete; Add here; Show waypoints on/off.
+- Saved per server and per world in `config/mega_waypoints.json`.
+
 ## Settings panel (press 0)
-Three tabs:
+Four tabs (Colours, Display, Players, Waypoints):
 - **Colours & blocks**: each colour has an ON/OFF button and **Edit blocks**. The edit page lists that colour's blocks: click one to turn it on/off, **X** removes it, type a block name (e.g. `obsidian`) and press **Add** to add any block. Matches show as you type. Adding a block that's in another colour moves it. **Reset** puts the default blocks back. The Farms page edits the plants that count as a farm.
 - **Display**: HUD, Blocks seen panel, tracer lines, boxes, X-ray options, max lines, list rows, ranges.
 - **Players**: warning, list, lines, invisible players, sneaky outlines, range, ignored players.

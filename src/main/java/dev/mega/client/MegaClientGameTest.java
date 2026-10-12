@@ -162,6 +162,29 @@ public class MegaClientGameTest implements FabricClientGameTest {
             ctx.waitTicks(20);
             ctx.takeScreenshot("07-100-below-xray");
             ctx.runOnClient(c -> { MegaClient.config.xray = false; MegaClient.applyConfig(); });
+            // Waypoints: add one, then die and check the death is saved
+            ctx.runOnClient(c -> MegaWaypoints.addHere(c, "Test base"));
+            srv.runCommand("gamemode survival @a");
+            ctx.waitTicks(5);
+            srv.runCommand("kill @a");
+            ctx.waitTicks(20);
+            long deaths = ctx.computeOnClient(c -> MegaWaypoints.list(c).stream().filter(w -> w.death).count());
+            boolean base = ctx.computeOnClient(c -> MegaWaypoints.list(c).stream().anyMatch(w -> w.name.equals("Test base")));
+            MegaClient.LOGGER.info("[M.E.G.A test] waypoint saved={} deaths saved={}", base, deaths);
+            check(base, "waypoint was not saved");
+            check(deaths >= 1, "death point was not saved");
+            ctx.runOnClient(c -> { c.player.requestRespawn(); c.setScreen(null); });
+            ctx.waitTicks(20);
+            srv.runCommand("gamemode spectator @a");
+            srv.runCommand("tp @a 0 -60 -3 0 15");
+            ctx.runOnClient(c -> MegaScreen.tab = 3);
+            ctx.setScreen(() -> new MegaScreen(null));
+            ctx.waitTicks(5);
+            ctx.takeScreenshot("08-waypoints-panel");
+            ctx.setScreen(() -> null);
+            ctx.waitTicks(20);
+            ctx.takeScreenshot("09-waypoints-hud");
+            ctx.runOnClient(c -> MegaScreen.tab = 0);
             MegaClient.LOGGER.info("[M.E.G.A test] ALL CHECKS PASSED");
         }
     }

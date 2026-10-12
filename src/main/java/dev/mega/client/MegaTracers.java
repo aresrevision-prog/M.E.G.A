@@ -51,7 +51,7 @@ public final class MegaTracers {
     static void render(MatrixStack matrices, VertexConsumerProvider consumers, Vec3d cam) {
         MegaConfig cfg = MegaClient.config;
         MinecraftClient client = MinecraftClient.getInstance();
-        if (cfg == null || !cfg.hudEnabled || (!cfg.tracers && !cfg.boxes && !cfg.tracePlayers && !cfg.outlineSneaky && !cfg.xray)) return;
+        if (cfg == null || !cfg.hudEnabled || (!cfg.tracers && !cfg.boxes && !cfg.tracePlayers && !cfg.outlineSneaky && !cfg.xray && !cfg.waypoints)) return;
         if (client.player == null || client.world == null) return;
 
         Vector3fc fwd = client.gameRenderer.getCamera().getHorizontalPlane(); // look direction
@@ -61,6 +61,14 @@ public final class MegaTracers {
         VertexConsumer buf = consumers.getBuffer(LAYER);
         MatrixStack.Entry entry = matrices.peek();
         float width = (float) cfg.lineWidth;
+
+        // Waypoints and deaths: a tall beam you can see from far away, a box on the block, and a line if lines are on
+        for (MegaWaypoints.Waypoint w : MegaWaypoints.here(client)) {
+            float wx = (float) (w.x + 0.5 - cam.x), wy = (float) (w.y - cam.y), wz = (float) (w.z + 0.5 - cam.z);
+            line(buf, entry, wx, wy, wz, wx, wy + 300, wz, w.color, width + 1);
+            VertexRendering.drawOutline(matrices, buf, VoxelShapes.fullCube(), w.x - cam.x, w.y - cam.y, w.z - cam.z, w.color, width);
+            if (cfg.tracers) line(buf, entry, sx, sy, sz, wx, wy + 0.5f, wz, w.color, width);
+        }
 
         List<Target> targets = MegaClient.targets;
         int n = Math.min(cfg.maxTracers, targets.size());
