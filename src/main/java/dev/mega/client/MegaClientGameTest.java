@@ -105,6 +105,7 @@ public class MegaClientGameTest implements FabricClientGameTest {
             srv.runCommand("setblock 31 -62 30 minecraft:chest");
             srv.runCommand("setblock 29 -62 30 minecraft:diamond_block");
             srv.runCommand("setblock 30 -62 31 minecraft:lime_shulker_box");
+            srv.runCommand("gamemode spectator @a"); // hover in place (no falling)
             srv.runCommand("tp @a 30.5 51 27.5 0 82");
             sp.getClientWorld().waitForChunksRender();
             ctx.waitTicks(80);
