@@ -6,7 +6,7 @@ Client-side info HUD + tracers. **Info only — no automation, no combat aids, n
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. This mod shows its version on the HUD (`M.E.G.A v0.18.0`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. This mod shows its version on the HUD (`M.E.G.A v0.18.1`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 
 ## Features & colours
@@ -24,7 +24,7 @@ Client-side info HUD + tracers. **Info only — no automation, no combat aids, n
 - **Blocks seen** panel (top-right): how many of each block type are in range (every block, e.g. `DIAMOND 23`, `CHEST 41`), coloured by group, biggest first. Panel button: *Blocks seen panel*.
 - **Player warning** banner when another player is in line of sight.
 - **Sneaky player outlines**: box outline through walls round **crouching** players (yellow) and **invisible** players (magenta). Panel button: *Outline sneaky players*.
-- **M.E.G.A X-ray** (panel button): every other block turns invisible; ores, valuable blocks, spawners, shulkers and storage stay solid with their real textures (like quartz and ores). Hidden blocks next to caves/air within 12 blocks keep an **outline in their own colour** (stone grey, dirt brown, deepslate dark grey…) so you can see the terrain shape (panel: *X-ray outlines*). Optional coloured edges round X-ray blocks: `xrayEdges` (off). Client-side night vision keeps them bright. Toggling rebuilds chunks (brief stutter). Header shows `X-RAY`. Block hiding doesn't work with Sodium (edges still do). Water/lava still show.
+- **M.E.G.A X-ray** (panel button): every other block turns invisible; ores, valuable blocks, spawners, shulkers and storage stay solid with their real textures (like quartz and ores). Hidden blocks next to caves/air within 12 blocks keep an **outline in their own colour** (stone grey, dirt brown, deepslate dark grey…; leaves, glass, ice and slime too) so you can see the terrain shape (panel: *X-ray outlines*). Optional coloured edges round X-ray blocks: `xrayEdges` (off). Client-side night vision keeps them bright. Toggling rebuilds chunks (brief stutter). Header shows `X-RAY`. Block hiding doesn't work with Sodium (edges still do). Water/lava still show.
 - **Player list**: name, distance, direction arrow. Bright yellow = visible, dim yellow = behind cover. No player coordinates.
 - **Block radar** for loaded chunks, nearest first, with arrow, distance, coords and block name (e.g. `RED_SHULKER_BOX`). Double chests count once.
 - **Ore / expensive-block finder** within `oreRange` (one entry per vein; sections without them are skipped, so it's cheap).

@@ -83,7 +83,9 @@ public final class MegaXray {
         for (int dy = -r; dy <= r; dy++) for (int dx = -r; dx <= r; dx++) for (int dz = -r; dz <= r; dz++) {
             m.set(c.getX() + dx, c.getY() + dy, c.getZ() + dz);
             BlockState st = world.getBlockState(m);
-            if (st.isAir() || !st.isOpaqueFullCube() || isVisible(st)) continue;
+            if (st.isAir() || isVisible(st)) continue;
+            // solid cubes, plus see-through full blocks (leaves, glass, stained/tinted glass, ice, slime)
+            if (!st.isOpaqueFullCube() && !st.isFullCube(world, m)) continue;
             boolean exposed = false;
             for (Direction d : DIRS) {
                 nb.set(m.getX() + d.getOffsetX(), m.getY() + d.getOffsetY(), m.getZ() + d.getOffsetZ());
@@ -91,7 +93,8 @@ public final class MegaXray {
             }
             if (!exposed) continue;
             pos[n] = m.asLong();
-            col[n] = 0xFF000000 | st.getMapColor(world, m).color;
+            int rgb = st.getMapColor(world, m).color;
+            col[n] = 0xFF000000 | (rgb == 0 ? 0xDDEEFF : rgb); // glass has no map colour: pale glass-blue
             if (++n >= max) break outer;
         }
         ghostPos = pos;
