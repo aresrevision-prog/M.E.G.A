@@ -16,7 +16,9 @@ import java.util.function.IntSupplier;
 
 /** In-game settings panel (default key: 0). Saves on close. */
 final class MegaScreen extends Screen {
-    private static final int BTN_W = 150, BTN_H = 20, GAP = 3;
+    private static final int BTN_H = 20, GAP = 3;
+    /** Button width: 150, or narrower so three columns always fit the window. */
+    private static int BTN_W = 150;
     private final Screen parent;
     private TextFieldWidget ignoredField;
 
@@ -29,9 +31,10 @@ final class MegaScreen extends Screen {
     protected void init() {
         MegaConfig c = MegaClient.config;
         // 3 columns so everything fits even at GUI scale 4
+        BTN_W = Math.max(90, Math.min(150, (width - 12 - 2 * GAP) / 3));
         int totalW = 3 * BTN_W + 2 * GAP;
         int[] col = {width / 2 - totalW / 2, width / 2 - totalW / 2 + BTN_W + GAP, width / 2 - totalW / 2 + 2 * (BTN_W + GAP)};
-        int y = 26;
+        int y = 22;
 
         // Toggles
         Object[][] toggles = {
@@ -65,13 +68,13 @@ final class MegaScreen extends Screen {
                 b.setMessage(toggleText(name, get.get()));
             }).dimensions(bx, by, BTN_W, BTN_H).build());
         }
-        y += ((toggles.length + 2) / 3) * (BTN_H + GAP) + 4;
+        y += ((toggles.length + 2) / 3) * (BTN_H + GAP) + 2;
 
         // Sliders
         addDrawableChild(new IntSlider(col[0], y, "Block range", 8, 1250, () -> c.maxDistance, v -> c.maxDistance = v));
         addDrawableChild(new IntSlider(col[1], y, "Ore range", 8, 1250, () -> c.oreRange, v -> c.oreRange = v));
         addDrawableChild(new IntSlider(col[2], y, "Player range", 8, 1250, () -> c.playerRange, v -> c.playerRange = v));
-        y += BTN_H + GAP + 12;
+        y += BTN_H + GAP + 10;
         addDrawableChild(new IntSlider(col[0], y, "Max tracers", 0, 50, () -> c.maxTracers, v -> c.maxTracers = v));
 
         // Ignored players (comma separated), next to Max tracers
@@ -80,7 +83,7 @@ final class MegaScreen extends Screen {
         ignoredField.setText(String.join(", ", c.ignoredPlayers));
         ignoredField.setPlaceholder(Text.literal("Ignored players, comma separated"));
         addDrawableChild(ignoredField);
-        y += BTN_H + GAP + 6;
+        y += BTN_H + GAP + 1;
 
         int half = (totalW - GAP) / 2;
         addDrawableChild(ButtonWidget.builder(Text.literal("§eWhat to detect..."), b -> {
@@ -98,7 +101,7 @@ final class MegaScreen extends Screen {
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.render(ctx, mouseX, mouseY, delta);
-        ctx.drawCenteredTextWithShadow(textRenderer, title, width / 2, 12, 0xFFFFD400);
+        ctx.drawCenteredTextWithShadow(textRenderer, title, width / 2, 8, 0xFFFFD400);
         if (ignoredField != null) {
             ctx.drawTextWithShadow(textRenderer, "Ignored players (never detected):",
                 ignoredField.getX(), ignoredField.getY() - 11, 0xFFAAAAAA);

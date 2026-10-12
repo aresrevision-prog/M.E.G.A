@@ -11,7 +11,8 @@ import java.util.List;
 
 /** "What to detect" page: one clickable on/off button per target type, coloured by category. */
 final class MegaTargetsScreen extends Screen {
-    private static final int COLS = 3, BTN_W = 150, BTN_H = 20, GAP = 2;
+    private static final int COLS = 3, BTN_H = 20, GAP = 2;
+    private int BTN_W = 150;
     private final Screen parent;
     private final List<Runnable> refreshers = new ArrayList<>();
 
@@ -25,9 +26,10 @@ final class MegaTargetsScreen extends Screen {
         refreshers.clear();
         List<String> off = MegaClient.config.disabledTargets;
         List<Object[]> options = MegaClient.targetOptions();
+        BTN_W = Math.max(90, Math.min(150, (width - 12 - (COLS - 1) * GAP) / COLS));
         int totalW = COLS * BTN_W + (COLS - 1) * GAP;
         int x0 = width / 2 - totalW / 2;
-        int y0 = 26;
+        int y0 = 22;
 
         for (int i = 0; i < options.size(); i++) {
             String key = (String) options.get(i)[0];
@@ -68,7 +70,7 @@ final class MegaTargetsScreen extends Screen {
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.render(ctx, mouseX, mouseY, delta);
-        ctx.drawCenteredTextWithShadow(textRenderer, title, width / 2, 12, 0xFFFFD400);
+        ctx.drawCenteredTextWithShadow(textRenderer, title, width / 2, 8, 0xFFFFD400);
     }
 
     @Override

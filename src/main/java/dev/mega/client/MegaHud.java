@@ -33,7 +33,8 @@ final class MegaHud {
         double pz = client.player.getZ();
         float yaw = client.player.getYaw();
 
-        // Farm alert banner, top centre
+        // Farm alert banner, top centre. Everything else in the top corners moves down below it.
+        int topPad = 0;
         MegaClient.Target farm = cfg.farmAlert ? MegaClient.nearestFarm() : null;
         if (cfg.farmAlert && (MegaClient.farmCount > 0 || farm != null)) {
             StringBuilder m = new StringBuilder("FARM DETECTED");
@@ -49,13 +50,17 @@ final class MegaHud {
                     .append(arrow(px, pz, yaw, MegaClient.farmX, MegaClient.farmZ));
             }
             String msg = m.toString();
+            int sw0 = ctx.getScaledWindowWidth();
+            if (tr.getWidth(msg) + 16 > sw0 - 8) msg = msg.replace("FARM DETECTED  ", "FARM  ").replace(" moving items ", " items ");
             int w = tr.getWidth(msg) + 16;
-            int bx = ctx.getScaledWindowWidth() / 2 - w / 2;
+            int bx = Math.max(2, sw0 / 2 - w / 2);
             int by = 4;
             ctx.fill(bx, by, bx + w, by + 18, 0xDD000000);
             ctx.fill(bx, by, bx + w, by + 2, 0xFFFF8800);
             ctx.fill(bx, by + 16, bx + w, by + 18, 0xFFFF8800);
             ctx.drawTextWithShadow(tr, msg, bx + 8, by + 5, 0xFFFF8800);
+            topPad = 24;
+            y += topPad;
         }
 
         // "Blocks seen" panel, top-right corner
@@ -69,7 +74,7 @@ final class MegaHud {
             int w = tr.getWidth(title);
             int n = Math.min(bc.size(), cfg.blockCountLines);
             for (int i = 0; i < n; i++) w = Math.max(w, tr.getWidth("■ " + bc.get(i).label() + "  " + bc.get(i).count()));
-            int rx = sw - w - 8, ry = 6;
+            int rx = sw - w - 8, ry = 6 + topPad;
             ctx.fill(rx - 4, ry - 2, sw - 4, ry + 11 + Math.max(n, 1) * 10 + 2, PANEL);
             ctx.drawTextWithShadow(tr, title, rx, ry, WHITE);
             ry += 11;
