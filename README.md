@@ -18,6 +18,8 @@ Taken automatically on every build by the in-game test, which launches the real 
 ![ESP](docs/images/real/esp.png)
 ![X-ray](docs/images/real/xray.png)
 ![Farm alert](docs/images/real/farm-alert.png)
+![Stash 113 blocks straight below](docs/images/real/100-below.png)
+![Same, X-ray on](docs/images/real/100-below-xray.png)
 ![Settings panel](docs/images/real/panel.png)
 ![What to detect](docs/images/real/what-to-detect.png)
 
