@@ -30,6 +30,7 @@ jobs:
           mkdir -p /tmp/out
           find . -path '*screenshots*' -name '*.png' -exec cp {} /tmp/out/ \; || true
           find . -path '*run*' -name 'latest.log' -exec cp {} /tmp/out/latest.log \; || true
+          cp build/libs/mega-client-*.jar /tmp/out/ 2>/dev/null || true; rm -f /tmp/out/*-sources.jar
           find . -path '*crash-reports*' -name '*.txt' -exec cp {} /tmp/out/ \; || true
           echo "commit ${{ github.sha }} - test outcome: ${{ steps.gametest.outcome }}" > /tmp/out/RESULT.txt
           cd /tmp/out && git init -q && git checkout -q -b test-results && git add -A
