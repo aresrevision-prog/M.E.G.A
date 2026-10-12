@@ -108,6 +108,7 @@ public class MegaClientGameTest implements FabricClientGameTest {
             srv.runCommand("gamemode spectator @a"); // hover in place (no falling)
             srv.runCommand("tp @a 30.5 51 27.5 0 82");
             sp.getClientWorld().waitForChunksRender();
+            ctx.runOnClient(c -> { c.player.setYaw(0); c.player.setPitch(80); }); // look straight down
             ctx.waitTicks(80);
             double deep = ctx.computeOnClient(c -> MegaClient.targets.stream()
                 .filter(t -> t.pos().getX() >= 29 && t.pos().getX() <= 31 && t.pos().getZ() >= 30 && t.pos().getZ() <= 31)
