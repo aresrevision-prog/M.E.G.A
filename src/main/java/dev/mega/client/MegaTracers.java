@@ -67,7 +67,7 @@ final class MegaTracers {
         }
 
         // X-ray ghost outlines: hidden blocks next to air, in their own colour
-        if (MegaXray.active() && cfg.xrayGhost) {
+        if (MegaXray.active() && (cfg.xrayGhost || cfg.xrayFluids)) {
             long[] gp = MegaXray.ghostPos;
             int[] gc = MegaXray.ghostColor;
             int gn = Math.min(MegaXray.ghostCount, Math.min(gp.length, gc.length));

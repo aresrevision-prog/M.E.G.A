@@ -37,6 +37,8 @@ public final class MegaConfig {
     public boolean xrayEdges = false;
     /** Hidden blocks next to caves/air keep an outline in their own colour, so you can see the terrain shape. */
     public boolean xrayGhost = true;
+    /** In X-ray, lava (orange) and water (blue) near you are outlined so you can see them through hidden blocks. */
+    public boolean xrayFluids = true;
     public int xrayGhostRange = 12;
     public int xrayGhostMax = 6000;
     /** Players the mod never detects (no line, not listed, no warning). Case-insensitive. */

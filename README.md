@@ -14,7 +14,7 @@ Client-side ESP, tracers, X-ray, farm alerts and block counter for the server.
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.18.1`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.19.0`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 
 ## Install
@@ -52,7 +52,9 @@ Client-side only: nothing is installed on the server, and other players don't ne
 ### X-ray: see-through blocks
 ![X-ray blocks](docs/images/xray-blocks.png)
 
-Outlines show within 12 blocks of you, only where a block touches air. Small shapes like torches, flowers, tall grass, rails and signs stay drawn. Water and lava stay visible.
+Outlines show within 12 blocks of you, only where a block touches air. Small shapes like torches, flowers, tall grass, rails and signs stay drawn.
+
+**Lava and water:** they still render normally, and in X-ray the edges of every lava pool (orange) and water body (blue) within 12 blocks are outlined, so you can see them through the hidden stone. Panel button: *X-ray lava & water*.
 
 ## Settings panel (press 0)
 ![Settings panel](docs/images/panel.png)
@@ -92,6 +94,7 @@ To change it, open `tools/spawner-editor.html`, paint a new one, and turn the co
 | ignoredItems | stone, cobblestone, cobbled deepslate, deepslate, gravel | never count for the moving-items alert |
 | xray | false | M.E.G.A X-ray |
 | xrayGhost / xrayGhostRange / xrayGhostMax | true / 12 / 6000 | outlines of hidden blocks |
+| xrayFluids | true | lava (orange) and water (blue) outlines in X-ray |
 | xrayEdges / xrayMax | false / 3000 | optional coloured edges round X-ray blocks |
 
 ## Build

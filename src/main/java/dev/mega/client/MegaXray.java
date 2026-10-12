@@ -5,6 +5,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -69,7 +71,7 @@ public final class MegaXray {
     /** Rescans ghost outlines every 10 ticks within config.xrayGhostRange (cube around you). */
     static void scanGhosts(MinecraftClient client) {
         MegaConfig cfg = MegaClient.config;
-        if (!active || !cfg.xrayGhost || client.world == null || client.player == null) { ghostCount = 0; return; }
+        if (!active || (!cfg.xrayGhost && !cfg.xrayFluids) || client.world == null || client.player == null) { ghostCount = 0; return; }
         if (++ghostTimer < 10) return;
         ghostTimer = 0;
         World world = client.world;
@@ -84,6 +86,24 @@ public final class MegaXray {
             m.set(c.getX() + dx, c.getY() + dy, c.getZ() + dz);
             BlockState st = world.getBlockState(m);
             if (st.isAir() || isVisible(st)) continue;
+            // Lava and water: outline every fluid block whose side touches something that isn't the same fluid
+            FluidState fs = st.getFluidState();
+            if (!fs.isEmpty()) {
+                if (!cfg.xrayFluids) continue;
+                boolean lava = fs.isIn(FluidTags.LAVA);
+                boolean edge = false;
+                for (Direction d : DIRS) {
+                    nb.set(m.getX() + d.getOffsetX(), m.getY() + d.getOffsetY(), m.getZ() + d.getOffsetZ());
+                    FluidState nf = world.getBlockState(nb).getFluidState();
+                    if (nf.isEmpty() || nf.isIn(FluidTags.LAVA) != lava) { edge = true; break; }
+                }
+                if (!edge) continue;
+                pos[n] = m.asLong();
+                col[n] = lava ? 0xFFFF5A00 : 0xFF3F76E4;
+                if (++n >= max) break outer;
+                continue;
+            }
+            if (!cfg.xrayGhost) continue;
             // solid cubes, plus see-through full blocks (leaves, glass, stained/tinted glass, ice, slime)
             if (!st.isOpaqueFullCube() && !st.isFullCube(world, m)) continue;
             boolean exposed = false;
