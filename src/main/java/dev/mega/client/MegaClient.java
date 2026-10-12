@@ -59,10 +59,13 @@ public final class MegaClient implements ClientModInitializer {
     private static Map<ItemEntity, double[]> lastItemPos = new java.util.IdentityHashMap<>();
     /** Plain blocks (no block entity) to find by scanning block states: ores and expensive blocks. */
     private static Map<Block, Category> scanBlocks = Map.of();
+    /** Blocks with a block entity (chests, spawners, shulkers...): found from the chunk's block-entity list (fast). */
+    private static Map<Block, Category> beBlocks = Map.of();
+    /** Farm plants -> label, e.g. KELP. */
+    private static Map<Block, String> farmPlants = Map.of();
     private static Set<String> ignored = Set.of();
     private static Set<net.minecraft.item.Item> ignoredItems = Set.of();
     private static Set<String> disabled = Set.of();
-    private static final Map<BlockEntityType<?>, String> BE_KEYS = new java.util.HashMap<>();
     private static final Map<Block, String> LABELS = new java.util.HashMap<>();
 
     private static KeyBinding reloadKey;
@@ -151,12 +154,25 @@ public final class MegaClient implements ClientModInitializer {
         Set<String> ig = new HashSet<>();
         for (String n : config.ignoredPlayers) if (n != null) ig.add(n.trim().toLowerCase(Locale.ROOT));
         ignored = ig;
-        Map<Block, Category> map = new java.util.LinkedHashMap<>();
-        addBlocks(map, config.oreBlocks, Category.ORE);
-        addBlocks(map, config.valuableBlocks, Category.VALUABLE);
-        addBlocks(map, config.workstationBlocks, Category.WORKSTATION);
-        scanBlocks = map;
-        MegaXray.apply(MinecraftClient.getInstance(), map.keySet());
+        // Every colour's block list. A block in two lists goes to the later one.
+        Map<Block, Category> all = new java.util.LinkedHashMap<>();
+        for (Category c : Category.values()) if (c != Category.FARM) addBlocks(all, c.blocks(config), c);
+        Map<Block, Category> be = new java.util.HashMap<>(), plain = new java.util.LinkedHashMap<>();
+        all.forEach((b, c) -> {
+            if (disabled.contains(Registries.BLOCK.getId(b).toString())) return; // switched off on its own
+            (b instanceof net.minecraft.block.BlockEntityProvider ? be : plain).put(b, c);
+        });
+        beBlocks = be;
+        scanBlocks = plain;
+        Map<Block, String> plants = new java.util.HashMap<>();
+        Map<Block, Category> tmp = new java.util.HashMap<>();
+        addBlocks(tmp, config.farmPlants, Category.FARM);
+        for (Block b : tmp.keySet()) {
+            String id = Registries.BLOCK.getId(b).toString();
+            if (!disabled.contains(id)) plants.put(b, Registries.BLOCK.getId(b).getPath().replace("_plant", "").toUpperCase(Locale.ROOT));
+        }
+        farmPlants = plants;
+        MegaXray.apply(MinecraftClient.getInstance(), all.keySet());
     }
 
     private static void addBlocks(Map<Block, Category> map, List<String> ids, Category cat) {
@@ -266,7 +282,7 @@ public final class MegaClient implements ClientModInitializer {
         int chunkRadius = client.options.getClampedViewDistance();
         j.oreChunkRadius = Math.min(chunkRadius, (int) Math.ceil(ore / 16.0));
         j.farmChunkRadius = Math.min(chunkRadius, (int) Math.ceil(farm / 16.0));
-        j.scanOres = (config.ores || config.valuables) && !scanBlocks.isEmpty();
+        j.scanOres = !scanBlocks.isEmpty();
         j.scanFarms = config.farmAlert && Category.FARM.enabled(config);
         j.center = client.player.getChunkPos();
         int r = Math.min(chunkRadius, (int) Math.ceil(max / 16.0) + 1);
@@ -290,9 +306,8 @@ public final class MegaClient implements ClientModInitializer {
             int dx = Math.abs(cp.x - j.center.x), dz = Math.abs(cp.z - j.center.z);
 
             for (BlockEntity be : chunk.getBlockEntities().values()) {
-                Category category = categoryFor(be);
+                Category category = beBlocks.get(be.getCachedState().getBlock());
                 if (category == null || !category.enabled(config)) continue;
-                if (disabled.contains(beKey(be.getType()))) continue;
                 if (isSecondChestHalf(be)) continue; // double chest = one entry
 
                 BlockPos pos = be.getPos();
@@ -315,7 +330,7 @@ public final class MegaClient implements ClientModInitializer {
             // (gold is everywhere in real worlds) don't take all the tracer lines away from a stash.
             j.found.sort(Comparator.comparingInt((Target t) -> config.oresLast && t.category() == Category.ORE ? 1 : 0)
                 .thenComparingDouble(Target::distance));
-            targets = j.found;
+            targets = everyColourFirst(j.found);
             j.xray.sort(Comparator.comparingDouble(Target::distance));
             xrayBlocks = j.xray.size() > config.xrayMax ? new ArrayList<>(j.xray.subList(0, config.xrayMax)) : j.xray;
             counts.clear();
@@ -351,7 +366,6 @@ public final class MegaClient implements ClientModInitializer {
                 Block block = section.getBlockState(x, y, z).getBlock();
                 Category cat = wanted.get(block);
                 if (cat == null) continue;
-                if (disabled.contains(cat == Category.VALUABLE ? VALUABLE_GROUP : cat == Category.WORKSTATION ? WORKSTATION_GROUP : blockKey(block))) continue;
                 int wx = baseX + x, wy = baseY + y, wz = baseZ + z;
                 double dx = wx + 0.5 - px, dy = wy + 0.5 - py, dz = wz + 0.5 - pz;
                 double sq = dx * dx + dy * dy + dz * dz;
@@ -378,9 +392,6 @@ public final class MegaClient implements ClientModInitializer {
     }
 
     private static final Set<Block> MACHINES = Set.of(Blocks.OBSERVER, Blocks.PISTON, Blocks.STICKY_PISTON);
-    private static final Map<Block, String> FARM_PLANTS = Map.of(
-        Blocks.KELP, "KELP", Blocks.KELP_PLANT, "KELP", Blocks.SUGAR_CANE, "SUGAR_CANE", Blocks.CACTUS, "CACTUS",
-        Blocks.BAMBOO, "BAMBOO", Blocks.PUMPKIN, "PUMPKIN", Blocks.MELON, "MELON");
 
     /**
      * Finds built farms per 16x16x16 section. Only sections containing observers/pistons are read in full (cheap).
@@ -404,7 +415,7 @@ public final class MegaClient implements ClientModInitializer {
             for (int y = 0; y < 16; y++) for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++) {
                 Block b = section.getBlockState(x, y, z).getBlock();
                 if (MACHINES.contains(b)) { machines++; mx += x; my += y; mz += z; continue; }
-                String plant = FARM_PLANTS.get(b);
+                String plant = farmPlants.get(b);
                 if (plant != null) plants.merge(plant, 1, Integer::sum);
             }
             if (machines == 0) continue;
@@ -443,53 +454,28 @@ public final class MegaClient implements ClientModInitializer {
         return null;
     }
 
-    /** Key used by the per-target on/off buttons, e.g. "chest", "hopper", "mob_spawner". */
-    private static String beKey(BlockEntityType<?> type) {
-        if (type == BlockEntityType.FURNACE || type == BlockEntityType.SMOKER || type == BlockEntityType.BLAST_FURNACE)
-            return WORKSTATION_GROUP;
-        return BE_KEYS.computeIfAbsent(type, t -> Registries.BLOCK_ENTITY_TYPE.getId(t).getPath());
+    /**
+     * The nearest target of every colour that's on goes first (nearest first), then the rest in the usual order.
+     * So the list and the lines always show every colour that was found, even when one colour (e.g. chests) is
+     * much closer or more common than the others.
+     */
+    static List<Target> everyColourFirst(List<Target> sorted) {
+        List<Target> first = new ArrayList<>(), rest = new ArrayList<>();
+        Set<Category> seen = java.util.EnumSet.noneOf(Category.class);
+        for (Target t : sorted) (seen.add(t.category()) ? first : rest).add(t);
+        first.sort(Comparator.comparingDouble(Target::distance));
+        first.addAll(rest);
+        return first;
     }
 
-    /** One on/off key for every block in the "Valuable blocks" group. */
-    static final String VALUABLE_GROUP = "valuable_blocks";
-    /** One on/off key for anvils, workbenches, furnaces and smokers. */
-    static final String WORKSTATION_GROUP = "workstations";
-
-    /** Key for scanned blocks; deepslate variants share the normal one, e.g. "diamond_ore". */
-    static String blockKey(Block block) {
-        return Registries.BLOCK.getId(block).getPath().replace("deepslate_", "");
-    }
-
-    /** Everything the panel lists as its own on/off button: {key, label, category}. */
-    static List<Object[]> targetOptions() {
-        List<Object[]> out = new ArrayList<>();
-        out.add(new Object[]{"mob_spawner", "Spawner", Category.SPAWNER});
-        out.add(new Object[]{"ender_chest", "Ender chest", Category.VALUABLE});
-        out.add(new Object[]{"enchanting_table", "Enchanting table", Category.VALUABLE});
-        out.add(new Object[]{"beacon", "Beacon", Category.VALUABLE});
-        out.add(new Object[]{VALUABLE_GROUP, "Valuable blocks", Category.VALUABLE});
-        out.add(new Object[]{WORKSTATION_GROUP, "Workstations", Category.WORKSTATION});
-        Set<String> seen = new HashSet<>();
-        out.add(new Object[]{"shulker_box", "Shulker box", Category.SHULKER});
-        out.add(new Object[]{"chest", "Chest", Category.STORAGE});
-        out.add(new Object[]{"barrel", "Barrel", Category.STORAGE});
-        out.add(new Object[]{"hopper", "Hopper", Category.STORAGE});
-        out.add(new Object[]{"crafter", "Crafter", Category.STORAGE});
-        out.add(new Object[]{"dispenser", "Dispenser", Category.STORAGE});
-        out.add(new Object[]{"dropper", "Dropper", Category.STORAGE});
-        out.add(new Object[]{"plant_farm", "Plant farms", Category.FARM});
-        out.add(new Object[]{"underground_farm", "Farms below y=0", Category.FARM});
-        for (Map.Entry<Block, Category> e : scanBlocks.entrySet()) {
-            if (e.getValue() != Category.ORE) continue;
-            String k = blockKey(e.getKey());
-            if (seen.add(k)) out.add(new Object[]{k, pretty(k), Category.ORE});
-        }
-        return out;
-    }
-
-    private static String pretty(String key) {
-        String s = key.replace('_', ' ');
-        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    /** Text colour that stays readable on the dark HUD panel (dark colours like dark green are lightened). */
+    static int readable(int argb) {
+        int r = (argb >> 16) & 255, g = (argb >> 8) & 255, b = argb & 255;
+        double lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255.0;
+        if (lum >= 0.5) return argb | 0xFF000000;
+        double k = (0.5 - lum) / (1 - lum) + 0.1; // mix towards white just enough
+        r += (int) ((255 - r) * k); g += (int) ((255 - g) * k); b += (int) ((255 - b) * k);
+        return 0xFF000000 | (Math.min(255, r) << 16) | (Math.min(255, g) << 8) | Math.min(255, b);
     }
 
     private static boolean isSecondChestHalf(BlockEntity be) {
@@ -497,36 +483,58 @@ public final class MegaClient implements ClientModInitializer {
         return state.getBlock() instanceof ChestBlock && state.get(ChestBlock.CHEST_TYPE) == ChestType.RIGHT;
     }
 
-    private static Category categoryFor(BlockEntity be) {
-        BlockEntityType<?> t = be.getType();
-        if (t == BlockEntityType.MOB_SPAWNER)
-            return Category.SPAWNER;
-        if (t == BlockEntityType.ENDER_CHEST || t == BlockEntityType.ENCHANTING_TABLE || t == BlockEntityType.BEACON)
-            return Category.VALUABLE;
-        if (t == BlockEntityType.FURNACE || t == BlockEntityType.SMOKER || t == BlockEntityType.BLAST_FURNACE)
-            return Category.WORKSTATION;
-        if (t == BlockEntityType.SHULKER_BOX)
-            return Category.SHULKER;
-        if (t == BlockEntityType.CHEST || t == BlockEntityType.BARREL
-            || t == BlockEntityType.HOPPER || t == BlockEntityType.CRAFTER
-            || t == BlockEntityType.DISPENSER || t == BlockEntityType.DROPPER)
-            return Category.STORAGE;
-        return null;
-    }
-
     enum Category {
-        ORE(0xFF55FFFF, "O"),        // cyan
-        SPAWNER(0xFFB455FF, "Sp"),   // purple
-        VALUABLE(0xFF4488FF, "V"),   // blue: enchanting tables, ender chests, beacons, expensive blocks
-        SHULKER(0xFF55DD55, "Sh"),   // green
-        WORKSTATION(0xFF1F8A2B, "W"), // dark green: anvils, workbenches, furnaces, smokers
-        STORAGE(0xFFFF4444, "St"),   // red: chests, barrels, hoppers, crafters, dispensers, droppers
-        FARM(0xFFFF8800, "F");       // orange: built kelp/cane/cactus/etc. farms and farms below y=0
+        ORE(0xFF55FFFF, "O", "Ores", "cyan"),
+        SPAWNER(0xFFB455FF, "Sp", "Spawners", "purple"),
+        VALUABLE(0xFF4488FF, "V", "Valuables", "blue"),
+        SHULKER(0xFF55DD55, "Sh", "Shulkers", "green"),
+        WORKSTATION(0xFF1F8A2B, "W", "Workstations", "dark green"),
+        STORAGE(0xFFFF4444, "St", "Storage", "red"),
+        FARM(0xFFFF8800, "F", "Farms", "orange"); // built plant farms (plants next to observers/pistons) + machines below y=0
 
         final int color;
-        final String code;
+        final String code, title, colourName;
 
-        Category(int color, String code) { this.color = color; this.code = code; }
+        Category(int color, String code, String title, String colourName) {
+            this.color = color; this.code = code; this.title = title; this.colourName = colourName;
+        }
+
+        /** This colour's editable block list (for Farms: the plants that make a farm). */
+        List<String> blocks(MegaConfig c) {
+            return switch (this) {
+                case ORE -> c.oreBlocks;
+                case SPAWNER -> c.spawnerBlocks;
+                case VALUABLE -> c.valuableBlocks;
+                case SHULKER -> c.shulkerBlocks;
+                case STORAGE -> c.storageBlocks;
+                case WORKSTATION -> c.workstationBlocks;
+                case FARM -> c.farmPlants;
+            };
+        }
+
+        List<String> defaults() {
+            return switch (this) {
+                case ORE -> MegaConfig.DEFAULT_ORES;
+                case SPAWNER -> MegaConfig.DEFAULT_SPAWNERS;
+                case VALUABLE -> MegaConfig.DEFAULT_VALUABLES;
+                case SHULKER -> MegaConfig.DEFAULT_SHULKERS;
+                case STORAGE -> MegaConfig.DEFAULT_STORAGE;
+                case WORKSTATION -> MegaConfig.DEFAULT_WORKSTATIONS;
+                case FARM -> MegaConfig.DEFAULT_FARM_PLANTS;
+            };
+        }
+
+        void setEnabled(MegaConfig c, boolean on) {
+            switch (this) {
+                case ORE -> c.ores = on;
+                case SPAWNER -> c.spawners = on;
+                case VALUABLE -> c.valuables = on;
+                case SHULKER -> c.shulkers = on;
+                case STORAGE -> c.storage = on;
+                case WORKSTATION -> c.workstations = on;
+                case FARM -> c.farmAlert = on;
+            }
+        }
 
         boolean enabled(MegaConfig c) {
             return switch (this) {

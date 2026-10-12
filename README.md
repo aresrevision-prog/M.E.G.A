@@ -43,7 +43,7 @@ Taken automatically on every build by the in-game test, which launches the real 
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.22.0`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.23.0`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 
 ## Install (Windows, automatic)
@@ -94,12 +94,14 @@ Outlines show within 12 blocks of you, only where a block touches air. Small sha
 **Lava and water** (panel button: *X-ray lava & water*): within 12 blocks, lava hidden inside rock shows as **see-through orange** with orange edges, so you can see the whole pool. Water keeps its normal texture, with blue edges.
 
 ## Settings panel (press 0)
-![Settings panel](docs/images/panel.png)
+Three tabs:
+- **Colours & blocks**: each colour has an ON/OFF button and **Edit blocks**. The edit page lists that colour's blocks: click one to turn it on/off, **X** removes it, type a block name (e.g. `obsidian`) and press **Add** to add any block. Matches show as you type. Adding a block that's in another colour moves it. **Reset** puts the default blocks back. The Farms page edits the plants that count as a farm.
+- **Display**: HUD, Blocks seen panel, tracer lines, boxes, X-ray options, max lines, list rows, ranges.
+- **Players**: warning, list, lines, invisible players, sneaky outlines, range, ignored players.
 
-- Left: on/off buttons, range sliders, max tracers and the ignored-players box.
-- **What to detect...**: one on/off button per block type, plus All on / All off.
-- Changes save and apply when you press Done or Back.
-- Reload config: no key by default; set one in Options → Controls → Key Binds → Miscellaneous.
+Every colour that's ON and found always gets at least one line and one list row (the nearest of each colour comes first), so a pile of chests can't push spawners or shulkers off the screen. Dark colours are lightened on the HUD so the text stays readable.
+
+Changes save and apply when you press Done or Back. Reload config: no key by default; set one in Options → Controls → Key Binds → Miscellaneous.
 
 ## Spawner texture (optional resource pack)
 ![Spawner texture](docs/images/spawner-texture.png)
@@ -119,12 +121,12 @@ Put the zip in `.minecraft/resourcepacks` (Windows: `%appdata%\.minecraft\resour
 | outlineSneaky | true | crouching / invisible player boxes |
 | ignoredPlayers | ["IzzosBro2013"] | never detected (case-insensitive) |
 | playerRange | 1250 | 1250 = whole render distance |
-| spawners / valuables / shulkers / storage / ores | true | group toggles |
-| disabledTargets | [] | single block types switched off (set from the panel) |
+| spawners / valuables / shulkers / storage / ores / workstations | true | colour on/off |
+| spawnerBlocks / shulkerBlocks / storageBlocks / valuableBlocks / workstationBlocks / oreBlocks | see Colours | each colour's block list (edit in the panel) |
+| farmPlants | kelp, sugar cane, cactus, bamboo, pumpkin, melon | plants that count as a farm |
+| disabledTargets | [] | single blocks switched off, e.g. `minecraft:hopper` (set from the panel) |
 | maxDistance / oreRange / farmRange | 1250 | search ranges; real limit is your render distance |
 | oreBlocks | diamond, deepslate diamond, emerald, gold, deepslate gold | any block IDs |
-| valuableBlocks | see Blue above | any block IDs; all share the Valuable blocks button |
-| workstations / workstationBlocks | true / see Dark green above | Workstations group |
 | scanIntervalTicks / chunksPerTick | 20 / 24 | scan pacing |
 | tracers / boxes / tracePlayers | true | |
 | maxTracers / lineWidth | 8 / 2.0 | |

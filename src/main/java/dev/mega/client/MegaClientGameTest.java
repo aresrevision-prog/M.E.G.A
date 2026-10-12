@@ -61,6 +61,14 @@ public class MegaClientGameTest implements FabricClientGameTest {
                 MegaClient.Category.STORAGE, MegaClient.Category.SHULKER, MegaClient.Category.VALUABLE, MegaClient.Category.WORKSTATION}) {
                 check(cats.contains(c), "category not found: " + c);
             }
+            int firstN = ctx.computeOnClient(c -> MegaClient.config.maxTracers);
+            Set<MegaClient.Category> lined = ctx.computeOnClient(c -> {
+                Set<MegaClient.Category> s = EnumSet.noneOf(MegaClient.Category.class);
+                for (int i = 0; i < Math.min(firstN, MegaClient.targets.size()); i++) s.add(MegaClient.targets.get(i).category());
+                return s;
+            });
+            MegaClient.LOGGER.info("[M.E.G.A test] colours with a line: {}", lined);
+            check(lined.containsAll(cats), "every colour found should get a line, missing: " + cats.stream().filter(x -> !lined.contains(x)).toList());
             check(kinds >= 8, "Blocks seen panel should list at least 8 block types, has " + kinds);
             ctx.takeScreenshot("01-esp-normal");
 
@@ -82,12 +90,37 @@ public class MegaClientGameTest implements FabricClientGameTest {
             check(!ctx.computeOnClient(c -> MegaXray.active()), "X-ray did not turn off");
 
             // Settings panels
+            ctx.runOnClient(c -> MegaScreen.tab = 0);
             ctx.setScreen(() -> new MegaScreen(null));
             ctx.waitTicks(5);
             ctx.takeScreenshot("03-panel");
-            ctx.setScreen(() -> new MegaTargetsScreen(null));
+            ctx.setScreen(() -> new MegaBlocksScreen(new MegaScreen(null), MegaClient.Category.VALUABLE));
             ctx.waitTicks(5);
-            ctx.takeScreenshot("04-what-to-detect");
+            ctx.takeScreenshot("04-edit-blocks");
+            ctx.runOnClient(c -> MegaScreen.tab = 1);
+            ctx.setScreen(() -> new MegaScreen(null));
+            ctx.waitTicks(5);
+            ctx.takeScreenshot("03b-panel-display");
+            ctx.runOnClient(c -> MegaScreen.tab = 2);
+            ctx.setScreen(() -> new MegaScreen(null));
+            ctx.waitTicks(5);
+            ctx.takeScreenshot("03c-panel-players");
+            ctx.runOnClient(c -> MegaScreen.tab = 0);
+            // Editing a colour's blocks: add obsidian to Storage (red), it must be found
+            srv.runCommand("setblock 6 -60 4 minecraft:obsidian");
+            ctx.runOnClient(c -> { MegaClient.config.storageBlocks.add("minecraft:obsidian"); MegaClient.applyConfig(); });
+            ctx.waitTicks(60);
+            boolean obs = ctx.computeOnClient(c -> MegaClient.targets.stream().anyMatch(x -> x.label().equals("OBSIDIAN")
+                && x.category() == MegaClient.Category.STORAGE));
+            check(obs, "block added to a colour was not found");
+            // Switching one block off: the spawner must disappear
+            ctx.runOnClient(c -> { MegaClient.config.disabledTargets.add("minecraft:spawner"); MegaClient.applyConfig(); });
+            ctx.waitTicks(60);
+            check(ctx.computeOnClient(c -> MegaClient.targets.stream().noneMatch(x -> x.category() == MegaClient.Category.SPAWNER)),
+                "spawner still shown after switching it off");
+            ctx.runOnClient(c -> { MegaClient.config.storageBlocks.remove("minecraft:obsidian");
+                MegaClient.config.disabledTargets.remove("minecraft:spawner"); MegaClient.applyConfig(); });
+            MegaClient.LOGGER.info("[M.E.G.A test] block editing OK");
             ctx.setScreen(() -> null);
 
             // Farm alert: lots of moving dropped items

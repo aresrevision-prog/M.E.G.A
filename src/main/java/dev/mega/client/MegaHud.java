@@ -84,7 +84,7 @@ public final class MegaHud {
                 String cnt = String.valueOf(b.count());
                 ctx.drawTextWithShadow(tr, "■", rx, ry, b.color());
                 ctx.drawTextWithShadow(tr, b.label(), rx + tr.getWidth("■ "), ry, WHITE);
-                ctx.drawTextWithShadow(tr, cnt, sw - 8 - tr.getWidth(cnt), ry, b.color());
+                ctx.drawTextWithShadow(tr, cnt, sw - 8 - tr.getWidth(cnt), ry, MegaClient.readable(b.color()));
                 ry += 10;
             }
         }
@@ -135,7 +135,7 @@ public final class MegaHud {
                 + sq(t.pos().getY() + 0.5 - client.player.getY()));
             String line = String.format("%s %s  %dm  %d, %d, %d", arrow(px, pz, yaw, tx, tz),
                 t.label(), Math.round(dist), t.pos().getX(), t.pos().getY(), t.pos().getZ());
-            y = line(ctx, tr, line, x, y, t.category().color);
+            y = line(ctx, tr, line, x, y, MegaClient.readable(t.category().color));
         }
     }
 

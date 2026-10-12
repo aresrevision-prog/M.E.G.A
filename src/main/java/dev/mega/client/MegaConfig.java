@@ -58,26 +58,47 @@ public final class MegaConfig {
     // Ore finder (loaded chunks only)
     public boolean ores = true;
     public int oreRange = 1250;
-    public java.util.List<String> oreBlocks = new java.util.ArrayList<>(java.util.List.of(
-        "minecraft:diamond_ore", "minecraft:deepslate_diamond_ore",
-        "minecraft:emerald_ore",
-        "minecraft:gold_ore", "minecraft:deepslate_gold_ore"));
-    // "Valuable blocks" group (blue, ONE on/off button).
+    public java.util.List<String> oreBlocks = new java.util.ArrayList<>(DEFAULT_ORES);
+    // Every colour has its own editable block list (panel: press 0 -> Edit blocks).
+    public java.util.List<String> spawnerBlocks = new java.util.ArrayList<>(DEFAULT_SPAWNERS);
+    static final java.util.List<String> DEFAULT_SPAWNERS = java.util.List.of("minecraft:spawner");
+    public java.util.List<String> shulkerBlocks = new java.util.ArrayList<>(DEFAULT_SHULKERS);
+    static final java.util.List<String> DEFAULT_SHULKERS = shulkers();
+    public java.util.List<String> storageBlocks = new java.util.ArrayList<>(DEFAULT_STORAGE);
+    static final java.util.List<String> DEFAULT_STORAGE = java.util.List.of(
+        "minecraft:chest", "minecraft:barrel", "minecraft:hopper", "minecraft:crafter", "minecraft:dispenser", "minecraft:dropper");
+    public java.util.List<String> farmPlants = new java.util.ArrayList<>(DEFAULT_FARM_PLANTS);
+    static final java.util.List<String> DEFAULT_FARM_PLANTS = java.util.List.of(
+        "minecraft:kelp", "minecraft:kelp_plant", "minecraft:sugar_cane", "minecraft:cactus",
+        "minecraft:bamboo", "minecraft:pumpkin", "minecraft:melon");
+    static final java.util.List<String> DEFAULT_ORES = java.util.List.of(
+        "minecraft:diamond_ore", "minecraft:deepslate_diamond_ore", "minecraft:emerald_ore",
+        "minecraft:gold_ore", "minecraft:deepslate_gold_ore");
+    // "Valuable blocks" (blue)
     public java.util.List<String> valuableBlocks = new java.util.ArrayList<>(DEFAULT_VALUABLES);
     static final java.util.List<String> DEFAULT_VALUABLES = java.util.List.of(
+        "minecraft:ender_chest", "minecraft:enchanting_table", "minecraft:beacon",
         "minecraft:netherite_block", "minecraft:ancient_debris", "minecraft:diamond_block",
         "minecraft:emerald_block", "minecraft:gold_block",
         "minecraft:quartz_block", "minecraft:chiseled_quartz_block", "minecraft:quartz_pillar",
         "minecraft:quartz_bricks", "minecraft:smooth_quartz",
         "minecraft:deepslate_emerald_ore", "minecraft:deepslate_coal_ore");
-    // "Workstations" group (dark green, ONE on/off button). Furnaces, smokers and blast furnaces are always in it too.
+    // "Workstations" (dark green)
     public boolean workstations = true;
     public java.util.List<String> workstationBlocks = new java.util.ArrayList<>(DEFAULT_WORKSTATIONS);
     static final java.util.List<String> DEFAULT_WORKSTATIONS = java.util.List.of(
         "minecraft:anvil", "minecraft:chipped_anvil", "minecraft:damaged_anvil",
         "minecraft:crafting_table", "minecraft:smithing_table", "minecraft:grindstone",
-        "minecraft:stonecutter", "minecraft:loom", "minecraft:cartography_table", "minecraft:fletching_table");
-    static final int CURRENT_VERSION = 8;
+        "minecraft:stonecutter", "minecraft:loom", "minecraft:cartography_table", "minecraft:fletching_table",
+        "minecraft:furnace", "minecraft:smoker", "minecraft:blast_furnace");
+    static final int CURRENT_VERSION = 9;
+
+    private static java.util.List<String> shulkers() {
+        java.util.List<String> l = new java.util.ArrayList<>(java.util.List.of("minecraft:shulker_box"));
+        for (String c : new String[]{"white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray",
+            "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"}) l.add("minecraft:" + c + "_shulker_box");
+        return java.util.List.copyOf(l);
+    }
     /** Bumped when defaults change, so old config files get the new block lists. */
     public int configVersion = 0;
 
@@ -99,7 +120,7 @@ public final class MegaConfig {
         "minecraft:stone", "minecraft:cobblestone", "minecraft:cobbled_deepslate",
         "minecraft:deepslate", "minecraft:gravel"));
 
-    /** Individual targets switched off in the panel, e.g. "hopper", "diamond_ore". */
+    /** Single blocks switched off in the panel, e.g. "minecraft:hopper", plus "underground_farm". */
     public java.util.List<String> disabledTargets = new java.util.ArrayList<>();
 
     public static MegaConfig load() {
@@ -112,7 +133,9 @@ public final class MegaConfig {
             }
         }
         if (cfg == null) cfg = new MegaConfig();
-        if (cfg.configVersion < CURRENT_VERSION) {
+        if (cfg.configVersion == 8) { migrate9(cfg); cfg.configVersion = CURRENT_VERSION; }
+        else if (cfg.configVersion < CURRENT_VERSION) {
+            cfg.disabledTargets = new java.util.ArrayList<>();
             cfg.valuableBlocks = new java.util.ArrayList<>(DEFAULT_VALUABLES);
             cfg.workstationBlocks = new java.util.ArrayList<>(DEFAULT_WORKSTATIONS);
             cfg.oreBlocks = new java.util.ArrayList<>(new MegaConfig().oreBlocks);
@@ -125,6 +148,32 @@ public final class MegaConfig {
         cfg.clamp();
         cfg.save(); // writes defaults / any new fields
         return cfg;
+    }
+
+    /** v9: every colour gets its own block list; per-block switches use full block ids. Keeps the player's edits. */
+    private static void migrate9(MegaConfig cfg) {
+        cfg.clamp();
+        java.util.List<String> v = new java.util.ArrayList<>(java.util.List.of("minecraft:ender_chest", "minecraft:enchanting_table", "minecraft:beacon"));
+        for (String id : cfg.valuableBlocks) if (!v.contains(id)) v.add(id);
+        cfg.valuableBlocks = v;
+        for (String id : java.util.List.of("minecraft:furnace", "minecraft:smoker", "minecraft:blast_furnace"))
+            if (!cfg.workstationBlocks.contains(id)) cfg.workstationBlocks.add(id);
+        java.util.List<String> off = new java.util.ArrayList<>();
+        for (String k : cfg.disabledTargets) {
+            switch (k) {
+                case "valuable_blocks" -> cfg.valuables = false;
+                case "workstations" -> cfg.workstations = false;
+                case "mob_spawner" -> off.add("minecraft:spawner");
+                case "shulker_box" -> off.addAll(DEFAULT_SHULKERS);
+                case "underground_farm" -> off.add(k);
+                case "plant_farm" -> off.addAll(DEFAULT_FARM_PLANTS);
+                default -> {
+                    off.add("minecraft:" + k);
+                    if (k.endsWith("_ore")) off.add("minecraft:deepslate_" + k);
+                }
+            }
+        }
+        cfg.disabledTargets = off;
     }
 
     public void save() {
@@ -161,5 +210,9 @@ public final class MegaConfig {
         if (ignoredPlayers == null) ignoredPlayers = new java.util.ArrayList<>();
         if (workstationBlocks == null) workstationBlocks = new java.util.ArrayList<>();
         if (valuableBlocks == null) valuableBlocks = new java.util.ArrayList<>();
+        if (spawnerBlocks == null) spawnerBlocks = new java.util.ArrayList<>(DEFAULT_SPAWNERS);
+        if (shulkerBlocks == null) shulkerBlocks = new java.util.ArrayList<>(DEFAULT_SHULKERS);
+        if (storageBlocks == null) storageBlocks = new java.util.ArrayList<>(DEFAULT_STORAGE);
+        if (farmPlants == null) farmPlants = new java.util.ArrayList<>(DEFAULT_FARM_PLANTS);
     }
 }
