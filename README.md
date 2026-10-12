@@ -8,6 +8,11 @@ Client-side ESP, tracers, X-ray, farm alerts and block counter for the server.
 ![First person, normal view](docs/images/first-person-normal.jpg)
 ![First person, X-ray on](docs/images/first-person-xray.jpg)
 
+**Elytra flight over a buried stash:**
+
+![Elytra, normal view](docs/images/elytra-normal.jpg)
+![Elytra, X-ray on](docs/images/elytra-xray.jpg)
+
 *Mockups drawn from the code. The mod builds, but has not been tested in-game yet.*
 
 ## Server rules
