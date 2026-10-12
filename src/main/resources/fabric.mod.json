@@ -11,6 +11,9 @@
   "entrypoints": {
     "client": [
       "dev.mega.client.MegaClient"
+    ],
+    "fabric-client-gametest": [
+      "dev.mega.client.MegaClientGameTest"
     ]
   },
   "depends": {

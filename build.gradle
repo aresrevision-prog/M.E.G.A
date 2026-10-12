@@ -14,6 +14,17 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    // In-game test on CI: real client + Fabric API + the client game-test module (not bundled in the Fabric API jar)
+    productionRuntimeMods "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    productionRuntimeMods fabricApi.module("fabric-client-gametest-api-v1", project.fabric_version)
+}
+
+// Launches the real 1.21.11 client with the built mod, runs MegaClientGameTest, then exits (fails the build on error).
+tasks.register("runProductionClientGameTest", net.fabricmc.loom.task.prod.ClientProductionRunTask) {
+    jvmArgs.add("-Dfabric.client.gametest")
+    jvmArgs.add("-Dfabric.client.gametest.disableNetworkSynchronizer=true")
+    useXVFB = true
 }
 
 processResources {

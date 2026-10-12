@@ -4,7 +4,7 @@ permissions:
   contents: write
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -12,22 +12,41 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
-      - run: chmod +x gradlew && ./gradlew build --no-daemon
+      - name: Build
+        run: chmod +x gradlew && ./gradlew build --no-daemon
       - uses: actions/upload-artifact@v4
         with:
           name: mega-client-jar
           path: build/libs/mega-client-*.jar
+
+      - name: Install virtual display
+        run: sudo apt-get update -q && sudo apt-get install -y -q xvfb
+      - name: In-game test (real Minecraft 1.21.11 client)
+        id: gametest
+        run: ./gradlew runProductionClientGameTest --no-daemon --stacktrace
+      - name: Publish test screenshots and logs to the test-results branch
+        if: always() && github.event_name == 'push'
+        run: |
+          mkdir -p /tmp/out
+          find . -path '*screenshots*' -name '*.png' -exec cp {} /tmp/out/ \; || true
+          find . -path '*run*' -name 'latest.log' -exec cp {} /tmp/out/latest.log \; || true
+          find . -path '*crash-reports*' -name '*.txt' -exec cp {} /tmp/out/ \; || true
+          echo "commit ${{ github.sha }} - test outcome: ${{ steps.gametest.outcome }}" > /tmp/out/RESULT.txt
+          cd /tmp/out && git init -q && git checkout -q -b test-results && git add -A
+          git -c user.name="M.E.G.A CI" -c user.email="ci@users.noreply.github.com" commit -qm "Test results for ${{ github.sha }}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" test-results
+
       - name: Read version
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
         id: ver
         run: echo "v=$(grep '^mod_version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_OUTPUT"
-      - name: Publish release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Publish release (only when the in-game test passed)
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.ver.outputs.v }}
           name: M.E.G.A Client v${{ steps.ver.outputs.v }}
-          body: "Fabric 1.21.11, client-side. Put the JAR (not -sources) in .minecraft/mods with Fabric API."
+          body: "Fabric 1.21.11, client-side. Passed the in-game test on CI. Put the JAR (not -sources) in .minecraft/mods with Fabric API."
           files: |
             build/libs/mega-client-*.jar
             !build/libs/*-sources.jar
