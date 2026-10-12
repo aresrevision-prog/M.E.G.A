@@ -3,7 +3,7 @@
   "id": "mega_client",
   "version": "${version}",
   "name": "M.E.G.A Client",
-  "description": "Client-side HUD: player warning, nearby player list and loaded-chunk block radar. Info only, no automation.",
+  "description": "Client-side ESP, tracers, X-ray, farm alerts and block counter. Needs only Fabric Loader. Info only, no automation.",
   "authors": [
     "MagicWinter"
   ],
@@ -21,8 +21,7 @@
   "depends": {
     "fabricloader": ">=0.17.0",
     "minecraft": "~1.21.11",
-    "java": ">=21",
-    "fabric-api": "*"
+    "java": ">=21"
   },
   "mixins": [
     "mega_client.mixins.json"

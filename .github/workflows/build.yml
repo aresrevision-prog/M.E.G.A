@@ -47,8 +47,34 @@ jobs:
         with:
           tag_name: v${{ steps.ver.outputs.v }}
           name: M.E.G.A Client v${{ steps.ver.outputs.v }}
-          body: "Fabric 1.21.11, client-side. Passed the in-game test on CI. Put the JAR (not -sources) in .minecraft/mods with Fabric API."
+          body: "Fabric 1.21.11, client-side, needs only Fabric Loader (no Fabric API). Passed the in-game test on CI. Easiest setup: download Install-MEGA.bat and double-click it."
           files: |
             build/libs/mega-client-*.jar
             !build/libs/*-sources.jar
+            installer/Install-MEGA.bat
           make_latest: true
+
+  installer-test:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run the installer on a fresh Windows machine
+        shell: cmd
+        run: |
+          mkdir "%APPDATA%\.minecraft"
+          echo {"profiles":{"latest-release":{"name":"","type":"latest-release","lastVersionId":"latest-release"}},"settings":{},"version":3}> "%APPDATA%\.minecraft\launcher_profiles.json"
+          echo n| installer\Install-MEGA.bat
+      - name: Check everything was set up
+        shell: pwsh
+        run: |
+          $mc = "$env:APPDATA\.minecraft"
+          Get-ChildItem -Recurse $mc | Select-Object FullName
+          $p = (Get-Content "$mc\launcher_profiles.json" -Raw | ConvertFrom-Json).profiles
+          if (-not $p.'mega-client') { throw 'M.E.G.A profile missing' }
+          if (-not $p.'latest-release') { throw 'existing profile was lost' }
+          $v = $p.'mega-client'.lastVersionId
+          if (-not (Test-Path "$mc\versions\$v\$v.json")) { throw "version json missing for $v" }
+          if (-not (Get-ChildItem "$mc\mods\mega-client-*.jar")) { throw 'mod JAR missing' }
+          Write-Host "INSTALLER TEST PASSED ($v)"

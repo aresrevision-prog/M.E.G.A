@@ -3,6 +3,15 @@
   "minVersion": "0.8",
   "package": "dev.mega.client.mixin",
   "compatibilityLevel": "JAVA_21",
-  "client": ["BlockMixin"],
-  "injectors": { "defaultRequire": 0 }
+  "client": [
+    "BlockMixin",
+    "MinecraftClientMixin",
+    "InGameHudMixin",
+    "GameOptionsMixin",
+    "WorldRendererMixin",
+    "CameraAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

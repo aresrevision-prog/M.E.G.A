@@ -11,7 +11,7 @@ import net.minecraft.util.math.MathHelper;
 import java.util.List;
 
 /** Draws the HUD. All colours are full ARGB — since 1.21.6, text with alpha 0 is not drawn. */
-final class MegaHud {
+public final class MegaHud {
     private static final String[] ARROWS = {"↑", "↗", "→", "↘", "↓", "↙", "←", "↖"};
     private static final int WHITE = 0xFFFFFFFF;
     private static final int GRAY = 0xFFAAAAAA;
@@ -21,7 +21,7 @@ final class MegaHud {
 
     private MegaHud() {}
 
-    static void render(MinecraftClient client, DrawContext ctx) {
+    public static void render(MinecraftClient client, DrawContext ctx) {
         MegaConfig cfg = MegaClient.config;
         if (cfg == null || !cfg.hudEnabled || client.player == null || client.world == null) return;
         if (client.getDebugHud().shouldShowDebugHud()) return;

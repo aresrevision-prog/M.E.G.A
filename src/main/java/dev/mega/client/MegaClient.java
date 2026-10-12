@@ -1,11 +1,6 @@
 package dev.mega.client;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -80,22 +75,28 @@ public final class MegaClient implements ClientModInitializer {
         version = FabricLoader.getInstance().getModContainer(MOD_ID)
             .map(c -> c.getMetadata().getVersion().getFriendlyString()).orElse("?");
 
-        KeyBinding.Category cat = KeyBinding.Category.create(Identifier.of(MOD_ID, "main"));
-        settingsKey = KeyBindingHelper.registerKeyBinding(
-            new KeyBinding("key.mega_client.settings", GLFW.GLFW_KEY_0, cat));
-        reloadKey = KeyBindingHelper.registerKeyBinding(
-            new KeyBinding("key.mega_client.reload_config", GLFW.GLFW_KEY_UNKNOWN, cat));
-
-        ClientTickEvents.END_CLIENT_TICK.register(MegaClient::onTick);
-        HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT,
-            Identifier.of(MOD_ID, "hud"), (ctx, tick) -> MegaHud.render(MinecraftClient.getInstance(), ctx));
-
-        WorldRenderEvents.END_MAIN.register(MegaTracers::render);
+        // No Fabric API needed: key bindings, the tick, the HUD and world drawing are hooked with our own mixins
+        // (mixin/GameOptionsMixin, MinecraftClientMixin, InGameHudMixin, WorldRendererMixin).
+        // Names are plain text because without Fabric API the game doesn't load mod language files.
+        settingsKey = new KeyBinding("M.E.G.A settings panel", GLFW.GLFW_KEY_0, KeyBinding.Category.MISC);
+        reloadKey = new KeyBinding("M.E.G.A reload config", GLFW.GLFW_KEY_UNKNOWN, KeyBinding.Category.MISC);
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc != null && mc.options != null) mc.options.allKeys = addKeys(mc.options.allKeys); // options already made
 
         LOGGER.info("M.E.G.A Client {} loaded", version);
     }
 
-    private static void onTick(MinecraftClient client) {
+    /** Adds our key bindings to the game's list (called from GameOptionsMixin before options load). */
+    public static KeyBinding[] addKeys(KeyBinding[] keys) {
+        if (settingsKey == null) return keys;
+        for (KeyBinding k : keys) if (k == settingsKey) return keys;
+        KeyBinding[] out = java.util.Arrays.copyOf(keys, keys.length + 2);
+        out[keys.length] = settingsKey;
+        out[keys.length + 1] = reloadKey;
+        return out;
+    }
+
+    public static void onTick(MinecraftClient client) {
         while (settingsKey.wasPressed()) {
             if (client.currentScreen == null) client.setScreen(new MegaScreen(null));
         }

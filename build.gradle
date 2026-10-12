@@ -13,11 +13,14 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    // The mod itself does NOT use Fabric API (only Fabric Loader). Fabric API is only needed to compile the in-game
+    // test classes, which never load for players.
+    modCompileOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    // In-game test on CI: real client + Fabric API + the client game-test module (not bundled in the Fabric API jar)
-    productionRuntimeMods "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    // In-game test on CI: real client + ONLY the game-test module and what it needs (no full Fabric API), so the test
+    // proves M.E.G.A works with just Fabric Loader.
     productionRuntimeMods fabricApi.module("fabric-client-gametest-api-v1", project.fabric_version)
+    productionRuntimeMods fabricApi.module("fabric-resource-loader-v1", project.fabric_version)
 }
 
 // Launches the real 1.21.11 client with the built mod, runs MegaClientGameTest, then exits (fails the build on error).

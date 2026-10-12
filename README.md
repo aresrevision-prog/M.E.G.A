@@ -37,21 +37,28 @@ Taken automatically on every build by the in-game test, which launches the real 
 ![Elytra, normal view](docs/images/elytra-normal.jpg)
 ![Elytra, X-ray on](docs/images/elytra-xray.jpg)
 
-*Mockups drawn from the code. The mod builds, but has not been tested in-game yet.*
+*Mockups drawn from the code. See the real screenshots above for the actual look.*
 
 ## Server rules
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.21.0`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.22.0`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 
-## Install
-1. Install Fabric Loader for Minecraft 1.21.11.
-2. Put **Fabric API** for 1.21.11 and `mega-client-<version>.jar` (not the `-sources` one) in `.minecraft/mods`.
+## Install (Windows, automatic)
+1. Download **[Install-MEGA.bat](https://github.com/aresrevision-prog/M.E.G.A/releases/latest/download/Install-MEGA.bat)** and double-click it. If Windows shows "Windows protected your PC", click **More info → Run anyway**.
+2. It installs Fabric Loader for 1.21.11, adds a **M.E.G.A** profile to the Minecraft Launcher, puts the newest mod in `.minecraft\mods`, and can add the spawner texture pack. No Java or Fabric API needed.
+3. Open the Minecraft Launcher, pick the **M.E.G.A** profile next to Play, and press Play. In game press **0** for the settings panel.
+
+Run it again any time to update. Your other launcher profiles are kept (a backup is saved as `launcher_profiles.json.mega-backup`). The installer is tested on a clean Windows machine on every build.
+
+## Install (manual)
+1. Install Fabric Loader for Minecraft 1.21.11 ([fabricmc.net](https://fabricmc.net/use/installer/)).
+2. Put `mega-client-<version>.jar` (not the `-sources` one) in `.minecraft/mods`. **Fabric API is not needed.**
 3. Launch the Fabric profile. Press **0** in-game for the settings panel.
 
-Client-side only: nothing is installed on the server, and other players don't need it.
+Client-side only: nothing is installed on the server, and other players don't need it. The mod needs a mod loader to run at all (Minecraft has no built-in way to load mods); Fabric Loader is the only thing it depends on.
 
 ## Colours
 | Colour | Shows |
@@ -92,7 +99,7 @@ Outlines show within 12 blocks of you, only where a block touches air. Small sha
 - Left: on/off buttons, range sliders, max tracers and the ignored-players box.
 - **What to detect...**: one on/off button per block type, plus All on / All off.
 - Changes save and apply when you press Done or Back.
-- Reload config: no key by default; set one in Options → Controls → M.E.G.A Client.
+- Reload config: no key by default; set one in Options → Controls → Key Binds → Miscellaneous.
 
 ## Spawner texture (optional resource pack)
 ![Spawner texture](docs/images/spawner-texture.png)

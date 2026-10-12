@@ -3,7 +3,6 @@ package dev.mega.client;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DepthTestFunction;
 import dev.mega.client.MegaClient.Target;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -23,7 +22,7 @@ import org.joml.Vector3fc;
 import java.util.List;
 
 /** Draws tracer lines from the crosshair to targets, plus a box outline round each target. Visible through walls. */
-final class MegaTracers {
+public final class MegaTracers {
     private static final int YELLOW = 0xFFFFD400;
     private static final int BLACK = 0xFF000000;
     private static final int INVISIBLE_COLOR = 0xFFFF55FF;
@@ -41,20 +40,25 @@ final class MegaTracers {
 
     private MegaTracers() {}
 
-    static void render(WorldRenderContext ctx) {
+    /** Called from WorldRendererMixin at the end of the main world pass (same point Fabric API calls END_MAIN). */
+    public static void renderWorld() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.gameRenderer == null) return;
+        Vec3d cam = ((dev.mega.client.mixin.CameraAccessor) client.gameRenderer.getCamera()).mega$getPos();
+        render(new MatrixStack(), client.getBufferBuilders().getEntityVertexConsumers(), cam);
+    }
+
+    static void render(MatrixStack matrices, VertexConsumerProvider consumers, Vec3d cam) {
         MegaConfig cfg = MegaClient.config;
         MinecraftClient client = MinecraftClient.getInstance();
         if (cfg == null || !cfg.hudEnabled || (!cfg.tracers && !cfg.boxes && !cfg.tracePlayers && !cfg.outlineSneaky && !cfg.xray)) return;
         if (client.player == null || client.world == null) return;
 
-        Vec3d cam = ctx.worldState().cameraRenderState.pos;
         Vector3fc fwd = client.gameRenderer.getCamera().getHorizontalPlane(); // look direction
         // start just in front of the eyes so the line comes from the crosshair
         float sx = fwd.x(), sy = fwd.y(), sz = fwd.z();
 
-        VertexConsumerProvider consumers = ctx.consumers();
         VertexConsumer buf = consumers.getBuffer(LAYER);
-        MatrixStack matrices = ctx.matrices();
         MatrixStack.Entry entry = matrices.peek();
         float width = (float) cfg.lineWidth;
 
