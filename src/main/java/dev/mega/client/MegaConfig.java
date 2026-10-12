@@ -62,18 +62,22 @@ public final class MegaConfig {
         "minecraft:diamond_ore", "minecraft:deepslate_diamond_ore",
         "minecraft:emerald_ore",
         "minecraft:gold_ore", "minecraft:deepslate_gold_ore"));
-    // "Valuable blocks" group (blue, ONE on/off button). Furnaces, smokers and blast furnaces are always in it too.
+    // "Valuable blocks" group (blue, ONE on/off button).
     public java.util.List<String> valuableBlocks = new java.util.ArrayList<>(DEFAULT_VALUABLES);
     static final java.util.List<String> DEFAULT_VALUABLES = java.util.List.of(
         "minecraft:netherite_block", "minecraft:ancient_debris", "minecraft:diamond_block",
         "minecraft:emerald_block", "minecraft:gold_block",
         "minecraft:quartz_block", "minecraft:chiseled_quartz_block", "minecraft:quartz_pillar",
         "minecraft:quartz_bricks", "minecraft:smooth_quartz",
-        "minecraft:deepslate_emerald_ore", "minecraft:deepslate_coal_ore",
+        "minecraft:deepslate_emerald_ore", "minecraft:deepslate_coal_ore");
+    // "Workstations" group (dark green, ONE on/off button). Furnaces, smokers and blast furnaces are always in it too.
+    public boolean workstations = true;
+    public java.util.List<String> workstationBlocks = new java.util.ArrayList<>(DEFAULT_WORKSTATIONS);
+    static final java.util.List<String> DEFAULT_WORKSTATIONS = java.util.List.of(
         "minecraft:anvil", "minecraft:chipped_anvil", "minecraft:damaged_anvil",
         "minecraft:crafting_table", "minecraft:smithing_table", "minecraft:grindstone",
         "minecraft:stonecutter", "minecraft:loom", "minecraft:cartography_table", "minecraft:fletching_table");
-    static final int CURRENT_VERSION = 7;
+    static final int CURRENT_VERSION = 8;
     /** Bumped when defaults change, so old config files get the new block lists. */
     public int configVersion = 0;
 
@@ -108,6 +112,7 @@ public final class MegaConfig {
         if (cfg == null) cfg = new MegaConfig();
         if (cfg.configVersion < CURRENT_VERSION) {
             cfg.valuableBlocks = new java.util.ArrayList<>(DEFAULT_VALUABLES);
+            cfg.workstationBlocks = new java.util.ArrayList<>(DEFAULT_WORKSTATIONS);
             cfg.oreBlocks = new java.util.ArrayList<>(new MegaConfig().oreBlocks);
             if (cfg.disabledTargets != null) cfg.disabledTargets.removeIf(k -> k.endsWith("_block") || k.equals("ancient_debris"));
             if (cfg.configVersion < 5) { // v5: 1250-block search range
@@ -152,6 +157,7 @@ public final class MegaConfig {
         if (ignoredItems == null) ignoredItems = new java.util.ArrayList<>();
         if (disabledTargets == null) disabledTargets = new java.util.ArrayList<>();
         if (ignoredPlayers == null) ignoredPlayers = new java.util.ArrayList<>();
+        if (workstationBlocks == null) workstationBlocks = new java.util.ArrayList<>();
         if (valuableBlocks == null) valuableBlocks = new java.util.ArrayList<>();
     }
 }

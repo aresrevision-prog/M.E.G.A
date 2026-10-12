@@ -153,6 +153,7 @@ public final class MegaClient implements ClientModInitializer {
         Map<Block, Category> map = new java.util.LinkedHashMap<>();
         addBlocks(map, config.oreBlocks, Category.ORE);
         addBlocks(map, config.valuableBlocks, Category.VALUABLE);
+        addBlocks(map, config.workstationBlocks, Category.WORKSTATION);
         scanBlocks = map;
         MegaXray.apply(MinecraftClient.getInstance(), map.keySet());
     }
@@ -345,7 +346,7 @@ public final class MegaClient implements ClientModInitializer {
                 Block block = section.getBlockState(x, y, z).getBlock();
                 Category cat = wanted.get(block);
                 if (cat == null) continue;
-                if (disabled.contains(cat == Category.VALUABLE ? VALUABLE_GROUP : blockKey(block))) continue;
+                if (disabled.contains(cat == Category.VALUABLE ? VALUABLE_GROUP : cat == Category.WORKSTATION ? WORKSTATION_GROUP : blockKey(block))) continue;
                 int wx = baseX + x, wy = baseY + y, wz = baseZ + z;
                 double dx = wx + 0.5 - px, dy = wy + 0.5 - py, dz = wz + 0.5 - pz;
                 double sq = dx * dx + dy * dy + dz * dz;
@@ -440,12 +441,14 @@ public final class MegaClient implements ClientModInitializer {
     /** Key used by the per-target on/off buttons, e.g. "chest", "hopper", "mob_spawner". */
     private static String beKey(BlockEntityType<?> type) {
         if (type == BlockEntityType.FURNACE || type == BlockEntityType.SMOKER || type == BlockEntityType.BLAST_FURNACE)
-            return VALUABLE_GROUP;
+            return WORKSTATION_GROUP;
         return BE_KEYS.computeIfAbsent(type, t -> Registries.BLOCK_ENTITY_TYPE.getId(t).getPath());
     }
 
     /** One on/off key for every block in the "Valuable blocks" group. */
     static final String VALUABLE_GROUP = "valuable_blocks";
+    /** One on/off key for anvils, workbenches, furnaces and smokers. */
+    static final String WORKSTATION_GROUP = "workstations";
 
     /** Key for scanned blocks; deepslate variants share the normal one, e.g. "diamond_ore". */
     static String blockKey(Block block) {
@@ -460,6 +463,7 @@ public final class MegaClient implements ClientModInitializer {
         out.add(new Object[]{"enchanting_table", "Enchanting table", Category.VALUABLE});
         out.add(new Object[]{"beacon", "Beacon", Category.VALUABLE});
         out.add(new Object[]{VALUABLE_GROUP, "Valuable blocks", Category.VALUABLE});
+        out.add(new Object[]{WORKSTATION_GROUP, "Workstations", Category.WORKSTATION});
         Set<String> seen = new HashSet<>();
         out.add(new Object[]{"shulker_box", "Shulker box", Category.SHULKER});
         out.add(new Object[]{"chest", "Chest", Category.STORAGE});
@@ -492,9 +496,10 @@ public final class MegaClient implements ClientModInitializer {
         BlockEntityType<?> t = be.getType();
         if (t == BlockEntityType.MOB_SPAWNER)
             return Category.SPAWNER;
-        if (t == BlockEntityType.ENDER_CHEST || t == BlockEntityType.ENCHANTING_TABLE || t == BlockEntityType.BEACON
-            || t == BlockEntityType.FURNACE || t == BlockEntityType.SMOKER || t == BlockEntityType.BLAST_FURNACE)
+        if (t == BlockEntityType.ENDER_CHEST || t == BlockEntityType.ENCHANTING_TABLE || t == BlockEntityType.BEACON)
             return Category.VALUABLE;
+        if (t == BlockEntityType.FURNACE || t == BlockEntityType.SMOKER || t == BlockEntityType.BLAST_FURNACE)
+            return Category.WORKSTATION;
         if (t == BlockEntityType.SHULKER_BOX)
             return Category.SHULKER;
         if (t == BlockEntityType.CHEST || t == BlockEntityType.BARREL
@@ -509,6 +514,7 @@ public final class MegaClient implements ClientModInitializer {
         SPAWNER(0xFFB455FF, "Sp"),   // purple
         VALUABLE(0xFF4488FF, "V"),   // blue: enchanting tables, ender chests, beacons, expensive blocks
         SHULKER(0xFF55DD55, "Sh"),   // green
+        WORKSTATION(0xFF1F8A2B, "W"), // dark green: anvils, workbenches, furnaces, smokers
         STORAGE(0xFFFF4444, "St"),   // red: chests, barrels, hoppers, crafters, dispensers, droppers
         FARM(0xFFFF8800, "F");       // orange: built kelp/cane/cactus/etc. farms and farms below y=0
 
@@ -524,6 +530,7 @@ public final class MegaClient implements ClientModInitializer {
                 case VALUABLE -> c.valuables;
                 case SHULKER -> c.shulkers;
                 case STORAGE -> c.storage;
+                case WORKSTATION -> c.workstations;
                 case FARM -> c.farmAlert;
             };
         }

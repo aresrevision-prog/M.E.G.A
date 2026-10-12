@@ -29,7 +29,7 @@ Taken automatically on every build by the in-game test, which launches the real 
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.19.3`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.20.0`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 
 ## Install
@@ -46,7 +46,8 @@ Client-side only: nothing is installed on the server, and other players don't ne
 | Yellow / black | Other players: striped line, player list, warning banner. Crouching players get a yellow box. Never you or ignored players. |
 | Magenta | Invisible players (box only) |
 | Green | Shulker boxes |
-| Blue | Ender chests, enchanting tables, beacons, and **Valuable blocks** (one button): netherite, ancient debris, diamond / emerald / gold blocks, quartz block / chiseled / pillar / bricks / smooth, deepslate emerald ore, deepslate coal ore, anvils, crafting / smithing tables, grindstones, stonecutters, looms, cartography & fletching tables, furnaces, smokers, blast furnaces |
+| Blue | Ender chests, enchanting tables, beacons, and **Valuable blocks** (one button): netherite, ancient debris, diamond / emerald / gold blocks, quartz block / chiseled / pillar / bricks / smooth, deepslate emerald ore, deepslate coal ore |
+| Dark green | **Workstations** (one button): anvils, crafting / smithing tables, grindstones, stonecutters, looms, cartography & fletching tables, furnaces, smokers, blast furnaces |
 | Red | Chests, barrels, hoppers, crafters, dispensers, droppers |
 | Orange | Farms: built kelp / sugar cane / cactus / bamboo / pumpkin / melon farms (plants next to observers or pistons), and observer/piston machinery below y=0 |
 | Cyan | Ores: diamond, emerald, gold (normal + deepslate). No coal, copper, iron, redstone or lapis. |
@@ -102,6 +103,7 @@ To change it, open `tools/spawner-editor.html`, paint a new one, and turn the co
 | maxDistance / oreRange / farmRange | 1250 | search ranges; real limit is your render distance |
 | oreBlocks | diamond, deepslate diamond, emerald, gold, deepslate gold | any block IDs |
 | valuableBlocks | see Blue above | any block IDs; all share the Valuable blocks button |
+| workstations / workstationBlocks | true / see Dark green above | Workstations group |
 | scanIntervalTicks / chunksPerTick | 20 / 24 | scan pacing |
 | tracers / boxes / tracePlayers | true | |
 | maxTracers / lineWidth | 8 / 2.0 | |

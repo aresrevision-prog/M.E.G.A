@@ -36,6 +36,8 @@ public class MegaClientGameTest implements FabricClientGameTest {
             srv.runCommand("setblock 7 -57 12 minecraft:diamond_block");
             srv.runCommand("setblock 8 -57 12 minecraft:netherite_block");
             srv.runCommand("setblock 9 -57 12 minecraft:quartz_pillar");
+            srv.runCommand("setblock 5 -57 12 minecraft:crafting_table");
+            srv.runCommand("setblock 4 -57 12 minecraft:furnace");
             // Lava pocket inside rock, left side, and a small water pool
             srv.runCommand("fill -9 -62 6 -3 -58 12 minecraft:stone");
             srv.runCommand("fill -7 -61 8 -5 -60 10 minecraft:lava");
@@ -55,7 +57,7 @@ public class MegaClientGameTest implements FabricClientGameTest {
             MegaClient.LOGGER.info("[M.E.G.A test] targets={} categories={} blockTypes={}", targets, cats, kinds);
             check(targets >= 8, "expected at least 8 targets, found " + targets);
             for (MegaClient.Category c : new MegaClient.Category[]{MegaClient.Category.ORE, MegaClient.Category.SPAWNER,
-                MegaClient.Category.STORAGE, MegaClient.Category.SHULKER, MegaClient.Category.VALUABLE}) {
+                MegaClient.Category.STORAGE, MegaClient.Category.SHULKER, MegaClient.Category.VALUABLE, MegaClient.Category.WORKSTATION}) {
                 check(cats.contains(c), "category not found: " + c);
             }
             check(kinds >= 8, "Blocks seen panel should list at least 8 block types, has " + kinds);
