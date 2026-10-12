@@ -180,8 +180,7 @@ public final class MegaClient implements ClientModInitializer {
             playerVisible = false;
             return;
         }
-        double pr = effectiveRange(client, config.playerRange);
-        double maxSq = pr * pr;
+        double maxSq = (double) config.playerRange * config.playerRange;
         List<PlayerInfo> found = new ArrayList<>();
         boolean anyVisible = false;
         for (AbstractClientPlayerEntity p : client.world.getPlayers()) {
@@ -207,8 +206,7 @@ public final class MegaClient implements ClientModInitializer {
     /** Counts dropped items in range that are moving (have velocity, or moved since the last scan). */
     private static void scanFarm(MinecraftClient client) {
         if (!config.farmAlert) { farmCount = 0; lastItemPos.clear(); return; }
-        double fr = effectiveRange(client, config.farmRange);
-        double maxSq = fr * fr;
+        double maxSq = (double) config.farmRange * config.farmRange;
         Map<ItemEntity, double[]> now = new java.util.IdentityHashMap<>();
         int moving = 0;
         double sx = 0, sy = 0, sz = 0;
@@ -258,9 +256,12 @@ public final class MegaClient implements ClientModInitializer {
         double max = effectiveRange(client, config.maxDistance);
         double ore = effectiveRange(client, config.oreRange);
         double farm = effectiveRange(client, config.farmRange);
-        j.maxSq = max * max;
-        j.oreSq = ore * ore;
-        j.farmSq = farm * farm;
+        // Render distance only limits how far out SIDEWAYS chunks load; every loaded chunk has its full height
+        // (bedrock to sky). So the 3D distance limit is the configured range, and the render distance only limits
+        // which chunks get scanned. This is what lets you find things 100+ blocks straight below you.
+        j.maxSq = (double) config.maxDistance * config.maxDistance;
+        j.oreSq = (double) config.oreRange * config.oreRange;
+        j.farmSq = (double) config.farmRange * config.farmRange;
         int chunkRadius = client.options.getClampedViewDistance();
         j.oreChunkRadius = Math.min(chunkRadius, (int) Math.ceil(ore / 16.0));
         j.farmChunkRadius = Math.min(chunkRadius, (int) Math.ceil(farm / 16.0));
