@@ -5,8 +5,8 @@ Client-side ESP, tracers, X-ray, farm alerts and block counter for the server.
 
 **[⬇ Download the latest JAR](https://github.com/aresrevision-prog/M.E.G.A/releases/latest)**
 
-![Normal view](docs/images/esp-normal.jpg)
-![X-ray view](docs/images/esp-xray.jpg)
+![First person, normal view](docs/images/first-person-normal.jpg)
+![First person, X-ray on](docs/images/first-person-xray.jpg)
 
 *Mockups drawn from the code. The mod builds, but has not been tested in-game yet.*
 
