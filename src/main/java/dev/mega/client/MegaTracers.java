@@ -8,6 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.RenderSetup;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -16,6 +17,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShapes;
+import org.joml.Matrix4f;
 import org.joml.Vector3fc;
 
 import java.util.List;
@@ -119,6 +121,44 @@ final class MegaTracers {
         }
 
         if (consumers instanceof VertexConsumerProvider.Immediate immediate) immediate.draw(LAYER);
+
+        // X-ray: see-through lava. Sides facing hidden rock get a translucent orange fill.
+        if (MegaXray.active() && cfg.xrayFluids && MegaXray.lavaCount > 0) {
+            RenderLayer fill = RenderLayers.debugFilledBox();
+            VertexConsumer fb = consumers.getBuffer(fill);
+            Matrix4f mat = entry.getPositionMatrix();
+            long[] lp = MegaXray.lavaPos;
+            byte[] lm = MegaXray.lavaMask;
+            int ln = Math.min(MegaXray.lavaCount, Math.min(lp.length, lm.length));
+            for (int i = 0; i < ln; i++) {
+                float x = (float) (net.minecraft.util.math.BlockPos.unpackLongX(lp[i]) - cam.x);
+                float y = (float) (net.minecraft.util.math.BlockPos.unpackLongY(lp[i]) - cam.y);
+                float z = (float) (net.minecraft.util.math.BlockPos.unpackLongZ(lp[i]) - cam.z);
+                int mask = lm[i];
+                for (int di = 0; di < MegaXray.DIRS.length; di++) {
+                    if ((mask & (1 << di)) == 0) continue;
+                    lavaFace(fb, mat, x, y, z, MegaXray.DIRS[di]);
+                }
+            }
+            if (consumers instanceof VertexConsumerProvider.Immediate immediate) immediate.draw(fill);
+        }
+    }
+
+    private static final int LAVA_FILL = 0x73FF5A00; // ~45% opaque orange
+
+    /** One face of a block as a quad, emitted in both windings so it shows from either side. */
+    private static void lavaFace(VertexConsumer b, Matrix4f m, float x, float y, float z, net.minecraft.util.math.Direction d) {
+        float x0 = x, y0 = y, z0 = z, x1 = x + 1, y1 = y + 1, z1 = z + 1;
+        float[][] q = switch (d) {
+            case DOWN -> new float[][]{{x0, y0, z0}, {x1, y0, z0}, {x1, y0, z1}, {x0, y0, z1}};
+            case UP -> new float[][]{{x0, y1, z0}, {x0, y1, z1}, {x1, y1, z1}, {x1, y1, z0}};
+            case NORTH -> new float[][]{{x0, y0, z0}, {x0, y1, z0}, {x1, y1, z0}, {x1, y0, z0}};
+            case SOUTH -> new float[][]{{x0, y0, z1}, {x1, y0, z1}, {x1, y1, z1}, {x0, y1, z1}};
+            case WEST -> new float[][]{{x0, y0, z0}, {x0, y0, z1}, {x0, y1, z1}, {x0, y1, z0}};
+            case EAST -> new float[][]{{x1, y0, z0}, {x1, y1, z0}, {x1, y1, z1}, {x1, y0, z1}};
+        };
+        for (int k = 0; k < 4; k++) b.vertex(m, q[k][0], q[k][1], q[k][2]).color(LAVA_FILL);
+        for (int k = 3; k >= 0; k--) b.vertex(m, q[k][0], q[k][1], q[k][2]).color(LAVA_FILL);
     }
 
     /** Yellow/black hazard-striped line for players. */

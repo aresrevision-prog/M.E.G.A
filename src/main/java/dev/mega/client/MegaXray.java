@@ -65,13 +65,17 @@ public final class MegaXray {
     static long[] ghostPos = new long[0];
     static int[] ghostColor = new int[0];
     static int ghostCount;
+    /** Lava blocks and which sides face hidden blocks: drawn as see-through orange so lava shows inside the rock. */
+    static long[] lavaPos = new long[0];
+    static byte[] lavaMask = new byte[0];
+    static int lavaCount;
     private static int ghostTimer;
-    private static final Direction[] DIRS = Direction.values();
+    static final Direction[] DIRS = Direction.values();
 
     /** Rescans ghost outlines every 10 ticks within config.xrayGhostRange (cube around you). */
     static void scanGhosts(MinecraftClient client) {
         MegaConfig cfg = MegaClient.config;
-        if (!active || (!cfg.xrayGhost && !cfg.xrayFluids) || client.world == null || client.player == null) { ghostCount = 0; return; }
+        if (!active || (!cfg.xrayGhost && !cfg.xrayFluids) || client.world == null || client.player == null) { ghostCount = 0; lavaCount = 0; return; }
         if (++ghostTimer < 10) return;
         ghostTimer = 0;
         World world = client.world;
@@ -80,6 +84,9 @@ public final class MegaXray {
         long[] pos = new long[max];
         int[] col = new int[max];
         int n = 0;
+        long[] lp = new long[max];
+        byte[] lm = new byte[max];
+        int ln = 0;
         BlockPos.Mutable m = new BlockPos.Mutable(), nb = new BlockPos.Mutable();
         outer:
         for (int dy = -r; dy <= r; dy++) for (int dx = -r; dx <= r; dx++) for (int dz = -r; dz <= r; dz++) {
@@ -92,12 +99,20 @@ public final class MegaXray {
                 if (!cfg.xrayFluids) continue;
                 boolean lava = fs.isIn(FluidTags.LAVA);
                 boolean edge = false;
-                for (Direction d : DIRS) {
+                int mask = 0;
+                for (int di = 0; di < DIRS.length; di++) {
+                    Direction d = DIRS[di];
                     nb.set(m.getX() + d.getOffsetX(), m.getY() + d.getOffsetY(), m.getZ() + d.getOffsetZ());
-                    FluidState nf = world.getBlockState(nb).getFluidState();
-                    if (nf.isEmpty() || nf.isIn(FluidTags.LAVA) != lava) { edge = true; break; }
+                    BlockState ns = world.getBlockState(nb);
+                    FluidState nf = ns.getFluidState();
+                    if (nf.isEmpty() || nf.isIn(FluidTags.LAVA) != lava) {
+                        edge = true;
+                        // sides against hidden blocks get a see-through fill (sides open to air already show real lava)
+                        if (lava && !ns.isAir() && !isVisible(ns)) mask |= 1 << di;
+                    }
                 }
                 if (!edge) continue;
+                if (mask != 0 && ln < max) { lp[ln] = m.asLong(); lm[ln] = (byte) mask; ln++; }
                 pos[n] = m.asLong();
                 col[n] = lava ? 0xFFFF5A00 : 0xFF3F76E4;
                 if (++n >= max) break outer;
@@ -120,6 +135,9 @@ public final class MegaXray {
         ghostPos = pos;
         ghostColor = col;
         ghostCount = n;
+        lavaPos = lp;
+        lavaMask = lm;
+        lavaCount = ln;
     }
 
     /** Keeps the client-side night vision on while x-ray is active (every tick, cheap). */
