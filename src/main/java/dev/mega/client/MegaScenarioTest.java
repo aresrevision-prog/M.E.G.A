@@ -46,7 +46,7 @@ public class MegaScenarioTest implements FabricClientGameTest {
             srv.runCommand("gamerule doMobSpawning false");
             srv.runCommand("item replace entity @a armor.chest with minecraft:elytra");
             srv.runCommand("item replace entity @a hotbar.0 with minecraft:firework_rocket 64");
-            ctx.runOnClient(c -> c.options.getViewDistance().setValue(8));
+            ctx.runOnClient(c -> c.options.getViewDistance().setValue(6));
 
             List<Stash> stashes = srv.computeOnServer(server -> buildStashes(server.getOverworld()));
             MegaClient.LOGGER.info("[M.E.G.A scenario] stashes: {}", stashes);
@@ -60,14 +60,14 @@ public class MegaScenarioTest implements FabricClientGameTest {
                 double ex = s.pos().getX() - Math.cos(ang) * 8, ez = s.pos().getZ() - Math.sin(ang) * 8;
                 double sy = s.top() + 34, ey = s.top() + 16;
                 tp(srv, sx, sy, sz, s.pos());
-                sp.getClientWorld().waitForChunksRender();
+                waitChunks(sp);
                 ctx.runOnClient(c -> { MegaClient.config.xray = false; MegaClient.applyConfig(); });
                 ctx.waitTicks(30); // let the mod scan the new area
 
                 for (int f = 0; f < FRAMES; f++) {
                     if (f == FRAMES / 2) { // second half of each pass: X-ray on
                         ctx.runOnClient(c -> { MegaClient.config.xray = true; MegaClient.applyConfig(); });
-                        sp.getClientWorld().waitForChunksRender();
+                        waitChunks(sp);
                         ctx.waitTicks(12);
                     }
                     double t = f / (double) (FRAMES - 1);
@@ -82,6 +82,11 @@ public class MegaScenarioTest implements FabricClientGameTest {
             ctx.runOnClient(c -> { MegaClient.config.xray = false; MegaClient.applyConfig(); });
             MegaClient.LOGGER.info("[M.E.G.A scenario] DONE, {} frames", frame);
         }
+    }
+
+    /** Real terrain generates slowly on CI, so allow up to 10 minutes. */
+    private static void waitChunks(TestSingleplayerContext sp) {
+        sp.getClientWorld().waitForChunksRender(true, 20 * 60 * 10);
     }
 
     /** Teleport the player and face the stash. */
@@ -101,7 +106,8 @@ public class MegaScenarioTest implements FabricClientGameTest {
         List<Stash> out = new ArrayList<>();
         for (int i = 0; i < STASHES; i++) {
             int x = r.nextInt(RADIUS * 2 + 1) - RADIUS, z = r.nextInt(RADIUS * 2 + 1) - RADIUS;
-            w.getChunk(x >> 4, z >> 4); // generate the terrain there
+            // generate the terrain around the stash now, so the flight there doesn't wait on world generation
+            for (int cx = -6; cx <= 6; cx++) for (int cz = -6; cz <= 6; cz++) w.getChunk((x >> 4) + cx, (z >> 4) + cz);
             int top = w.getTopY(Heightmap.Type.OCEAN_FLOOR, x, z);
             int floor = Math.max(-50, top - 14);
             // carve a 7x4x7 room
