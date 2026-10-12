@@ -5,6 +5,16 @@ Client-side ESP, tracers, X-ray, farm alerts and block counter for the server.
 
 **[⬇ Download the latest JAR](https://github.com/aresrevision-prog/M.E.G.A/releases/latest)**
 
+## Real in-game screenshots (Minecraft 1.21.11)
+Taken automatically on every build by the in-game test, which launches the real 1.21.11 client with the mod, builds a test world and checks that everything works. A release is only published if it passes.
+
+![ESP](docs/images/real/esp.png)
+![X-ray](docs/images/real/xray.png)
+![Farm alert](docs/images/real/farm-alert.png)
+![Settings panel](docs/images/real/panel.png)
+![What to detect](docs/images/real/what-to-detect.png)
+
+## Mockups
 ![First person, normal view](docs/images/first-person-normal.jpg)
 ![First person, X-ray on](docs/images/first-person-xray.jpg)
 
