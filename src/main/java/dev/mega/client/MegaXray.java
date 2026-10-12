@@ -57,6 +57,9 @@ public final class MegaXray {
         boolean changed = want != active || (want && !set.equals(visible));
         visible = Set.copyOf(set);
         active = want;
+        // Minecraft skips drawing chunk sections it thinks are hidden behind solid rock ("cave culling"). With X-ray the
+        // rock is invisible, so turn that off (like spectator mode) or stashes deep below you would not be drawn.
+        client.chunkCullingEnabled = !want;
         if (changed && client.worldRenderer != null) client.worldRenderer.reload();
         if (!want) removeNightVision(client);
     }

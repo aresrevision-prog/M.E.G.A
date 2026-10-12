@@ -98,6 +98,27 @@ public class MegaClientGameTest implements FabricClientGameTest {
             int farm = ctx.computeOnClient(c -> MegaClient.farmCount);
             MegaClient.LOGGER.info("[M.E.G.A test] movingItems={}", farm);
             ctx.takeScreenshot("05-farm-alert");
+
+            // Stash 100+ blocks straight below you (flat world bottom is y=-64): must still be found and shown in X-ray
+            srv.runCommand("kill @e[type=minecraft:item]");
+            srv.runCommand("setblock 30 -62 30 minecraft:spawner");
+            srv.runCommand("setblock 31 -62 30 minecraft:chest");
+            srv.runCommand("setblock 29 -62 30 minecraft:diamond_block");
+            srv.runCommand("setblock 30 -62 31 minecraft:lime_shulker_box");
+            srv.runCommand("tp @a 30.5 51 27.5 0 82");
+            sp.getClientWorld().waitForChunksRender();
+            ctx.waitTicks(80);
+            double deep = ctx.computeOnClient(c -> MegaClient.targets.stream()
+                .filter(t -> t.pos().getX() >= 29 && t.pos().getX() <= 31 && t.pos().getZ() >= 30 && t.pos().getZ() <= 31)
+                .mapToDouble(MegaClient.Target::distance).max().orElse(-1));
+            MegaClient.LOGGER.info("[M.E.G.A test] deep stash found at {} blocks", Math.round(deep));
+            check(deep >= 100, "stash 100+ blocks below was not found (got " + deep + ")");
+            ctx.takeScreenshot("06-100-below");
+            ctx.runOnClient(c -> { MegaClient.config.xray = true; MegaClient.applyConfig(); });
+            sp.getClientWorld().waitForChunksRender();
+            ctx.waitTicks(20);
+            ctx.takeScreenshot("07-100-below-xray");
+            ctx.runOnClient(c -> { MegaClient.config.xray = false; MegaClient.applyConfig(); });
             MegaClient.LOGGER.info("[M.E.G.A test] ALL CHECKS PASSED");
         }
     }
