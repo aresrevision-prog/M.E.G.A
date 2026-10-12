@@ -6,7 +6,7 @@ Client-side info HUD + tracers. **Info only — no automation, no combat aids, n
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. This mod shows its version on the HUD (`M.E.G.A v0.17.0`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. This mod shows its version on the HUD (`M.E.G.A v0.18.0`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 
 ## Features & colours
@@ -30,6 +30,8 @@ Client-side info HUD + tracers. **Info only — no automation, no combat aids, n
 - **Ore / expensive-block finder** within `oreRange` (one entry per vein; sections without them are skipped, so it's cheap).
 - **Tracers + boxes** to the nearest targets, through walls. Player tracers are yellow/black striped and **on** (`tracePlayers`).
 - Header shows version and counts (`O` ore, `Sp` spawner, `V` valuable, `Sh` shulker, `St` storage). Hides while F3 is open.
+
+- **Custom spawner texture**: spawners use the M.E.G.A design (`assets/minecraft/textures/block/spawner.png`). Only players with the mod see it. Edit it with `tools/spawner-editor.html`.
 
 ## Controls
 - `0` — open the settings panel: on/off buttons, range sliders, ignored players, and **What to detect...** (one on/off button per block type: chest, hopper, diamond ore, etc., plus All on / All off). Saves on Done.
