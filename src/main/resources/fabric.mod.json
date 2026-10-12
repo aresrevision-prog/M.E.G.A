@@ -25,5 +25,6 @@
   },
   "mixins": [
     "mega_client.mixins.json"
-  ]
+  ],
+  "accessWidener": "mega_client.accesswidener"
 }

@@ -65,3 +65,7 @@ tasks.register("runProductionClientDig", net.fabricmc.loom.task.prod.ClientProdu
     jvmArgs.add("-Xmx3G")
     useXVFB = true
 }
+
+loom {
+    accessWidenerPath = file("src/main/resources/mega_client.accesswidener")
+}
