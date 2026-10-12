@@ -1,5 +1,7 @@
 name: Build
 on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,3 +17,18 @@ jobs:
         with:
           name: mega-client-jar
           path: build/libs/mega-client-*.jar
+      - name: Read version
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        id: ver
+        run: echo "v=$(grep '^mod_version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_OUTPUT"
+      - name: Publish release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.ver.outputs.v }}
+          name: M.E.G.A Client v${{ steps.ver.outputs.v }}
+          body: "Fabric 1.21.11, client-side. Put the JAR (not -sources) in .minecraft/mods with Fabric API."
+          files: |
+            build/libs/mega-client-*.jar
+            !build/libs/*-sources.jar
+          make_latest: true
