@@ -41,7 +41,8 @@ public class MegaDigScenario implements FabricClientGameTest {
                 "effect give @a minecraft:night_vision infinite 0 true",
                 "item replace entity @a hotbar.0 with minecraft:netherite_pickaxe",
                 "item replace entity @a hotbar.1 with minecraft:purple_banner"}) srv.runCommand(c);
-            ctx.runOnClient(c -> { c.options.getViewDistance().setValue(6); c.options.getMaxFps().setValue(20); });
+            ctx.runOnClient(c -> { c.options.getViewDistance().setValue(6); c.options.getMaxFps().setValue(20);
+                MegaClient.config.maxTracers = 30; MegaClient.config.maxLines = 10; });
 
             // Bury the stash ~100 blocks under the surface, 40 blocks from spawn
             int[] info = srv.computeOnServer(server -> buildStash(server.getOverworld()));
