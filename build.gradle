@@ -44,3 +44,12 @@ tasks.withType(JavaCompile).configureEach {
     it.options.release = 21
     it.options.encoding = 'UTF-8'
 }
+
+// Long "live footage" scenario: random stashes across a 5000-block world, elytra flight, frames for a video.
+tasks.register("runProductionClientScenario", net.fabricmc.loom.task.prod.ClientProductionRunTask) {
+    jvmArgs.add("-Dfabric.client.gametest")
+    jvmArgs.add("-Dfabric.client.gametest.disableNetworkSynchronizer=true")
+    jvmArgs.add("-Dmega.scenario=true")
+    jvmArgs.add("-Xmx3G")
+    useXVFB = true
+}

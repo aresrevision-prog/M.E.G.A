@@ -1,0 +1,39 @@
+name: Scenario footage
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  scenario:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Install virtual display and ffmpeg
+        run: sudo apt-get update -q && sudo apt-get install -y -q xvfb ffmpeg
+      - name: Build
+        run: chmod +x gradlew && ./gradlew build --no-daemon
+      - name: Fly the scenario in the real game
+        id: run
+        run: ./gradlew runProductionClientScenario --no-daemon --stacktrace
+      - name: Make the video
+        if: always()
+        run: |
+          mkdir -p /tmp/out
+          D=$(find . -type d -name scenario_frames | head -1)
+          echo "frames dir: $D"; ls "$D" | head; ls "$D" | wc -l
+          if [ -n "$D" ]; then
+            ffmpeg -y -loglevel error -framerate 16 -pattern_type glob -i "$D/f*.png" -c:v libx264 -pix_fmt yuv420p -crf 24 -movflags +faststart /tmp/out/scenario.mp4
+            ffmpeg -y -loglevel error -framerate 16 -pattern_type glob -i "$D/f*.png" -vf "fps=8,scale=640:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128[p];[b][p]paletteuse" /tmp/out/scenario.gif
+            for n in 0010 0050 0074 0114 0138 0178; do [ -f "$D/f$n.png" ] && cp "$D/f$n.png" /tmp/out/; done
+          fi
+          find . -path '*run*' -name 'latest.log' -exec cp {} /tmp/out/latest.log \; || true
+          echo "commit ${{ github.sha }} - scenario outcome: ${{ steps.run.outcome }}" > /tmp/out/RESULT.txt
+          ls -la /tmp/out
+          cd /tmp/out && git init -q && git checkout -q -b scenario-results && git add -A
+          git -c user.name="M.E.G.A CI" -c user.email="ci@users.noreply.github.com" commit -qm "Scenario footage for ${{ github.sha }}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" scenario-results

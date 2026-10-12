@@ -17,6 +17,7 @@ import java.util.Set;
 public class MegaClientGameTest implements FabricClientGameTest {
     @Override
     public void runTest(ClientGameTestContext ctx) {
+        if (Boolean.getBoolean("mega.scenario")) return; // the scenario job runs MegaScenarioTest only
         try (TestSingleplayerContext sp = ctx.worldBuilder().create()) {
             TestServerContext srv = sp.getServer();
             // Flat test world: grass top at y=-61.

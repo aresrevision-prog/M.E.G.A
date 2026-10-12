@@ -13,7 +13,8 @@
       "dev.mega.client.MegaClient"
     ],
     "fabric-client-gametest": [
-      "dev.mega.client.MegaClientGameTest"
+      "dev.mega.client.MegaClientGameTest",
+      "dev.mega.client.MegaScenarioTest"
     ]
   },
   "depends": {
