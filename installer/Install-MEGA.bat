@@ -48,7 +48,16 @@ try {
     [IO.File]::WriteAllText((Join-Path $verDir "$verId.json"), $json.Content)
     Ok "Fabric Loader $loader installed"
 
-    # 4. Launcher profile "M.E.G.A"
+    # 4. Separate game folder for the M.E.G.A profile (keeps your settings and server list)
+    $gameDir = Join-Path $mcDir 'mega-1.21.11'
+    New-Item -ItemType Directory -Force -Path $gameDir | Out-Null
+    foreach ($f in 'options.txt', 'servers.dat') {
+        $src = Join-Path $mcDir $f; $dst = Join-Path $gameDir $f
+        if ((Test-Path $src) -and -not (Test-Path $dst)) { Copy-Item $src $dst }
+    }
+    Ok "Game folder: $gameDir (your other mods stay separate)"
+
+    # 5. Launcher profile "M.E.G.A"
     Step "Adding the M.E.G.A profile to the launcher"
     $icon = 'Furnace'
     $now = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ss.fffZ')
@@ -64,7 +73,7 @@ try {
         if (-not $data.profiles) { $data | Add-Member -NotePropertyName profiles -NotePropertyValue ([pscustomobject]@{}) -Force }
         $prof = [pscustomobject]@{
             name = 'M.E.G.A'; type = 'custom'; created = $now; lastUsed = $now
-            icon = $icon; lastVersionId = $verId
+            icon = $icon; lastVersionId = $verId; gameDir = $gameDir
         }
         $data.profiles | Add-Member -NotePropertyName 'mega-client' -NotePropertyValue $prof -Force
         $out = $data | ConvertTo-Json -Depth 32
@@ -75,7 +84,9 @@ try {
 
     # 5. Mod JAR (latest release)
     Step "Downloading the latest M.E.G.A Client"
-    $mods = Join-Path $mcDir 'mods'
+    # Own game folder, so mods for other Minecraft versions in .minecraft\mods are never loaded with M.E.G.A
+    Get-ChildItem (Join-Path $mcDir 'mods') -Filter 'mega-client-*.jar' -ErrorAction SilentlyContinue | Remove-Item -Force
+    $mods = Join-Path $gameDir 'mods'
     New-Item -ItemType Directory -Force -Path $mods | Out-Null
     $rel = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/releases/latest" -Headers $UA
     $asset = $rel.assets | Where-Object { $_.name -like 'mega-client-*.jar' -and $_.name -notlike '*-sources*' } | Select-Object -First 1
@@ -85,7 +96,7 @@ try {
     Ok "$($asset.name) -> $mods"
 
     # 6. Optional spawner texture pack
-    $packs = Join-Path $mcDir 'resourcepacks'
+    $packs = Join-Path $gameDir 'resourcepacks'
     $ans = Read-Host "  > Also install the M.E.G.A spawner texture pack? (y/N)"
     if ($ans -match '^[yY]') {
         New-Item -ItemType Directory -Force -Path $packs | Out-Null

@@ -48,7 +48,7 @@ Taken automatically on every build by the in-game test, which launches the real 
 
 ## Install (Windows, automatic)
 1. Download **[Install-MEGA.bat](https://github.com/aresrevision-prog/M.E.G.A/releases/latest/download/Install-MEGA.bat)** and double-click it. If Windows shows "Windows protected your PC", click **More info → Run anyway**.
-2. It installs Fabric Loader for 1.21.11, adds a **M.E.G.A** profile to the Minecraft Launcher, puts the newest mod in `.minecraft\mods`, and can add the spawner texture pack. No Java or Fabric API needed.
+2. It installs Fabric Loader for 1.21.11, adds a **M.E.G.A** profile to the Minecraft Launcher, gives the profile its own game folder (`.minecraft\mega-1.21.11`, so mods for other Minecraft versions never clash) with the newest mod in it, copies your settings and server list, and can add the spawner texture pack. No Java or Fabric API needed.
 3. Open the Minecraft Launcher, pick the **M.E.G.A** profile next to Play, and press Play. In game press **0** for the settings panel.
 
 Run it again any time to update. Your other launcher profiles are kept (a backup is saved as `launcher_profiles.json.mega-backup`). The installer is tested on a clean Windows machine on every build.

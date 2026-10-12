@@ -66,6 +66,8 @@ jobs:
         run: |
           mkdir "%APPDATA%\.minecraft"
           echo {"profiles":{"latest-release":{"name":"","type":"latest-release","lastVersionId":"latest-release"}},"settings":{},"version":3}> "%APPDATA%\.minecraft\launcher_profiles.json"
+          mkdir "%APPDATA%\.minecraft\mods"
+          echo x> "%APPDATA%\.minecraft\mods\other-26.3-mod.jar"
           echo n| installer\Install-MEGA.bat
       - name: Check everything was set up
         shell: pwsh
@@ -77,5 +79,6 @@ jobs:
           if (-not $p.'latest-release') { throw 'existing profile was lost' }
           $v = $p.'mega-client'.lastVersionId
           if (-not (Test-Path "$mc\versions\$v\$v.json")) { throw "version json missing for $v" }
-          if (-not (Get-ChildItem "$mc\mods\mega-client-*.jar")) { throw 'mod JAR missing' }
+          if ($p.'mega-client'.gameDir -ne "$mc\mega-1.21.11") { throw 'gameDir not set' }
+          if (-not (Get-ChildItem "$mc\mega-1.21.11\mods\mega-client-*.jar")) { throw 'mod JAR missing' }
           Write-Host "INSTALLER TEST PASSED ($v)"
