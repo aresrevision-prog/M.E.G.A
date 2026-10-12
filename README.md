@@ -1,41 +1,72 @@
 # M.E.G.A Client — Fabric 1.21.11
 
-Client-side info HUD + tracers. **Info only — no automation, no combat aids, no packet tricks.**
+Client-side ESP, tracers, X-ray, farm alerts and block counter for the server.
+**Info only:** it reads what the server already sends your game and draws it on your screen. No automation, no combat aids, no packet tricks.
+
+**[⬇ Download the latest JAR](https://github.com/aresrevision-prog/M.E.G.A/releases/latest)**
+
+![Normal view](docs/images/esp-normal.jpg)
+![X-ray view](docs/images/esp-xray.jpg)
+
+*Mockups drawn from the code. The mod builds, but has not been tested in-game yet.*
 
 ## Server rules
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. This mod shows its version on the HUD (`M.E.G.A v0.18.1`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.18.1`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 
-## Features & colours
-| Colour | What |
+## Install
+1. Install Fabric Loader for Minecraft 1.21.11.
+2. Put **Fabric API** for 1.21.11 and `mega-client-<version>.jar` (not the `-sources` one) in `.minecraft/mods`.
+3. Launch the Fabric profile. Press **0** in-game for the settings panel.
+
+Client-side only: nothing is installed on the server, and other players don't need it.
+
+## Colours
+| Colour | Shows |
 |---|---|
-| Purple | Spawners |
-| Yellow / black | Other players (warning banner, player list, striped tracer). Never you. |
+| Purple | Spawners (with the custom M.E.G.A texture) |
+| Yellow / black | Other players: striped line, player list, warning banner. Crouching players get a yellow box. Never you or ignored players. |
+| Magenta | Invisible players (box only) |
 | Green | Shulker boxes |
-| Blue | Enchanting tables, ender chests, beacons, and **Valuable blocks** (one button): netherite, ancient debris, deepslate emerald ore, deepslate coal ore, diamond, emerald, gold blocks, quartz block / chiseled / pillar / bricks / smooth (no ore), anvils, crafting/smithing tables, grindstones, stonecutters, looms, cartography & fletching tables, furnaces, smokers, blast furnaces |
+| Blue | Ender chests, enchanting tables, beacons, and **Valuable blocks** (one button): netherite, ancient debris, diamond / emerald / gold blocks, quartz block / chiseled / pillar / bricks / smooth, deepslate emerald ore, deepslate coal ore, anvils, crafting / smithing tables, grindstones, stonecutters, looms, cartography & fletching tables, furnaces, smokers, blast furnaces |
 | Red | Chests, barrels, hoppers, crafters, dispensers, droppers |
-| Orange | **Farms**: built kelp / sugar cane / cactus / bamboo / pumpkin / melon farms (plants next to observers or pistons), and any observer/piston machinery below y=0. Buttons: *Plant farms*, *Farms below y=0* |
-| Cyan | Ores: diamond (+deepslate), emerald, gold (+deepslate). No coal, copper, iron, redstone or lapis. |
+| Orange | Farms: built kelp / sugar cane / cactus / bamboo / pumpkin / melon farms (plants next to observers or pistons), and observer/piston machinery below y=0 |
+| Cyan | Ores: diamond, emerald, gold (normal + deepslate). No coal, copper, iron, redstone or lapis. |
 
-- **Farm alert**: orange `FARM DETECTED` banner at the top centre for (a) the nearest built farm (e.g. `KELP FARM 40m ↗`, `UNDERGROUND FARM`) and/or (b) more than 32 dropped items moving within render distance. Natural kelp/cane is ignored: a plant farm needs observers or pistons with it. Farms also appear in the list with orange tracers.
-- **Blocks seen** panel (top-right): how many of each block type are in range (every block, e.g. `DIAMOND 23`, `CHEST 41`), coloured by group, biggest first. Panel button: *Blocks seen panel*.
-- **Player warning** banner when another player is in line of sight.
-- **Sneaky player outlines**: box outline through walls round **crouching** players (yellow) and **invisible** players (magenta). Panel button: *Outline sneaky players*.
-- **M.E.G.A X-ray** (panel button): every other block turns invisible; ores, valuable blocks, spawners, shulkers and storage stay solid with their real textures (like quartz and ores). Hidden blocks next to caves/air within 12 blocks keep an **outline in their own colour** (stone grey, dirt brown, deepslate dark grey…; leaves, glass, ice and slime too) so you can see the terrain shape (panel: *X-ray outlines*). Optional coloured edges round X-ray blocks: `xrayEdges` (off). Client-side night vision keeps them bright. Toggling rebuilds chunks (brief stutter). Header shows `X-RAY`. Block hiding doesn't work with Sodium (edges still do). Water/lava still show.
-- **Player list**: name, distance, direction arrow. Bright yellow = visible, dim yellow = behind cover. No player coordinates.
-- **Block radar** for loaded chunks, nearest first, with arrow, distance, coords and block name (e.g. `RED_SHULKER_BOX`). Double chests count once.
-- **Ore / expensive-block finder** within `oreRange` (one entry per vein; sections without them are skipped, so it's cheap).
-- **Tracers + boxes** to the nearest targets, through walls. Player tracers are yellow/black striped and **on** (`tracePlayers`).
-- Header shows version and counts (`O` ore, `Sp` spawner, `V` valuable, `Sh` shulker, `St` storage). Hides while F3 is open.
+## Features
+- **Player warning** banner when another player is in sight.
+- **Player list**: name, distance, direction arrow. Bright yellow = visible, dim yellow = behind cover. No coordinates.
+- **Block radar** list: nearest targets with arrow, distance, coordinates and block name (e.g. `RED_SHULKER_BOX`). Double chests count once.
+- **Tracers and boxes** through walls to the nearest 8 targets, in their group colour. Striped yellow/black lines to players.
+- **Sneaky player outlines**: yellow box round crouching players, magenta box round invisible players.
+- **Ore and valuable-block finder** across your whole render distance (setting goes up to 1250 blocks).
+- **Farm alert** banner (top centre): nearest built farm, and 32+ moving dropped items. Stone, cobblestone, cobbled deepslate, deepslate and gravel drops are ignored.
+- **Blocks seen** panel (top right): how many of each block type are in range.
+- **M.E.G.A X-ray**: every other block turns see-through; important blocks keep their real textures; hidden blocks near you keep an outline in their own colour. Client-side night vision keeps things bright.
+- **Ignore list**: `IzzosBro2013` (and you) are never detected.
+- Scanning is spread over several ticks, nearest chunks first, so there are no lag spikes.
 
-- **Custom spawner texture**: spawners use the M.E.G.A design (`assets/minecraft/textures/block/spawner.png`). Only players with the mod see it. Edit it with `tools/spawner-editor.html`.
+### X-ray: see-through blocks
+![X-ray blocks](docs/images/xray-blocks.png)
 
-## Controls
-- `0` — open the settings panel: on/off buttons, range sliders, ignored players, and **What to detect...** (one on/off button per block type: chest, hopper, diamond ore, etc., plus All on / All off). Saves on Done.
-- Reload config — unbound by default; set it in Options → Controls → M.E.G.A Client
+Outlines show within 12 blocks of you, only where a block touches air. Small shapes like torches, flowers, tall grass, rails and signs stay drawn. Water and lava stay visible.
+
+## Settings panel (press 0)
+![Settings panel](docs/images/panel.png)
+
+- Left: on/off buttons, range sliders, max tracers and the ignored-players box.
+- **What to detect...**: one on/off button per block type, plus All on / All off.
+- Changes save and apply when you press Done or Back.
+- Reload config: no key by default; set one in Options → Controls → M.E.G.A Client.
+
+## Spawner texture
+![Spawner texture](docs/images/spawner-texture.png)
+
+Spawners use this design (`src/main/resources/assets/minecraft/textures/block/spawner.png`). Only players with the mod see it.
+To change it, open `tools/spawner-editor.html`, paint a new one, and turn the copied `MEGA16:` code into the PNG.
 
 ## Config — `config/mega_client.json`
 | Key | Default | Notes |
@@ -43,44 +74,35 @@ Client-side info HUD + tracers. **Info only — no automation, no combat aids, n
 | hudEnabled | true | |
 | hudX / hudY | 8 / 8 | HUD position |
 | maxLines | 8 | rows per list (1–30) |
-| blockCountPanel | true | Blocks seen corner panel |
-| blockCountLines | 15 | rows in that panel (1–40) |
+| blockCountPanel / blockCountLines | true / 15 | Blocks seen panel and its rows |
 | playerWarning / playerList | true / true | |
-| showInvisiblePlayers | false | |
-| outlineSneaky | true | outline crouching / invisible players |
-| xray | false | M.E.G.A X-ray on/off |
-| xrayGhost | true | outlines of hidden blocks in their own colour |
-| xrayGhostRange | 12 | 4–32 blocks around you |
-| xrayGhostMax | 6000 | most outlines at once |
-| xrayEdges | false | coloured edges round X-ray blocks |
-| xrayMax | 3000 | most blocks outlined at once (lower = more FPS) |
-| disabledTargets | [] | individual block types switched off (set from the panel) |
-| ignoredPlayers | ["IzzosBro2013"] | never detected: no line, not listed, no warning (case-insensitive) |
-| playerRange | 1250 | 8–1250 (1250 = max render distance) |
-| spawners / valuables / shulkers / storage | true | category toggles |
-| maxDistance | 1250 | 8–1250; default searches your whole render distance like the original mod |
-| scanIntervalTicks | 20 | 5–200, pause between scans |
-| chunksPerTick | 24 | scan is spread over ticks, nearest chunks first, so no lag spikes |
-| tracers / boxes | true / true | lines and box outlines |
-| tracePlayers | true | yellow/black lines to players in `playerRange` |
-| maxTracers | 8 | 0–50, nearest targets get lines |
-| lineWidth | 2.0 | 0.5–10 |
-| farmAlert | true | farm banner on/off |
-| farmThreshold | 32 | alert when MORE than this many items are moving |
-| ignoredItems | stone, cobblestone, cobbled deepslate, deepslate, gravel | dropped items that never count for the moving-items alert |
-| farmRange | 1250 | farms and moving items (1250 = max render) |
-| ores | true | ore finder on/off |
-| oreRange | 1250 | ores and valuable blocks (1250 = max render) |
-| valuableBlocks | see Blue above | any block IDs; all share the one Valuable blocks button |
-| oreBlocks | diamond, deepslate diamond, ancient debris, emerald, deepslate emerald | any block IDs, e.g. `"minecraft:gold_ore"` |
+| showInvisiblePlayers | false | list + lines for invisible players (their box always shows) |
+| outlineSneaky | true | crouching / invisible player boxes |
+| ignoredPlayers | ["IzzosBro2013"] | never detected (case-insensitive) |
+| playerRange | 1250 | 1250 = whole render distance |
+| spawners / valuables / shulkers / storage / ores | true | group toggles |
+| disabledTargets | [] | single block types switched off (set from the panel) |
+| maxDistance / oreRange / farmRange | 1250 | search ranges; real limit is your render distance |
+| oreBlocks | diamond, deepslate diamond, emerald, gold, deepslate gold | any block IDs |
+| valuableBlocks | see Blue above | any block IDs; all share the Valuable blocks button |
+| scanIntervalTicks / chunksPerTick | 20 / 24 | scan pacing |
+| tracers / boxes / tracePlayers | true | |
+| maxTracers / lineWidth | 8 / 2.0 | |
+| farmAlert / farmThreshold | true / 32 | alert when more than this many items are moving |
+| ignoredItems | stone, cobblestone, cobbled deepslate, deepslate, gravel | never count for the moving-items alert |
+| xray | false | M.E.G.A X-ray |
+| xrayGhost / xrayGhostRange / xrayGhostMax | true / 12 / 6000 | outlines of hidden blocks |
+| xrayEdges / xrayMax | false / 3000 | optional coloured edges round X-ray blocks |
 
 ## Build
-**Easiest (no setup):** push this folder to a GitHub repo. The included Actions workflow builds it; download the JAR from the run's *Artifacts* (`mega-client-jar`).
+Every push to `main` builds on GitHub Actions and publishes the JAR to [Releases](https://github.com/aresrevision-prog/M.E.G.A/releases).
+Locally: JDK 21, then `./gradlew build` (Windows: `gradlew.bat build`); the JAR is in `build/libs/`.
 
-**Locally:** JDK 21, then `./gradlew build` (Windows: `gradlew.bat build`). JAR is in `build/libs/` (use the one without `-sources`). Put it in `.minecraft/mods` with Fabric API.
+## Limits
+- Only sees chunks your game has loaded; the server never sends anything further away.
+- Can't see chest contents until you open them.
+- An anti-xray plugin on the server (e.g. Paper's) shows fake ores, so the ore finder and X-ray will be wrong.
+- X-ray block hiding doesn't work alongside Sodium (everything else does).
+- No combat, movement, teleport or auto-break features: those would break rules 1–3.
 
-## Limits (by design / impossible client-side)
-- Only sees chunks your client has loaded — the server never sends unloaded chunks.
-- Can't see chest contents until you open them — the server doesn't send them.
-- If the server runs an anti-xray plugin (e.g. Paper's), hidden ores are fake and the ore finder will show wrong results.
-- No combat, movement, teleport or auto-break features — those would break rules 1–3.
+More: [`docs/overview.html`](docs/overview.html) has everything on one page.
