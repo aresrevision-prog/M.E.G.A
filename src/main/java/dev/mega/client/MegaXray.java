@@ -106,6 +106,8 @@ public final class MegaXray {
                     BlockState ns = world.getBlockState(nb);
                     FluidState nf = ns.getFluidState();
                     if (nf.isEmpty() || nf.isIn(FluidTags.LAVA) != lava) {
+                        // water touching open air is just a normal water surface: no outline (stops oceans turning into a grid)
+                        if (!lava && ns.isAir()) continue;
                         edge = true;
                         // sides against hidden blocks get a see-through fill (sides open to air already show real lava)
                         if (lava && !ns.isAir() && !isVisible(ns)) mask |= 1 << di;

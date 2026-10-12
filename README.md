@@ -5,6 +5,13 @@ Client-side ESP, tracers, X-ray, farm alerts and block counter for the server.
 
 **[⬇ Download the latest JAR](https://github.com/aresrevision-prog/M.E.G.A/releases/latest)**
 
+## Real footage: elytra flight over a 5000-block world
+8 stashes buried at random spots within 5000 blocks of spawn in a normal (non-flat) world, flown to one by one with X-ray off then on. Recorded in the real 1.21.11 client by the *Scenario footage* workflow.
+
+![Stash flight preview](docs/video/stash-preview.gif)
+
+[Full video (32 s, MP4)](docs/video/scenario-flight.mp4)
+
 ## Real in-game screenshots (Minecraft 1.21.11)
 Taken automatically on every build by the in-game test, which launches the real 1.21.11 client with the mod, builds a test world and checks that everything works. A release is only published if it passes.
 
@@ -29,7 +36,7 @@ Taken automatically on every build by the in-game test, which launches the real 
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.20.0`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.20.1`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 
 ## Install
