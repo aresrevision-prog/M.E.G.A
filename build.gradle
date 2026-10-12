@@ -53,3 +53,12 @@ tasks.register("runProductionClientScenario", net.fabricmc.loom.task.prod.Client
     jvmArgs.add("-Xmx3G")
     useXVFB = true
 }
+
+// "Dig to the stash" footage: find a stash ~100 blocks down, dig to it, place a banner.
+tasks.register("runProductionClientDig", net.fabricmc.loom.task.prod.ClientProductionRunTask) {
+    jvmArgs.add("-Dfabric.client.gametest")
+    jvmArgs.add("-Dfabric.client.gametest.disableNetworkSynchronizer=true")
+    jvmArgs.add("-Dmega.scenario=dig")
+    jvmArgs.add("-Xmx3G")
+    useXVFB = true
+}
