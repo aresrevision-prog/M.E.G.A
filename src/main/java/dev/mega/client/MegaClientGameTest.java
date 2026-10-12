@@ -118,7 +118,7 @@ public class MegaClientGameTest implements FabricClientGameTest {
             check(deep >= 100, "stash 100+ blocks below was not found (got " + deep + ")");
             ctx.takeScreenshot("06-100-below");
             ctx.runOnClient(c -> { MegaClient.config.xray = true; MegaClient.applyConfig(); });
-            sp.getClientWorld().waitForChunksRender();
+            sp.getClientWorld().waitForChunksRender(true, 20 * 60 * 5);
             ctx.waitTicks(20);
             ctx.takeScreenshot("07-100-below-xray");
             ctx.runOnClient(c -> { MegaClient.config.xray = false; MegaClient.applyConfig(); });
