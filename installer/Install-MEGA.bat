@@ -32,8 +32,9 @@ try {
     # 2. Close the launcher so it doesn't overwrite the new profile
     $running = Get-Process -Name 'MinecraftLauncher','Minecraft' -ErrorAction SilentlyContinue
     if ($running) {
-        Write-Host "    The Minecraft Launcher is open. Close it, then press Enter." -ForegroundColor Yellow
-        [void](Read-Host)
+        Step 'Closing the Minecraft Launcher'
+        $running | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 3
     }
 
     # 3. Fabric Loader (latest stable for 1.21.11)
