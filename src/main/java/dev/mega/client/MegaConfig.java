@@ -86,6 +86,8 @@ public final class MegaConfig {
     public boolean boxes = true;
     public boolean tracePlayers = true;
     public int maxTracers = 8;
+    /** List and tracers show stash blocks before natural ores (ores still counted and shown, just after). */
+    public boolean oresLast = true;
     public double lineWidth = 2.0;
 
     // Farm alert: banner at the top when more than farmThreshold dropped items are moving within farmRange

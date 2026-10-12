@@ -310,7 +310,10 @@ public final class MegaClient implements ClientModInitializer {
                 scanFarmBlocks(client, chunk, j.farmSq, j.found, j.counts);
         }
         if (j.index >= j.chunks.size()) {
-            j.found.sort(Comparator.comparingDouble(Target::distance));
+            // Stash blocks come first (storage, spawners, shulkers, valuables...), natural ores after, so ores
+            // (gold is everywhere in real worlds) don't take all the tracer lines away from a stash.
+            j.found.sort(Comparator.comparingInt((Target t) -> config.oresLast && t.category() == Category.ORE ? 1 : 0)
+                .thenComparingDouble(Target::distance));
             targets = j.found;
             j.xray.sort(Comparator.comparingDouble(Target::distance));
             xrayBlocks = j.xray.size() > config.xrayMax ? new ArrayList<>(j.xray.subList(0, config.xrayMax)) : j.xray;

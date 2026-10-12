@@ -37,7 +37,7 @@ public class MegaDigScenario implements FabricClientGameTest {
                 .create()) {
             TestServerContext srv = sp.getServer();
             for (String c : new String[]{"gamemode creative @a", "time set noon", "gamerule doDaylightCycle false",
-                "gamerule doWeatherCycle false", "weather clear", "gamerule doMobSpawning false", "gamerule doTileDrops false",
+                "gamerule doWeatherCycle false", "weather clear", "gamerule doMobSpawning false", "gamerule doTileDrops false", "gamerule announceAdvancements false", "gamerule sendCommandFeedback false",
                 "effect give @a minecraft:night_vision infinite 0 true",
                 "item replace entity @a hotbar.0 with minecraft:netherite_pickaxe",
                 "item replace entity @a hotbar.1 with minecraft:purple_banner"}) srv.runCommand(c);
@@ -109,6 +109,7 @@ public class MegaDigScenario implements FabricClientGameTest {
 
     private void shot(ClientGameTestContext ctx) {
         ctx.waitTick();
+        ctx.runOnClient(c -> { c.getToastManager().clear(); c.inGameHud.getChatHud().clear(false); });
         ctx.takeScreenshot(TestScreenshotOptions.of(String.format("f%04d", frame++)).disableCounterPrefix().withDestinationDir(out));
     }
 
