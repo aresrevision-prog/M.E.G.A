@@ -43,7 +43,7 @@ Taken automatically on every build by the in-game test, which launches the real 
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.20.3`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.21.0`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 
 ## Install
@@ -56,7 +56,7 @@ Client-side only: nothing is installed on the server, and other players don't ne
 ## Colours
 | Colour | Shows |
 |---|---|
-| Purple | Spawners (with the custom M.E.G.A texture) |
+| Purple | Spawners |
 | Yellow / black | Other players: striped line, player list, warning banner. Crouching players get a yellow box. Never you or ignored players. |
 | Magenta | Invisible players (box only) |
 | Green | Shulker boxes |
@@ -94,11 +94,11 @@ Outlines show within 12 blocks of you, only where a block touches air. Small sha
 - Changes save and apply when you press Done or Back.
 - Reload config: no key by default; set one in Options → Controls → M.E.G.A Client.
 
-## Spawner texture
+## Spawner texture (optional resource pack)
 ![Spawner texture](docs/images/spawner-texture.png)
 
-Spawners use this design (`src/main/resources/assets/minecraft/textures/block/spawner.png`). Only players with the mod see it.
-To change it, open `tools/spawner-editor.html`, paint a new one, and turn the copied `MEGA16:` code into the PNG.
+The mod uses Minecraft's normal spawner texture. The M.E.G.A design is a separate resource pack: [`resourcepacks/MEGA-Spawner-Texture.zip`](resourcepacks/MEGA-Spawner-Texture.zip).
+Put the zip in `.minecraft/resourcepacks` (Windows: `%appdata%\.minecraft\resourcepacks`), then Options → Resource Packs → move it to the right. Works with or without the mod.
 
 ## Config — `config/mega_client.json`
 | Key | Default | Notes |
