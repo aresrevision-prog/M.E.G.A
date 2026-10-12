@@ -13,7 +13,7 @@ jobs:
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
       - name: Build
-        run: chmod +x gradlew && ./gradlew build --no-daemon
+        run: chmod +x gradlew && set -o pipefail && ./gradlew build --no-daemon 2>&1 | tee build.log
       - uses: actions/upload-artifact@v4
         with:
           name: mega-client-jar
@@ -28,6 +28,7 @@ jobs:
         if: always() && github.event_name == 'push'
         run: |
           mkdir -p /tmp/out
+          cp build.log /tmp/out/ 2>/dev/null || true
           find . -path '*screenshots*' -name '*.png' -exec cp {} /tmp/out/ \; || true
           find . -path '*run*' -name 'latest.log' -exec cp {} /tmp/out/latest.log \; || true
           cp build/libs/mega-client-*.jar /tmp/out/ 2>/dev/null || true; rm -f /tmp/out/*-sources.jar
