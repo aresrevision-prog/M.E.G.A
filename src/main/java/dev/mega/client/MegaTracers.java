@@ -1,0 +1,146 @@
+package dev.mega.client;
+
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.DepthTestFunction;
+import dev.mega.client.MegaClient.Target;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderSetup;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexRendering;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShapes;
+import org.joml.Vector3fc;
+
+import java.util.List;
+
+/** Draws tracer lines from the crosshair to targets, plus a box outline round each target. Visible through walls. */
+final class MegaTracers {
+    private static final int YELLOW = 0xFFFFD400;
+    private static final int BLACK = 0xFF000000;
+    private static final int INVISIBLE_COLOR = 0xFFFF55FF;
+    private static final float STRIPE = 0.75f; // blocks per stripe on player lines
+
+    /** Vanilla line shader, but with depth test off so lines show through blocks. */
+    private static final RenderPipeline PIPELINE = RenderPipeline.builder(RenderPipelines.RENDERTYPE_LINES_SNIPPET)
+        .withLocation(Identifier.of(MegaClient.MOD_ID, "pipeline/esp_lines"))
+        .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+        .withDepthWrite(false)
+        .build();
+
+    private static final RenderLayer LAYER = RenderLayer.of("mega_client_esp_lines",
+        RenderSetup.builder(PIPELINE).build());
+
+    private MegaTracers() {}
+
+    static void render(WorldRenderContext ctx) {
+        MegaConfig cfg = MegaClient.config;
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (cfg == null || !cfg.hudEnabled || (!cfg.tracers && !cfg.boxes && !cfg.tracePlayers && !cfg.outlineSneaky && !cfg.xray)) return;
+        if (client.player == null || client.world == null) return;
+
+        Vec3d cam = ctx.worldState().cameraRenderState.pos;
+        Vector3fc fwd = client.gameRenderer.getCamera().getHorizontalPlane(); // look direction
+        // start just in front of the eyes so the line comes from the crosshair
+        float sx = fwd.x(), sy = fwd.y(), sz = fwd.z();
+
+        VertexConsumerProvider consumers = ctx.consumers();
+        VertexConsumer buf = consumers.getBuffer(LAYER);
+        MatrixStack matrices = ctx.matrices();
+        MatrixStack.Entry entry = matrices.peek();
+        float width = (float) cfg.lineWidth;
+
+        List<Target> targets = MegaClient.targets;
+        int n = Math.min(cfg.maxTracers, targets.size());
+        for (int i = 0; i < n; i++) {
+            Target t = targets.get(i);
+            double bx = t.pos().getX() - cam.x, by = t.pos().getY() - cam.y, bz = t.pos().getZ() - cam.z;
+            int color = t.category().color;
+            if (cfg.tracers) line(buf, entry, sx, sy, sz, (float) (bx + 0.5), (float) (by + 0.5), (float) (bz + 0.5), color, width);
+            if (cfg.boxes) VertexRendering.drawOutline(matrices, buf, VoxelShapes.fullCube(), bx, by, bz, color, width);
+        }
+
+        // X-ray ghost outlines: hidden blocks next to air, in their own colour
+        if (MegaXray.active() && cfg.xrayGhost) {
+            long[] gp = MegaXray.ghostPos;
+            int[] gc = MegaXray.ghostColor;
+            int gn = Math.min(MegaXray.ghostCount, Math.min(gp.length, gc.length));
+            float gw = Math.max(1.0f, width - 0.5f);
+            for (int i = 0; i < gn; i++) {
+                long l = gp[i];
+                VertexRendering.drawOutline(matrices, buf, VoxelShapes.fullCube(),
+                    net.minecraft.util.math.BlockPos.unpackLongX(l) - cam.x,
+                    net.minecraft.util.math.BlockPos.unpackLongY(l) - cam.y,
+                    net.minecraft.util.math.BlockPos.unpackLongZ(l) - cam.z, gc[i], gw);
+            }
+        }
+
+        // X-ray: edges of every matching block, through walls, in its category colour
+        if (cfg.xray && cfg.xrayEdges) {
+            for (Target t : MegaClient.xrayBlocks) {
+                VertexRendering.drawOutline(matrices, buf, VoxelShapes.fullCube(),
+                    t.pos().getX() - cam.x, t.pos().getY() - cam.y, t.pos().getZ() - cam.z, t.category().color, width);
+            }
+        }
+
+        if (cfg.outlineSneaky) {
+            float delta = client.getRenderTickCounter().getTickProgress(true);
+            double maxSq = (double) cfg.playerRange * cfg.playerRange;
+            for (AbstractClientPlayerEntity p : client.world.getPlayers()) {
+                if (MegaClient.skipPlayer(client, p)) continue;
+                boolean invisible = p.isInvisible();
+                if (!invisible && !p.isInSneakingPose()) continue;
+                if (client.player.squaredDistanceTo(p) > maxSq) continue;
+                Vec3d pos = p.getLerpedPos(delta);
+                VertexRendering.drawOutline(matrices, buf,
+                    VoxelShapes.cuboid(p.getBoundingBox().offset(-p.getX(), -p.getY(), -p.getZ())),
+                    pos.x - cam.x, pos.y - cam.y, pos.z - cam.z,
+                    invisible ? INVISIBLE_COLOR : YELLOW, width + 1);
+            }
+        }
+
+        if (cfg.tracePlayers) {
+            float delta = client.getRenderTickCounter().getTickProgress(true);
+            double maxSq = (double) cfg.playerRange * cfg.playerRange;
+            for (AbstractClientPlayerEntity p : client.world.getPlayers()) {
+                if (MegaClient.skipPlayer(client, p)) continue;
+                if (p.isInvisible() && !cfg.showInvisiblePlayers) continue;
+                if (client.player.squaredDistanceTo(p) > maxSq) continue;
+                Vec3d pos = p.getLerpedPos(delta);
+                float tx = (float) (pos.x - cam.x), ty = (float) (pos.y + p.getHeight() / 2 - cam.y), tz = (float) (pos.z - cam.z);
+                stripedLine(buf, entry, sx, sy, sz, tx, ty, tz, width);
+            }
+        }
+
+        if (consumers instanceof VertexConsumerProvider.Immediate immediate) immediate.draw(LAYER);
+    }
+
+    /** Yellow/black hazard-striped line for players. */
+    private static void stripedLine(VertexConsumer buf, MatrixStack.Entry e, float x1, float y1, float z1,
+                                    float x2, float y2, float z2, float width) {
+        float dx = x2 - x1, dy = y2 - y1, dz = z2 - z1;
+        float len = (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
+        int n = Math.min(400, Math.max(1, (int) Math.ceil(len / STRIPE)));
+        for (int i = 0; i < n; i++) {
+            float a = (float) i / n, b = (float) (i + 1) / n;
+            line(buf, e, x1 + dx * a, y1 + dy * a, z1 + dz * a, x1 + dx * b, y1 + dy * b, z1 + dz * b,
+                (i & 1) == 0 ? YELLOW : BLACK, width + 1);
+        }
+    }
+
+    private static void line(VertexConsumer buf, MatrixStack.Entry e, float x1, float y1, float z1,
+                             float x2, float y2, float z2, int color, float width) {
+        float dx = x2 - x1, dy = y2 - y1, dz = z2 - z1;
+        float len = (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (len < 1.0e-4f) return;
+        dx /= len; dy /= len; dz /= len;
+        buf.vertex(e, x1, y1, z1).color(color).normal(e, dx, dy, dz).lineWidth(width);
+        buf.vertex(e, x2, y2, z2).color(color).normal(e, dx, dy, dz).lineWidth(width);
+    }
+}
