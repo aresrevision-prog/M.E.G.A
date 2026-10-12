@@ -121,6 +121,13 @@ public class MegaClientGameTest implements FabricClientGameTest {
             ctx.runOnClient(c -> { MegaClient.config.storageBlocks.remove("minecraft:obsidian");
                 MegaClient.config.disabledTargets.remove("minecraft:spawner"); MegaClient.applyConfig(); });
             MegaClient.LOGGER.info("[M.E.G.A test] block editing OK");
+            // R = refresh: results cleared, then a full rescan finds everything again
+            ctx.runOnClient(MegaClient::refresh);
+            check(ctx.computeOnClient(c -> MegaClient.targets.isEmpty()), "refresh did not clear old results");
+            ctx.waitTicks(40);
+            int again = ctx.computeOnClient(c -> MegaClient.targets.size());
+            check(again >= 8, "refresh did not rescan (found " + again + ")");
+            MegaClient.LOGGER.info("[M.E.G.A test] refresh OK, {} targets", again);
             ctx.setScreen(() -> null);
 
             // Farm alert: lots of moving dropped items

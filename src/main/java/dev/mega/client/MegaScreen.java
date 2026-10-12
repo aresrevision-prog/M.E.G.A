@@ -27,7 +27,9 @@ final class MegaScreen extends Screen {
     static int tab = 0;
     private final Screen parent;
     private TextFieldWidget ignoredField;
-    private int contentTop;
+    private int contentTop, contentEnd;
+    /** Dark panel behind the buttons: left, top, right, bottom. */
+    private int[] box = new int[4];
 
     MegaScreen(Screen parent) {
         super(Text.literal("M.E.G.A Client v" + MegaClient.version));
@@ -58,7 +60,7 @@ final class MegaScreen extends Screen {
 
         if (tab == 0) {
             // One row per colour: [■ Ores (cyan): ON] [Edit blocks (5/5) >]
-            int toggleW = (int) (w * 0.58);
+            int toggleW = (int) (w * 0.66);
             for (Category cat : Category.values()) {
                 addDrawableChild(ButtonWidget.builder(colourText(cat, cat.enabled(c)), b -> {
                     cat.setEnabled(c, !cat.enabled(c));
@@ -66,26 +68,26 @@ final class MegaScreen extends Screen {
                 }).dimensions(x0, y, toggleW, BTN_H).build());
                 List<String> blocks = cat.blocks(c);
                 long on = blocks.stream().filter(id -> !c.disabledTargets.contains(id)).count();
-                String what = cat == Category.FARM ? "Edit plants" : "Edit blocks";
-                addDrawableChild(ButtonWidget.builder(Text.literal(what + " (" + on + "/" + blocks.size() + ") >"),
+                addDrawableChild(ButtonWidget.builder(Text.literal("Edit  §7" + on + "/" + blocks.size() + " §f›"),
                     b -> client.setScreen(new MegaBlocksScreen(this, cat)))
                     .dimensions(x0 + toggleW + GAP, y, w - toggleW - GAP, BTN_H).build());
                 y += BTN_H + GAP;
             }
         } else if (tab == 1) {
-            List<Object[]> toggles = List.of(
+            // Screen | Lines | X-ray | Range, two per row
+            y = toggleGrid(List.of(
                 t("HUD", () -> c.hudEnabled, v -> c.hudEnabled = v),
                 t("Blocks seen panel", () -> c.blockCountPanel, v -> c.blockCountPanel = v),
-                t("Tracer lines", () -> c.tracers, v -> c.tracers = v),
-                t("Boxes", () -> c.boxes, v -> c.boxes = v),
-                t("M.E.G.A X-ray", () -> c.xray, v -> { c.xray = v; MegaClient.applyConfig(); }),
+                t("Lines", () -> c.tracers, v -> c.tracers = v),
+                t("Boxes", () -> c.boxes, v -> c.boxes = v)), x0, y, colW);
+            addDrawableChild(new IntSlider(x0, y, colW, "Lines shown", 0, 50, () -> c.maxTracers, v -> c.maxTracers = v));
+            addDrawableChild(new IntSlider(x0 + colW + GAP, y, colW, "List rows", 1, 30, () -> c.maxLines, v -> c.maxLines = v));
+            y += BTN_H + GAP + 4;
+            y = toggleGrid(List.of(
+                t("X-ray", () -> c.xray, v -> { c.xray = v; MegaClient.applyConfig(); }),
                 t("X-ray outlines", () -> c.xrayGhost, v -> c.xrayGhost = v),
                 t("X-ray lava & water", () -> c.xrayFluids, v -> c.xrayFluids = v),
-                t("Natural ores listed last", () -> c.oresLast, v -> c.oresLast = v));
-            y = toggleGrid(toggles, x0, y, colW);
-            addDrawableChild(new IntSlider(x0, y, colW, "Max lines", 0, 50, () -> c.maxTracers, v -> c.maxTracers = v));
-            addDrawableChild(new IntSlider(x0 + colW + GAP, y, colW, "List rows", 1, 30, () -> c.maxLines, v -> c.maxLines = v));
-            y += BTN_H + GAP;
+                t("Ores after stashes", () -> c.oresLast, v -> c.oresLast = v)), x0, y, colW) + 4;
             addDrawableChild(new IntSlider(x0, y, colW, "Block range", 8, 1250, () -> c.maxDistance, v -> c.maxDistance = v));
             addDrawableChild(new IntSlider(x0 + colW + GAP, y, colW, "Ore range", 8, 1250, () -> c.oreRange, v -> c.oreRange = v));
             y += BTN_H + GAP;
@@ -99,7 +101,7 @@ final class MegaScreen extends Screen {
             y = toggleGrid(toggles, x0, y, colW);
             addDrawableChild(new IntSlider(x0 + colW + GAP, y - BTN_H - GAP, colW, "Player range", 8, 1250,
                 () -> c.playerRange, v -> c.playerRange = v));
-            y += 12;
+            y += 14;
             ignoredField = new TextFieldWidget(textRenderer, x0, y, w, BTN_H, Text.literal("Ignored players"));
             ignoredField.setMaxLength(512);
             ignoredField.setText(String.join(", ", c.ignoredPlayers));
@@ -108,8 +110,24 @@ final class MegaScreen extends Screen {
             y += BTN_H + GAP;
         }
 
+        contentEnd = y;
+        int doneY = Math.min(height - BTN_H - 4, y + 16);
         addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close())
-            .dimensions(width / 2 - 75, Math.min(height - BTN_H - 4, y + 6), 150, BTN_H).build());
+            .dimensions(x0, doneY, w, BTN_H).build());
+        box = new int[]{x0 - 6, 1, x0 + w + 6, doneY + BTN_H + 5};
+    }
+
+    /** Blurred game behind, then one dark panel holding everything. */
+    @Override
+    public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        super.renderBackground(ctx, mouseX, mouseY, delta);
+        panel(ctx, box);
+    }
+
+    static void panel(DrawContext ctx, int[] b) {
+        ctx.fill(b[0], b[1], b[2], b[3], 0xC0101014);
+        ctx.fill(b[0], b[1], b[2], b[1] + 1, 0xFFFFD400); // gold line on top
+        ctx.fill(b[0], b[3] - 1, b[2], b[3], 0x60FFFFFF);
     }
 
     private static Object[] t(String name, Supplier<Boolean> get, Consumer<Boolean> set) {
@@ -135,25 +153,26 @@ final class MegaScreen extends Screen {
         return Text.literal(name + ": " + (on ? "§aON" : "§cOFF"));
     }
 
-    /** "■ Ores (cyan): ON" with the square in the colour itself. */
+    /** "■ Ores  ON" with the square and name in the colour itself. */
     static MutableText colourText(Category cat, boolean on) {
-        return Text.literal("■ ").withColor(MegaClient.readable(cat.color) & 0xFFFFFF)
-            .append(Text.literal(cat.title + " (" + cat.colourName + "): " + (on ? "§aON" : "§cOFF")));
+        return Text.literal("■ " + cat.title).withColor(MegaClient.readable(cat.color) & 0xFFFFFF)
+            .append(Text.literal(on ? "  §aON" : "  §cOFF"));
     }
 
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.render(ctx, mouseX, mouseY, delta);
-        ctx.drawCenteredTextWithShadow(textRenderer, title, width / 2, 7, 0xFFFFD400);
+        ctx.drawCenteredTextWithShadow(textRenderer, title, width / 2, 4, 0xFFFFD400);
         if (ignoredField != null) {
             ctx.drawTextWithShadow(textRenderer, "Ignored players (never detected):",
                 ignoredField.getX(), ignoredField.getY() - 11, 0xFFAAAAAA);
         }
-        if (tab == 0) {
-            int y = contentTop + Category.values().length * (BTN_H + GAP) + 2;
-            if (y + 34 < height)
-                ctx.drawCenteredTextWithShadow(textRenderer, "Every colour that's ON always gets a line and a list row.",
-                    width / 2, y, 0xFFAAAAAA);
+        // Footer hint, just above Done
+        int hy = box[3] - BTN_H - 17;
+        if (hy >= contentEnd - GAP) {
+            String hint = tab == 0 ? "Every colour that's ON always gets a line  ·  R refreshes"
+                : "Saves when you press Done  ·  R refreshes";
+            ctx.drawCenteredTextWithShadow(textRenderer, hint, width / 2, hy, 0xFF8A8A8A);
         }
     }
 

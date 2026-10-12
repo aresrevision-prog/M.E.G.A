@@ -43,7 +43,7 @@ Taken automatically on every build by the in-game test, which launches the real 
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.23.0`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.24.0`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 
 ## Install (Windows, automatic)
@@ -101,7 +101,7 @@ Three tabs:
 
 Every colour that's ON and found always gets at least one line and one list row (the nearest of each colour comes first), so a pile of chests can't push spawners or shulkers off the screen. Dark colours are lightened on the HUD so the text stays readable.
 
-Changes save and apply when you press Done or Back. Reload config: no key by default; set one in Options → Controls → Key Binds → Miscellaneous.
+Changes save and apply when you press Done or Back. Press **R** to refresh: reloads the settings file and rescans everything straight away. Both keys can be changed in Options → Controls → Key Binds → Miscellaneous.
 
 ## Spawner texture (optional resource pack)
 ![Spawner texture](docs/images/spawner-texture.png)

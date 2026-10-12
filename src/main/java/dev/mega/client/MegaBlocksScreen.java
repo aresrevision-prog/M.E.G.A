@@ -30,6 +30,7 @@ final class MegaBlocksScreen extends Screen {
     private List<String> matches = List.of();
     private TextFieldWidget field;
     private int pages = 1;
+    private int[] box = new int[4];
 
     MegaBlocksScreen(Screen parent, Category cat) {
         super(Text.literal("■ ").withColor(MegaClient.readable(cat.color) & 0xFFFFFF)
@@ -122,6 +123,13 @@ final class MegaBlocksScreen extends Screen {
             .dimensions(x0 + w - arrowW, navY, arrowW, BTN_H).build();
         next.active = page < pages - 1;
         addDrawableChild(next);
+        box = new int[]{x0 - 6, 1, x0 + w + 6, navY + BTN_H + 3};
+    }
+
+    @Override
+    public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        super.renderBackground(ctx, mouseX, mouseY, delta);
+        MegaScreen.panel(ctx, box);
     }
 
     /** Adds the typed block (or the only match), moving it out of any other colour. */
@@ -210,7 +218,7 @@ final class MegaBlocksScreen extends Screen {
         super.render(ctx, mouseX, mouseY, delta);
         List<String> list = cat.blocks(MegaClient.config);
         ctx.drawCenteredTextWithShadow(textRenderer, title, width / 2, 7, 0xFFFFFFFF);
-        String sub = list.size() + (cat == Category.FARM ? " plants" : " blocks") + "  ·  click to turn on/off  ·  X removes"
+        String sub = list.size() + (cat == Category.FARM ? " plants" : " blocks") + "  ·  click: on/off  ·  X: remove"
             + (pages > 1 ? "  ·  page " + (page + 1) + "/" + pages : "");
         ctx.drawCenteredTextWithShadow(textRenderer, sub, width / 2, 20, 0xFFAAAAAA);
         if (list.isEmpty())

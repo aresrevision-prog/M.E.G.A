@@ -82,7 +82,7 @@ public final class MegaClient implements ClientModInitializer {
         // (mixin/GameOptionsMixin, MinecraftClientMixin, InGameHudMixin, WorldRendererMixin).
         // Names are plain text because without Fabric API the game doesn't load mod language files.
         settingsKey = new KeyBinding("M.E.G.A settings panel", GLFW.GLFW_KEY_0, KeyBinding.Category.MISC);
-        reloadKey = new KeyBinding("M.E.G.A reload config", GLFW.GLFW_KEY_UNKNOWN, KeyBinding.Category.MISC);
+        reloadKey = new KeyBinding("M.E.G.A refresh", GLFW.GLFW_KEY_R, KeyBinding.Category.MISC);
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc != null && mc.options != null) mc.options.allKeys = addKeys(mc.options.allKeys); // options already made
 
@@ -103,12 +103,7 @@ public final class MegaClient implements ClientModInitializer {
         while (settingsKey.wasPressed()) {
             if (client.currentScreen == null) client.setScreen(new MegaScreen(null));
         }
-        while (reloadKey.wasPressed()) {
-            loadConfig();
-            tickCounter = Integer.MAX_VALUE - 1; // rescan next tick
-        job = null;
-            message(client, "Config reloaded", Formatting.AQUA);
-        }
+        while (reloadKey.wasPressed()) refresh(client);
 
         MegaXray.tick(client);
         MegaXray.scanGhosts(client);
@@ -134,6 +129,20 @@ public final class MegaClient implements ClientModInitializer {
             startScan(client);
             continueScan(client);
         }
+    }
+
+    /** R: reload the config file, forget old results and scan everything again right now. */
+    static void refresh(MinecraftClient client) {
+        loadConfig();
+        job = null;
+        targets = List.of();
+        xrayBlocks = List.of();
+        blockCounts = List.of();
+        counts.clear();
+        lastItemPos.clear();
+        tickCounter = Integer.MAX_VALUE - 1; // full rescan on this tick
+        if (MegaXray.active() && client.worldRenderer != null) client.worldRenderer.reload();
+        message(client, "Refreshed", Formatting.AQUA);
     }
 
     private static void loadConfig() {
