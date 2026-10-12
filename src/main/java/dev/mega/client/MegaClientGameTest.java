@@ -106,6 +106,7 @@ public class MegaClientGameTest implements FabricClientGameTest {
             srv.runCommand("setblock 29 -62 30 minecraft:diamond_block");
             srv.runCommand("setblock 30 -62 31 minecraft:lime_shulker_box");
             srv.runCommand("gamemode spectator @a"); // hover in place (no falling)
+            ctx.runOnClient(c -> c.options.getViewDistance().setValue(12)); // fog would hide ground 112 blocks away at the test default
             srv.runCommand("tp @a 30.5 51 27.5 0 82");
             sp.getClientWorld().waitForChunksRender();
             ctx.runOnClient(c -> { c.player.setYaw(0); c.player.setPitch(80); }); // look straight down
