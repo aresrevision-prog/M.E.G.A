@@ -633,7 +633,7 @@ public final class MegaClient implements ClientModInitializer {
         WORKSTATION(0xFF1F8A2B, "W", "Workstations", "dark green"),
         STORAGE(0xFFFF4444, "St", "Storage", "red"),
         FARM(0xFFFF8800, "F", "Farms", "orange"), // built plant farms (machines aimed at plants) + machines below y=0
-        LIGHT(0xFFFFF59D, "L", "Lights underground", "pale yellow"), // torches/lanterns/glowstone buried underground
+        LIGHT(0xFFFFF59D, "L", "Lights", "pale yellow"), // torches/lanterns/glowstone buried underground
         BUILT(0xFFF2F2F2, "B", "built_block", "white"),        // blocks that never generate naturally
         BASE(0xFFFF8FC8, "Bs", "Base signs", "pink");          // trading halls, animal pens, tamed pets, named mobs
 

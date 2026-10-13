@@ -43,7 +43,7 @@ Taken automatically on every build by the in-game test, which launches the real 
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.29.0`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.29.1`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 6. Teleporting is allowed (M.E.G.A itself has no teleport: it can't be done client-side without cheating).
 
@@ -72,7 +72,7 @@ Client-side only: nothing is installed on the server, and other players don't ne
 | Dark green | **Workstations** (one button): anvils, crafting / smithing tables, grindstones, stonecutters, looms, cartography & fletching tables, furnaces, smokers, blast furnaces |
 | Red | Chests, barrels, hoppers, crafters, dispensers, droppers |
 | Orange | Farms: built kelp / sugar cane / cactus / bamboo / pumpkin / melon farms (2+ observers or pistons aimed at the plants; named after the plant most of them aim at), and observer/piston machinery below y=0 |
-| Pale yellow | **Lights underground**: torches, lanterns, glowstone, sea lanterns, froglights, campfires... only when buried 4+ blocks under the surface (caves never have them). One entry per area, e.g. `LIGHTS_UNDERGROUND x9` |
+| Pale yellow | **Lights** (underground): torches, lanterns, glowstone, sea lanterns, froglights, campfires... only when buried 4+ blocks under the surface (caves never have them). One entry per area, e.g. `LIGHTS_UNDERGROUND x9` |
 | White | **built_block**: every block that never generates naturally (concrete, concrete powder, glazed terracotta, wool, carpet, all glass and panes, polished stone, smooth stone). One entry per area with 6+, e.g. `BUILT_BLOCKS x40`. Switch any block type off on its edit page |
 | Pink | **Base signs**: trading halls (6+ villagers packed together), animal pens (12+ of one animal), tamed pets, named mobs. Each can be switched off |
 | Cyan | Ores: diamond, emerald, gold (normal + deepslate). No coal, copper, iron, redstone or lapis. |
