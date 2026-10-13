@@ -83,7 +83,7 @@ public final class MegaTracers {
                 int[] gc = MegaXray.ghostColor;
                 byte[] gf = MegaXray.ghostFaces;
                 int gn = Math.min(MegaXray.ghostCount, Math.min(gp.length, Math.min(gc.length, gf.length)));
-                float gw = width + 1.0f; // thicker so the shape of caves and hidden blocks is easy to read
+                float gw = width + 2.0f; // thicker so the shape of caves and hidden blocks is easy to read
                 for (int i = 0; i < gn; i++) {
                     long l = gp[i];
                     openEdges(dbuf, entry,
@@ -97,7 +97,7 @@ public final class MegaTracers {
             if (cfg.xray && cfg.xrayEdges) {
                 for (Target t : MegaClient.xrayBlocks) {
                     VertexRendering.drawOutline(matrices, dbuf, CUBE_OUT,
-                        t.pos().getX() - cam.x, t.pos().getY() - cam.y, t.pos().getZ() - cam.z, t.category().color, width + 1.0f);
+                        t.pos().getX() - cam.x, t.pos().getY() - cam.y, t.pos().getZ() - cam.z, t.category().color, width + 2.0f);
                 }
             }
 
@@ -106,7 +106,7 @@ public final class MegaTracers {
                 for (int i = 0; i < Math.min(cfg.maxTracers, ts.size()); i++) {
                     Target t = ts.get(i);
                     VertexRendering.drawOutline(matrices, dbuf, CUBE_OUT, t.pos().getX() - cam.x, t.pos().getY() - cam.y,
-                        t.pos().getZ() - cam.z, t.category().color, width + 1.0f);
+                        t.pos().getZ() - cam.z, t.category().color, width + 2.0f);
                 }
             }
             if (consumers instanceof VertexConsumerProvider.Immediate immediate) immediate.draw(DEPTH_LAYER);
@@ -119,7 +119,7 @@ public final class MegaTracers {
         for (MegaWaypoints.Waypoint w : MegaWaypoints.here(client)) {
             float wx = (float) (w.x + 0.5 - cam.x), wy = (float) (w.y - cam.y), wz = (float) (w.z + 0.5 - cam.z);
             line(buf, entry, wx, wy, wz, wx, wy + 300, wz, w.color, width + 1);
-            VertexRendering.drawOutline(matrices, buf, VoxelShapes.fullCube(), w.x - cam.x, w.y - cam.y, w.z - cam.z, w.color, width);
+            VertexRendering.drawOutline(matrices, buf, VoxelShapes.fullCube(), w.x - cam.x, w.y - cam.y, w.z - cam.z, w.color, width + 1.5f);
             if (cfg.tracers) line(buf, entry, sx, sy, sz, wx, wy + 0.5f, wz, w.color, width);
         }
 
@@ -130,7 +130,7 @@ public final class MegaTracers {
             double bx = t.pos().getX() - cam.x, by = t.pos().getY() - cam.y, bz = t.pos().getZ() - cam.z;
             int color = t.category().color;
             if (cfg.tracers) line(buf, entry, sx, sy, sz, (float) (bx + 0.5), (float) (by + 0.5), (float) (bz + 0.5), color, width);
-            if (cfg.boxes && !xrayOn) VertexRendering.drawOutline(matrices, buf, VoxelShapes.fullCube(), bx, by, bz, color, width);
+            if (cfg.boxes && !xrayOn) VertexRendering.drawOutline(matrices, buf, VoxelShapes.fullCube(), bx, by, bz, color, width + 1.5f);
         }
 
         if (cfg.outlineSneaky) {
