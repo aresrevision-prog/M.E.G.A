@@ -359,8 +359,7 @@ public final class MegaClient implements ClientModInitializer {
         if (j.index >= j.chunks.size()) {
             // Stash blocks come first (storage, spawners, shulkers, valuables...), natural ores after, so ores
             // (gold is everywhere in real worlds) don't take all the tracer lines away from a stash.
-            j.found.sort(Comparator.comparingInt((Target t) -> config.oresLast && t.category() == Category.ORE ? 1 : 0)
-                .thenComparingDouble(Target::distance));
+            j.found.sort(ORDER);
             if (config.deepScan) j.found.removeIf(t -> !underground(client, t.pos()));
             targets = everyColourFirst(j.found);
             j.xray.sort(Comparator.comparingDouble(Target::distance));
@@ -368,7 +367,9 @@ public final class MegaClient implements ClientModInitializer {
             counts.clear();
             counts.putAll(j.counts);
             List<BlockCount> bc = new ArrayList<>(j.blockCounts.values());
-            bc.sort(Comparator.comparingInt(BlockCount::count).reversed().thenComparing(BlockCount::label));
+            // stash blocks first (biggest count first), natural ores after, so thousands of ore blocks don't push them off
+            bc.sort(Comparator.comparingInt((BlockCount b) -> natural(b.label(), b.color()) ? 1 : 0)
+                .thenComparing(Comparator.comparingInt(BlockCount::count).reversed()).thenComparing(BlockCount::label));
             blockCounts = bc;
             job = null;
             scanFarm(client);
@@ -511,11 +512,21 @@ public final class MegaClient implements ClientModInitializer {
         return p.getY() <= top - 5;
     }
 
+    /** Natural ores (any colour: e.g. deepslate coal in Valuables) count as "natural"; everything else was placed. */
+    static boolean natural(String label, int color) {
+        return color == Category.ORE.color || label.endsWith("_ORE") || label.equals("ANCIENT_DEBRIS");
+    }
+
+    /** Placed stash blocks first, natural ores after (if oresLast), then nearest first. */
+    static final Comparator<Target> ORDER = Comparator.comparingInt((Target t) ->
+            config.oresLast && natural(t.label(), t.category().color) ? 1 : 0)
+        .thenComparingDouble(Target::distance);
+
     static List<Target> everyColourFirst(List<Target> sorted) {
         List<Target> first = new ArrayList<>(), rest = new ArrayList<>();
         Set<Category> seen = java.util.EnumSet.noneOf(Category.class);
         for (Target t : sorted) (seen.add(t.category()) ? first : rest).add(t);
-        first.sort(Comparator.comparingDouble(Target::distance));
+        first.sort(ORDER);
         first.addAll(rest);
         return first;
     }

@@ -69,6 +69,11 @@ public class MegaClientGameTest implements FabricClientGameTest {
             });
             MegaClient.LOGGER.info("[M.E.G.A test] colours with a line: {}", lined);
             check(lined.containsAll(cats), "every colour found should get a line, missing: " + cats.stream().filter(x -> !lined.contains(x)).toList());
+            // natural ores (any colour) come after placed stash blocks, in the list and the Blocks seen panel
+            String firstLabel = ctx.computeOnClient(c -> MegaClient.targets.get(0).label() + "/" + MegaClient.blockCounts.get(0).label());
+            MegaClient.LOGGER.info("[M.E.G.A test] first row / first block type: {}", firstLabel);
+            check(!firstLabel.contains("DIAMOND/") && !firstLabel.startsWith("GOLD") && !firstLabel.endsWith("/DIAMOND") && !firstLabel.endsWith("/GOLD"),
+                "natural ore listed before stash blocks: " + firstLabel);
             check(kinds >= 8, "Blocks seen panel should list at least 8 block types, has " + kinds);
             ctx.takeScreenshot("01-esp-normal");
 

@@ -43,7 +43,7 @@ Taken automatically on every build by the in-game test, which launches the real 
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.28.0`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.28.1`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 6. Teleporting is allowed (M.E.G.A itself has no teleport: it can't be done client-side without cheating).
 
@@ -145,7 +145,7 @@ Put the zip in `.minecraft/resourcepacks` (Windows: `%appdata%\.minecraft\resour
 | scanIntervalTicks / chunksPerTick | 20 / 24 | scan pacing |
 | tracers / boxes / tracePlayers | true | |
 | maxTracers / lineWidth | 8 / 2.0 | |
-| oresLast | true | list and lines show stash blocks before natural ores |
+| oresLast | true | list, lines and Blocks seen show placed stash blocks before natural ores (any colour, e.g. deepslate coal) |
 | farmAlert / farmThreshold | true / 32 | alert when more than this many items are moving |
 | ignoredItems | stone, cobblestone, cobbled deepslate, deepslate, gravel | never count for the moving-items alert |
 | xray | false | M.E.G.A X-ray |
