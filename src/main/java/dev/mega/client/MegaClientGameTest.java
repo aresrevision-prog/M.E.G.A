@@ -107,6 +107,7 @@ public class MegaClientGameTest implements FabricClientGameTest {
             ctx.waitTicks(5);
             ctx.takeScreenshot("03c-panel-players");
             ctx.runOnClient(c -> MegaScreen.tab = 0);
+            ctx.setScreen(() -> null);
             // Editing a colour's blocks: add obsidian to Storage (red), it must be found
             srv.runCommand("setblock 6 -60 4 minecraft:obsidian");
             ctx.runOnClient(c -> { MegaClient.config.storageBlocks.add("minecraft:obsidian"); MegaClient.applyConfig(); });
