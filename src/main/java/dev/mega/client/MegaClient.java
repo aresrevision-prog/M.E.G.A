@@ -440,24 +440,38 @@ public final class MegaClient implements ClientModInitializer {
             if (!section.hasAny(st -> MACHINES.contains(st.getBlock()))) continue;
             int baseY = chunk.sectionIndexToCoord(i) << 4;
 
-            int machines = 0;
+            // A farm machine points AT a plant: an observer watching it, or a piston facing it (1-2 blocks along
+            // its facing, or just above/below that, for cane/cactus/bamboo columns). Random pistons near wild plants
+            // (jungle temples, villages) don't point at plants, so they no longer count.
+            int machines = 0, aimed = 0;
             Map<String, Integer> plants = new java.util.HashMap<>();
             long mx = 0, my = 0, mz = 0;
+            BlockPos.Mutable q = new BlockPos.Mutable();
             for (int y = 0; y < 16; y++) for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++) {
-                Block b = section.getBlockState(x, y, z).getBlock();
-                if (MACHINES.contains(b)) { machines++; mx += x; my += y; mz += z; continue; }
-                String plant = farmPlants.get(b);
-                if (plant != null) plants.merge(plant, 1, Integer::sum);
+                BlockState st = section.getBlockState(x, y, z);
+                if (!MACHINES.contains(st.getBlock())) continue;
+                machines++; mx += x; my += y; mz += z;
+                net.minecraft.util.math.Direction f = st.getOrEmpty(net.minecraft.state.property.Properties.FACING).orElse(null);
+                if (f == null) continue;
+                int wx = baseX + x, wy = baseY + y, wz = baseZ + z;
+                String hit = null;
+                search:
+                for (int dist = 1; dist <= 2; dist++) for (int dy = -1; dy <= 1; dy++) {
+                    q.set(wx + f.getOffsetX() * dist, wy + f.getOffsetY() * dist + dy, wz + f.getOffsetZ() * dist);
+                    String plant = farmPlants.get(client.world.getBlockState(q).getBlock());
+                    if (plant != null) { hit = plant; break search; }
+                }
+                if (hit != null) { aimed++; plants.merge(hit, 1, Integer::sum); }
             }
             if (machines == 0) continue;
 
             String best = null;
             int bestN = 0;
             for (Map.Entry<String, Integer> e : plants.entrySet()) {
-                if (e.getValue() > bestN) { best = e.getKey(); bestN = e.getValue(); }
+                if (e.getValue() > bestN) { best = e.getKey(); bestN = e.getValue(); } // the plant most machines aim at
             }
             String key, label;
-            if (best != null && bestN >= 8 && machines >= 2) { key = "plant_farm"; label = best + "_FARM"; }
+            if (best != null && aimed >= 2) { key = "plant_farm"; label = best + "_FARM"; }
             else if (baseY < 0 && machines >= 4) { key = "underground_farm"; label = "UNDERGROUND_FARM"; }
             else continue;
             if (disabled.contains(key)) continue;

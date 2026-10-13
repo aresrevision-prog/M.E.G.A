@@ -129,6 +129,22 @@ public class MegaClientGameTest implements FabricClientGameTest {
             int again = ctx.computeOnClient(c -> MegaClient.targets.size());
             check(again >= 8, "refresh did not rescan (found " + again + ")");
             MegaClient.LOGGER.info("[M.E.G.A test] refresh OK, {} targets", again);
+            // Farms: a real bamboo farm (observers aimed at the bamboo) is found and named right; pistons that are just
+            // NEXT TO wild bamboo (like a jungle temple) are not a farm.
+            for (int z = 0; z < 3; z++) {
+                srv.runCommand("setblock -20 -60 " + z + " minecraft:bamboo");
+                srv.runCommand("setblock -21 -59 " + z + " minecraft:observer[facing=east]");
+                srv.runCommand("setblock -50 -60 " + z + " minecraft:sticky_piston[facing=up]");
+                for (int dx = 1; dx <= 3; dx++) srv.runCommand("setblock " + (-50 - dx) + " -60 " + z + " minecraft:bamboo");
+            }
+            ctx.runOnClient(MegaClient::refresh);
+            ctx.waitTicks(60);
+            String farms = ctx.computeOnClient(c -> MegaClient.targets.stream().filter(t -> t.category() == MegaClient.Category.FARM)
+                .map(t -> t.label() + "@" + t.pos().getX()).toList().toString());
+            MegaClient.LOGGER.info("[M.E.G.A test] farms: {}", farms);
+            check(farms.contains("BAMBOO_FARM"), "real bamboo farm not found: " + farms);
+            check(!farms.contains("@-5"), "pistons next to wild bamboo were called a farm: " + farms);
+
             // Deep scan: only buried things. The hill stash (inside 6 blocks of stone) stays; the furnace/table on the hill top go.
             ctx.runOnClient(c -> { MegaClient.config.deepScan = true; MegaClient.config.save(); MegaClient.refresh(c); });
             ctx.waitTicks(40);
