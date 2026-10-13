@@ -74,6 +74,9 @@ public final class MegaHud {
             title += " (" + total + ")";
             int w = tr.getWidth(title);
             int n = Math.min(bc.size(), cfg.blockCountLines);
+            // never run down into the radars
+            int limit = (MegaRadar.top(client, ctx) - 14 - (6 + topPad) - 11) / 10;
+            n = Math.max(0, Math.min(n, limit));
             for (int i = 0; i < n; i++) w = Math.max(w, tr.getWidth("■ " + bc.get(i).label() + "  " + bc.get(i).count()));
             int rx = sw - w - 8, ry = 6 + topPad;
             ctx.fill(rx - 4, ry - 2, sw - 4, ry + 11 + Math.max(n, 1) * 10 + 2, PANEL);

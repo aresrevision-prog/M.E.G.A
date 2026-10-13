@@ -73,9 +73,9 @@ public final class MegaRadar {
         MegaConfig cfg = MegaClient.config;
         if (!cfg.radar || client.player == null) return;
         TextRenderer tr = client.textRenderer;
-        int size = cfg.radarSize, gap = 4;
+        int gap = 4, size = size(ctx);
         int sw = ctx.getScaledWindowWidth(), sh = ctx.getScaledWindowHeight();
-        int y = sh - size - 6;
+        int y = sh - size - 3;
         int x0 = sw - 3 * (size + gap) - 2;
         for (int l = 0; l < 3; l++) {
             int x = x0 + l * (size + gap);
@@ -93,11 +93,26 @@ public final class MegaRadar {
                     ctx.fill(ex - 1, ey - 1, ex + 2, ey + 2, c);
                 } else ctx.fill(ex - 1, ey - 1, ex + 1, ey + 1, c);
             }
-            String label = NAMES[l] + " " + count[l];
-            ctx.drawTextWithShadow(tr, label, x + 2, y - 10, 0xFFFFFFFF);
+            String label = tr.trimToWidth(NAMES[l] + " " + count[l], size);
+            if (tr.getWidth(NAMES[l] + " " + count[l]) > size) label = tr.trimToWidth((l == 2 ? "<0" : NAMES[l].substring(0, 1)) + " " + count[l], size);
+            ctx.drawTextWithShadow(tr, label, x + 1, y - 10, 0xFFFFFFFF);
         }
         ctx.drawTextWithShadow(tr, cfg.radarRange + "m", x0 + 3 * (size + gap) - gap - tr.getWidth(cfg.radarRange + "m") - 2,
             y + size - 9, 0xFF9A9A9A);
+    }
+
+    /** Radar size: fits in the space right of the hotbar, so it never covers hearts, food or items. */
+    static int size(DrawContext ctx) {
+        int sw = ctx.getScaledWindowWidth();
+        int free = sw - (sw / 2 + 91 + 6) - 2 * 4 - 4; // right of the 182-wide hotbar
+        return Math.max(28, Math.min(MegaClient.config.radarSize, free / 3));
+    }
+
+    /** Top of the radar labels (so other HUD parts can stay above), or the screen bottom when radars are off. */
+    static int top(MinecraftClient client, DrawContext ctx) {
+        int sh = ctx.getScaledWindowHeight();
+        if (!MegaClient.config.radar) return sh;
+        return sh - size(ctx) - 3 - 10;
     }
 
     private static void border(DrawContext ctx, int x, int y, int s, int c) {
