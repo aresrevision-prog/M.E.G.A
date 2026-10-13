@@ -40,6 +40,7 @@ public final class MegaXray {
     /** Applies the config value; rebuilds chunks only if something changed. */
     static void apply(MinecraftClient client, Set<Block> scanned) {
         Set<Block> set = new HashSet<>(scanned); // ores + valuable blocks
+        set.add(Blocks.BEDROCK); // so you can see the bottom of the world in X-ray
         set.add(Blocks.SPAWNER);
         set.add(Blocks.CHEST);
         set.add(Blocks.BARREL);

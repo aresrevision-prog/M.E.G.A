@@ -83,6 +83,7 @@ public class MegaClientGameTest implements FabricClientGameTest {
             check(xr, "X-ray did not turn on");
             check(ghosts > 0, "X-ray outlines missing");
             check(lava > 0, "see-through lava missing");
+            check(ctx.computeOnClient(c -> MegaXray.isVisible(net.minecraft.block.Blocks.BEDROCK.getDefaultState())), "bedrock hidden in X-ray");
             ctx.takeScreenshot("02-xray");
             ctx.runOnClient(c -> { MegaClient.config.xray = false; MegaClient.applyConfig(); });
             sp.getClientWorld().waitForChunksRender();

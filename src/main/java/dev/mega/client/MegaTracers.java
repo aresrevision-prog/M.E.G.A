@@ -38,6 +38,17 @@ public final class MegaTracers {
     private static final RenderLayer LAYER = RenderLayer.of("mega_client_esp_lines",
         RenderSetup.builder(PIPELINE).build());
 
+    /** Same lines but hidden behind blocks that are drawn: in X-ray, outlines don't show through ores/stash blocks. */
+    private static final RenderPipeline DEPTH_PIPELINE = RenderPipeline.builder(RenderPipelines.RENDERTYPE_LINES_SNIPPET)
+        .withLocation(Identifier.of(MegaClient.MOD_ID, "pipeline/xray_lines"))
+        .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
+        .withDepthWrite(false)
+        .build();
+    private static final RenderLayer DEPTH_LAYER = RenderLayer.of("mega_client_xray_lines",
+        RenderSetup.builder(DEPTH_PIPELINE).build());
+    /** A block, a hair bigger, so its outline isn't hidden by the block's own faces. */
+    private static final net.minecraft.util.shape.VoxelShape CUBE_OUT = VoxelShapes.cuboid(-0.003, -0.003, -0.003, 1.003, 1.003, 1.003);
+
     private MegaTracers() {}
 
     /** Called from WorldRendererMixin at the end of the main world pass (same point Fabric API calls END_MAIN). */
@@ -58,9 +69,50 @@ public final class MegaTracers {
         // start just in front of the eyes so the line comes from the crosshair
         float sx = fwd.x(), sy = fwd.y(), sz = fwd.z();
 
-        VertexConsumer buf = consumers.getBuffer(LAYER);
         MatrixStack.Entry entry = matrices.peek();
         float width = (float) cfg.lineWidth;
+        boolean xrayOn = MegaXray.active();
+
+        // ---- X-ray outlines first, depth-tested: blocks X-ray keeps (ores, stash blocks, bedrock) hide the lines
+        // behind them, so you get a clear view instead of lines showing through solid blocks.
+        if (xrayOn) {
+            VertexConsumer dbuf = consumers.getBuffer(DEPTH_LAYER);
+            // X-ray ghost outlines: hidden blocks next to air, in their own colour
+            if (MegaXray.active() && (cfg.xrayGhost || cfg.xrayFluids)) {
+                long[] gp = MegaXray.ghostPos;
+                int[] gc = MegaXray.ghostColor;
+                int gn = Math.min(MegaXray.ghostCount, Math.min(gp.length, gc.length));
+                float gw = width + 1.0f; // thicker so the shape of caves and hidden blocks is easy to read
+                for (int i = 0; i < gn; i++) {
+                    long l = gp[i];
+                    VertexRendering.drawOutline(matrices, dbuf, CUBE_OUT,
+                        net.minecraft.util.math.BlockPos.unpackLongX(l) - cam.x,
+                        net.minecraft.util.math.BlockPos.unpackLongY(l) - cam.y,
+                        net.minecraft.util.math.BlockPos.unpackLongZ(l) - cam.z, gc[i], gw);
+                }
+            }
+
+            // X-ray: edges of every matching block, in its category colour
+            if (cfg.xray && cfg.xrayEdges) {
+                for (Target t : MegaClient.xrayBlocks) {
+                    VertexRendering.drawOutline(matrices, dbuf, CUBE_OUT,
+                        t.pos().getX() - cam.x, t.pos().getY() - cam.y, t.pos().getZ() - cam.z, t.category().color, width + 1.0f);
+                }
+            }
+
+            if (cfg.boxes) { // target boxes too, a bit thicker
+                List<Target> ts = MegaClient.targets;
+                for (int i = 0; i < Math.min(cfg.maxTracers, ts.size()); i++) {
+                    Target t = ts.get(i);
+                    VertexRendering.drawOutline(matrices, dbuf, CUBE_OUT, t.pos().getX() - cam.x, t.pos().getY() - cam.y,
+                        t.pos().getZ() - cam.z, t.category().color, width + 1.0f);
+                }
+            }
+            if (consumers instanceof VertexConsumerProvider.Immediate immediate) immediate.draw(DEPTH_LAYER);
+        }
+
+        // ---- Everything else: through walls
+        VertexConsumer buf = consumers.getBuffer(LAYER);
 
         // Waypoints and deaths: a tall beam you can see from far away, a box on the block, and a line if lines are on
         for (MegaWaypoints.Waypoint w : MegaWaypoints.here(client)) {
@@ -77,30 +129,7 @@ public final class MegaTracers {
             double bx = t.pos().getX() - cam.x, by = t.pos().getY() - cam.y, bz = t.pos().getZ() - cam.z;
             int color = t.category().color;
             if (cfg.tracers) line(buf, entry, sx, sy, sz, (float) (bx + 0.5), (float) (by + 0.5), (float) (bz + 0.5), color, width);
-            if (cfg.boxes) VertexRendering.drawOutline(matrices, buf, VoxelShapes.fullCube(), bx, by, bz, color, width);
-        }
-
-        // X-ray ghost outlines: hidden blocks next to air, in their own colour
-        if (MegaXray.active() && (cfg.xrayGhost || cfg.xrayFluids)) {
-            long[] gp = MegaXray.ghostPos;
-            int[] gc = MegaXray.ghostColor;
-            int gn = Math.min(MegaXray.ghostCount, Math.min(gp.length, gc.length));
-            float gw = Math.max(1.0f, width - 0.5f);
-            for (int i = 0; i < gn; i++) {
-                long l = gp[i];
-                VertexRendering.drawOutline(matrices, buf, VoxelShapes.fullCube(),
-                    net.minecraft.util.math.BlockPos.unpackLongX(l) - cam.x,
-                    net.minecraft.util.math.BlockPos.unpackLongY(l) - cam.y,
-                    net.minecraft.util.math.BlockPos.unpackLongZ(l) - cam.z, gc[i], gw);
-            }
-        }
-
-        // X-ray: edges of every matching block, through walls, in its category colour
-        if (cfg.xray && cfg.xrayEdges) {
-            for (Target t : MegaClient.xrayBlocks) {
-                VertexRendering.drawOutline(matrices, buf, VoxelShapes.fullCube(),
-                    t.pos().getX() - cam.x, t.pos().getY() - cam.y, t.pos().getZ() - cam.z, t.category().color, width);
-            }
+            if (cfg.boxes && !xrayOn) VertexRendering.drawOutline(matrices, buf, VoxelShapes.fullCube(), bx, by, bz, color, width);
         }
 
         if (cfg.outlineSneaky) {
