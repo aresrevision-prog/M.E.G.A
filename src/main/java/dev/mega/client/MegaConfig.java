@@ -47,6 +47,8 @@ public final class MegaConfig {
 
     // Waypoints (B adds one where you stand) and your last deaths
     public boolean waypoints = true;
+    /** G: only show stashes buried underground. */
+    public boolean deepScan = false;
     public int deathsKept = 3;
 
     // Block targets

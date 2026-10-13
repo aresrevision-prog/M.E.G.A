@@ -129,6 +129,15 @@ public class MegaClientGameTest implements FabricClientGameTest {
             int again = ctx.computeOnClient(c -> MegaClient.targets.size());
             check(again >= 8, "refresh did not rescan (found " + again + ")");
             MegaClient.LOGGER.info("[M.E.G.A test] refresh OK, {} targets", again);
+            // Deep scan: only buried things. The hill stash (inside 6 blocks of stone) stays; the furnace/table on the hill top go.
+            ctx.runOnClient(c -> { MegaClient.config.deepScan = true; MegaClient.refresh(c); });
+            ctx.waitTicks(40);
+            int deepN = ctx.computeOnClient(c -> MegaClient.targets.size());
+            boolean allBuried = ctx.computeOnClient(c -> MegaClient.targets.stream().allMatch(t -> MegaClient.underground(c, t.pos())));
+            MegaClient.LOGGER.info("[M.E.G.A test] deep scan: {} buried targets", deepN);
+            check(deepN > 0 && allBuried, "deep scan should list only buried targets (" + deepN + ")");
+            ctx.runOnClient(c -> { MegaClient.config.deepScan = false; MegaClient.refresh(c); });
+            ctx.waitTicks(40);
             ctx.setScreen(() -> null);
 
             // Farm alert: lots of moving dropped items

@@ -71,6 +71,7 @@ public final class MegaClient implements ClientModInitializer {
     private static KeyBinding reloadKey;
     private static KeyBinding settingsKey;
     private static KeyBinding waypointKey;
+    private static KeyBinding deepKey;
     private static int tickCounter;
 
     @Override
@@ -85,6 +86,8 @@ public final class MegaClient implements ClientModInitializer {
         settingsKey = new KeyBinding("M.E.G.A settings panel", GLFW.GLFW_KEY_0, KeyBinding.Category.MISC);
         reloadKey = new KeyBinding("M.E.G.A refresh", GLFW.GLFW_KEY_R, KeyBinding.Category.MISC);
         waypointKey = new KeyBinding("M.E.G.A add waypoint here", GLFW.GLFW_KEY_B, KeyBinding.Category.MISC);
+        // T is chat in Minecraft, so deep scan defaults to G (change it in Controls)
+        deepKey = new KeyBinding("M.E.G.A deep scan (underground only)", GLFW.GLFW_KEY_G, KeyBinding.Category.MISC);
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc != null && mc.options != null) mc.options.allKeys = addKeys(mc.options.allKeys); // options already made
 
@@ -95,10 +98,11 @@ public final class MegaClient implements ClientModInitializer {
     public static KeyBinding[] addKeys(KeyBinding[] keys) {
         if (settingsKey == null) return keys;
         for (KeyBinding k : keys) if (k == settingsKey) return keys;
-        KeyBinding[] out = java.util.Arrays.copyOf(keys, keys.length + 3);
+        KeyBinding[] out = java.util.Arrays.copyOf(keys, keys.length + 4);
         out[keys.length] = settingsKey;
         out[keys.length + 1] = reloadKey;
         out[keys.length + 2] = waypointKey;
+        out[keys.length + 3] = deepKey;
         return out;
     }
 
@@ -107,6 +111,13 @@ public final class MegaClient implements ClientModInitializer {
             if (client.currentScreen == null) client.setScreen(new MegaScreen(null));
         }
         while (reloadKey.wasPressed()) refresh(client);
+        while (deepKey.wasPressed()) {
+            config.deepScan = !config.deepScan;
+            config.save();
+            refresh(client);
+            message(client, config.deepScan ? "Deep scan ON: only stashes buried underground" : "Deep scan OFF: everything",
+                config.deepScan ? Formatting.GOLD : Formatting.AQUA);
+        }
         while (waypointKey.wasPressed()) {
             if (client.player != null && client.world != null) {
                 MegaWaypoints.Waypoint w = MegaWaypoints.addHere(client, null);
@@ -349,6 +360,7 @@ public final class MegaClient implements ClientModInitializer {
             // (gold is everywhere in real worlds) don't take all the tracer lines away from a stash.
             j.found.sort(Comparator.comparingInt((Target t) -> config.oresLast && t.category() == Category.ORE ? 1 : 0)
                 .thenComparingDouble(Target::distance));
+            if (config.deepScan) j.found.removeIf(t -> !underground(client, t.pos()));
             targets = everyColourFirst(j.found);
             j.xray.sort(Comparator.comparingDouble(Target::distance));
             xrayBlocks = j.xray.size() > config.xrayMax ? new ArrayList<>(j.xray.subList(0, config.xrayMax)) : j.xray;
@@ -478,6 +490,12 @@ public final class MegaClient implements ClientModInitializer {
      * So the list and the lines always show every colour that was found, even when one colour (e.g. chests) is
      * much closer or more common than the others.
      */
+    /** Buried: at least 4 blocks under the surface (top solid block) above it. */
+    static boolean underground(MinecraftClient client, BlockPos p) {
+        int top = client.world.getTopY(net.minecraft.world.Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, p.getX(), p.getZ());
+        return p.getY() <= top - 5;
+    }
+
     static List<Target> everyColourFirst(List<Target> sorted) {
         List<Target> first = new ArrayList<>(), rest = new ArrayList<>();
         Set<Category> seen = java.util.EnumSet.noneOf(Category.class);

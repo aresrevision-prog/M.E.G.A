@@ -116,6 +116,7 @@ public final class MegaHud {
         List<Target> targets = MegaClient.targets;
         StringBuilder head = new StringBuilder("M.E.G.A v").append(MegaClient.version);
         if (cfg.xray) head.append("  X-RAY");
+        if (cfg.deepScan) head.append("  DEEP");
         for (Category c : Category.values()) {
             Integer n = MegaClient.counts.get(c);
             if (n != null) head.append("  ").append(c.code).append(':').append(n);
