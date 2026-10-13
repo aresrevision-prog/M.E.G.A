@@ -43,7 +43,7 @@ Taken automatically on every build by the in-game test, which launches the real 
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.31.0`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.32.0`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 6. Teleporting is allowed (M.E.G.A itself has no teleport: it can't be done client-side without cheating).
 
@@ -96,6 +96,19 @@ Client-side only: nothing is installed on the server, and other players don't ne
 Outlines show within 12 blocks of you, only on the sides of a block that touch air (ground seen from above is just its top square, no vertical lines). They're drawn thicker, and blocks X-ray keeps (ores, stash blocks, bedrock) hide the outlines behind them, so nothing shows through a solid block. **Bedrock stays visible** so you can see the bottom of the world. Small shapes like torches, flowers, tall grass, rails and signs stay drawn.
 
 **Lava and water** (panel button: *X-ray lava & water*): within 12 blocks, lava hidden inside rock shows as **see-through orange** with orange edges, so you can see the whole pool. Water keeps its normal texture, with blue edges.
+
+## Minimap and big map
+- **Top-right corner has two slots** (panel → Map): each can be **Minimap**, **Blocks seen**, **Radars** or empty. Default: Minimap on top, Blocks seen under it. Radars go bottom-right unless you put them in a slot.
+- **Minimap** turns with you (up = where you face). Shows real terrain, stashes as dots in their colours, players as yellow arrows, mobs (red/green), waypoints and deaths (pinned to the edge when far). **N** switches layer: **SURFACE**, **CAVE** (the level you're on: open space shows its floor, rock is dark, so tunnels and rooms stand out) and **BELOW 0** (the first open space under y=0: deep bases).
+- **Big map (M)**: full screen, drag to move, scroll to zoom. It **remembers every area you've had loaded** (saved per server and dimension in `config/mega_map/`), so it keeps growing as you fly. Shows remembered stashes, current finds, waypoints, deaths, players and where you last saw people; hover a dot for its name and coordinates.
+
+## Tracking
+- **Stash memory**: every stash, base sign, built area, portal etc. you pass is remembered (`config/mega_memory.json`) and shown on the big map after you leave.
+- **Player trails**: a fading yellow line where each player walked or flew (default last 3 minutes).
+- **Last seen**: when a player leaves your view, the HUD shows where and how long ago (with an arrow), a dim beam marks the spot for 10 minutes, and the big map keeps it.
+- **Join/leave alerts**: a chat note (only you see it) when someone joins or leaves.
+- **Portals & beds** (violet): nether/end portals, end gateways, beds (counted once), respawn anchors.
+- **Hidden storage**: chest/hopper minecarts, chest boats, donkeys/mules/llamas with chests (red, Storage).
 
 ## Hitboxes
 Panel → Display → **Hitboxes** (on by default, range 64, up to 256): every player, mob and minecart/boat near you gets its real hitbox outlined through walls, like F3+B. Yellow = players (plus a blue line where they're looking), red = hostile, green = animals, grey = vehicles. Look only: hitboxes are never made bigger (that would be a combat aid).

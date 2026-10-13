@@ -62,7 +62,7 @@ public final class MegaTracers {
     static void render(MatrixStack matrices, VertexConsumerProvider consumers, Vec3d cam) {
         MegaConfig cfg = MegaClient.config;
         MinecraftClient client = MinecraftClient.getInstance();
-        if (cfg == null || !cfg.hudEnabled || (!cfg.tracers && !cfg.boxes && !cfg.tracePlayers && !cfg.outlineSneaky && !cfg.xray && !cfg.waypoints && !cfg.hitboxes)) return;
+        if (cfg == null || !cfg.hudEnabled || (!cfg.tracers && !cfg.boxes && !cfg.tracePlayers && !cfg.outlineSneaky && !cfg.xray && !cfg.waypoints && !cfg.hitboxes && !cfg.trails && !cfg.lastSeen)) return;
         if (client.player == null || client.world == null) return;
 
         Vector3fc fwd = client.gameRenderer.getCamera().getHorizontalPlane(); // look direction
@@ -131,6 +131,31 @@ public final class MegaTracers {
             int color = t.category().color;
             if (cfg.tracers) line(buf, entry, sx, sy, sz, (float) (bx + 0.5), (float) (by + 0.5), (float) (bz + 0.5), color, width);
             if (cfg.boxes && !xrayOn) VertexRendering.drawOutline(matrices, buf, VoxelShapes.fullCube(), bx, by, bz, color, width + 1.5f);
+        }
+
+        // Player trails: a line along where each player went, fading out with age
+        if (cfg.trails) {
+            long now = System.currentTimeMillis(), keep = cfg.trailSeconds * 1000L;
+            for (java.util.ArrayDeque<MegaTracking.Point> q : MegaTracking.trails.values()) {
+                MegaTracking.Point prev = null;
+                for (MegaTracking.Point p : q) {
+                    if (prev != null) {
+                        int alpha = (int) Math.max(30, 255 * (1 - (now - p.t()) / (double) keep));
+                        line(buf, entry, (float) (prev.x() - cam.x), (float) (prev.y() - cam.y), (float) (prev.z() - cam.z),
+                            (float) (p.x() - cam.x), (float) (p.y() - cam.y), (float) (p.z() - cam.z), (alpha << 24) | 0xFFD400, width);
+                    }
+                    prev = p;
+                }
+            }
+        }
+        // Where you last saw players (last 10 minutes): a dim yellow beam
+        if (cfg.lastSeen) {
+            long now = System.currentTimeMillis();
+            for (MegaTracking.Seen g : MegaTracking.recentlyGone(client, 10)) {
+                if (now - g.t() > 600_000) continue;
+                float bx = (float) (g.x() - cam.x), by = (float) (g.y() - cam.y), bz = (float) (g.z() - cam.z);
+                line(buf, entry, bx, by, bz, bx, by + 80, bz, 0xC0B89600, width + 1);
+            }
         }
 
         // Hitboxes: every mob / player / vehicle's real hitbox (like F3+B), through walls, coloured by type

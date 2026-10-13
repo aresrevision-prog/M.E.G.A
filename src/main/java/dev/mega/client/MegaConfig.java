@@ -53,6 +53,23 @@ public final class MegaConfig {
     public boolean radar = true;
     public int radarRange = 1000;
     public int radarSize = 64;
+    /** Top-right corner: two slots, each "minimap", "blocks" (Blocks seen), "radars" or "none". */
+    public String cornerSlot1 = "minimap";
+    public String cornerSlot2 = "blocks";
+    public int minimapSize = 96;
+    /** 0 = surface, 1 = cave (your level), 2 = below 0. N cycles it. */
+    public int minimapLayer = 0;
+    /** Remember every stash you pass (big map, M). */
+    public boolean stashMemory = true;
+    /** Fading line where each player has been. */
+    public boolean trails = true;
+    public int trailSeconds = 180;
+    /** Where you last saw each player (HUD + big map + grey beam). */
+    public boolean lastSeen = true;
+    public boolean joinAlerts = true;
+    // Portals & beds (violet)
+    public boolean portals = true;
+    public java.util.List<String> portalBlocks = new java.util.ArrayList<>(defaultPortals());
     public int deathsKept = 3;
 
     // Block targets
@@ -128,6 +145,14 @@ public final class MegaConfig {
     static final int CURRENT_VERSION = 9;
 
     /** Every block id that never generates in the world on its own (checked against the game's block list). */
+    static java.util.List<String> defaultPortals() {
+        java.util.List<String> l = new java.util.ArrayList<>(java.util.List.of("minecraft:nether_portal", "minecraft:end_portal",
+            "minecraft:end_portal_frame", "minecraft:end_gateway", "minecraft:respawn_anchor"));
+        for (String c : new String[]{"white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray",
+            "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"}) l.add("minecraft:" + c + "_bed");
+        return l;
+    }
+
     static java.util.List<String> defaultBuilt() {
         java.util.List<String> out = new java.util.ArrayList<>();
         try {
@@ -271,6 +296,12 @@ public final class MegaConfig {
         deathsKept = Math.clamp(deathsKept, 1, 20);
         radarRange = Math.clamp(radarRange, 16, 1250);
         hitboxRange = Math.clamp(hitboxRange, 8, 256);
+        minimapSize = Math.clamp(minimapSize, 48, 200);
+        minimapLayer = Math.clamp(minimapLayer, 0, 2);
+        trailSeconds = Math.clamp(trailSeconds, 10, 1800);
+        if (!java.util.List.of("minimap", "blocks", "radars", "none").contains(cornerSlot1)) cornerSlot1 = "minimap";
+        if (!java.util.List.of("minimap", "blocks", "radars", "none").contains(cornerSlot2)) cornerSlot2 = "blocks";
+        if (portalBlocks == null) portalBlocks = new java.util.ArrayList<>(defaultPortals());
         radarSize = Math.clamp(radarSize, 40, 128);
         if (lightBlocks == null) lightBlocks = new java.util.ArrayList<>(DEFAULT_LIGHTS);
         if (builtBlocks == null || builtBlocks.isEmpty() && built) builtBlocks = new java.util.ArrayList<>(defaultBuilt());

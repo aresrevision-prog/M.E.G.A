@@ -25,7 +25,8 @@ public final class MegaHud {
         MegaConfig cfg = MegaClient.config;
         if (cfg == null || !cfg.hudEnabled || client.player == null || client.world == null) return;
         if (client.getDebugHud().shouldShowDebugHud()) return;
-        MegaRadar.render(client, ctx);
+        boolean radarsInCorner = cfg.cornerSlot1.equals("radars") || cfg.cornerSlot2.equals("radars");
+        if (!radarsInCorner) MegaRadar.render(client, ctx); // bottom right
 
         TextRenderer tr = client.textRenderer;
         int x = cfg.hudX;
@@ -64,32 +65,22 @@ public final class MegaHud {
             y += topPad;
         }
 
-        // "Blocks seen" panel, top-right corner
-        if (cfg.blockCountPanel) {
-            List<MegaClient.BlockCount> bc = MegaClient.blockCounts;
-            int sw = ctx.getScaledWindowWidth();
-            String title = "Blocks seen";
-            int total = 0;
-            for (MegaClient.BlockCount b : bc) total += b.count();
-            title += " (" + total + ")";
-            int w = tr.getWidth(title);
-            int n = Math.min(bc.size(), cfg.blockCountLines);
-            // never run down into the radars
-            int limit = (MegaRadar.top(client, ctx) - 14 - (6 + topPad) - 11) / 10;
-            n = Math.max(0, Math.min(n, limit));
-            for (int i = 0; i < n; i++) w = Math.max(w, tr.getWidth("■ " + bc.get(i).label() + "  " + bc.get(i).count()));
-            int rx = sw - w - 8, ry = 6 + topPad;
-            ctx.fill(rx - 4, ry - 2, sw - 4, ry + 11 + Math.max(n, 1) * 10 + 2, PANEL);
-            ctx.drawTextWithShadow(tr, title, rx, ry, WHITE);
-            ry += 11;
-            if (n == 0) ctx.drawTextWithShadow(tr, "nothing yet", rx, ry, GRAY);
-            for (int i = 0; i < n; i++) {
-                MegaClient.BlockCount b = bc.get(i);
-                String cnt = String.valueOf(b.count());
-                ctx.drawTextWithShadow(tr, "■", rx, ry, b.color());
-                ctx.drawTextWithShadow(tr, b.label(), rx + tr.getWidth("■ "), ry, WHITE);
-                ctx.drawTextWithShadow(tr, cnt, sw - 8 - tr.getWidth(cnt), ry, MegaClient.readable(b.color()));
-                ry += 10;
+        // Top-right corner: two slots, each Minimap / Blocks seen / Radars (panel → Map)
+        int sw = ctx.getScaledWindowWidth();
+        int cy = 6 + topPad;
+        for (String slot : new String[]{cfg.cornerSlot1, cfg.cornerSlot2}) {
+            switch (slot) {
+                case "minimap" -> {
+                    int size = Math.min(cfg.minimapSize, ctx.getScaledWindowHeight() / 3);
+                    cy = MegaMap.render(client, ctx, sw - size - 5, cy, size) + 6;
+                }
+                case "blocks" -> { if (cfg.blockCountPanel) cy = blocksSeen(client, ctx, tr, cfg, cy, topPad) + 6; }
+                case "radars" -> {
+                    int size = Math.max(28, Math.min(cfg.radarSize, (sw / 3 - 16) / 3));
+                    MegaRadar.renderAt(client, ctx, sw - 3 * (size + 4) - 2, cy + 10, size);
+                    cy += size + 16;
+                }
+                default -> { }
             }
         }
 
@@ -140,6 +131,21 @@ public final class MegaHud {
             y = line(ctx, tr, line, x, y, MegaClient.readable(t.category().color));
         }
 
+        // Players you saw recently who are out of sight now
+        if (cfg.lastSeen) {
+            List<MegaTracking.Seen> gone = MegaTracking.recentlyGone(client, 3);
+            if (!gone.isEmpty()) {
+                y = header(ctx, tr, "Last seen", x, y + 4);
+                for (MegaTracking.Seen g : gone) {
+                    long secs = (System.currentTimeMillis() - g.t()) / 1000;
+                    double d = Math.sqrt(sq(g.x() - px) + sq(g.y() - client.player.getY()) + sq(g.z() - pz));
+                    String line = String.format("%s %s  %s ago  %dm", arrow(px, pz, yaw, g.x(), g.z()), g.name(),
+                        secs < 60 ? secs + "s" : secs / 60 + "m", Math.round(d));
+                    y = line(ctx, tr, line, x, y, 0xFFB89600);
+                }
+            }
+        }
+
         // Waypoints and deaths in this dimension, nearest first
         List<MegaWaypoints.Waypoint> wps = new java.util.ArrayList<>(MegaWaypoints.here(client));
         if (!wps.isEmpty()) {
@@ -153,6 +159,36 @@ public final class MegaHud {
                 y = line(ctx, tr, line, x, y, MegaClient.readable(w.color));
             }
         }
+    }
+
+    /** "Blocks seen" list at the top-right, starting at y; returns the y below it. */
+    private static int blocksSeen(MinecraftClient client, DrawContext ctx, TextRenderer tr, MegaConfig cfg, int startY, int topPad) {
+            List<MegaClient.BlockCount> bc = MegaClient.blockCounts;
+            int sw = ctx.getScaledWindowWidth();
+            String title = "Blocks seen";
+            int total = 0;
+            for (MegaClient.BlockCount b : bc) total += b.count();
+            title += " (" + total + ")";
+            int w = tr.getWidth(title);
+            int n = Math.min(bc.size(), cfg.blockCountLines);
+            // never run down into the radars
+            int limit = (MegaRadar.top(client, ctx) - 14 - startY - 11) / 10;
+            n = Math.max(0, Math.min(n, limit));
+            for (int i = 0; i < n; i++) w = Math.max(w, tr.getWidth("■ " + bc.get(i).label() + "  " + bc.get(i).count()));
+            int rx = sw - w - 8, ry = startY;
+            ctx.fill(rx - 4, ry - 2, sw - 4, ry + 11 + Math.max(n, 1) * 10 + 2, PANEL);
+            ctx.drawTextWithShadow(tr, title, rx, ry, WHITE);
+            ry += 11;
+            if (n == 0) { ctx.drawTextWithShadow(tr, "nothing yet", rx, ry, GRAY); ry += 10; }
+            for (int i = 0; i < n; i++) {
+                MegaClient.BlockCount b = bc.get(i);
+                String cnt = String.valueOf(b.count());
+                ctx.drawTextWithShadow(tr, "■", rx, ry, b.color());
+                ctx.drawTextWithShadow(tr, b.label(), rx + tr.getWidth("■ "), ry, WHITE);
+                ctx.drawTextWithShadow(tr, cnt, sw - 8 - tr.getWidth(cnt), ry, MegaClient.readable(b.color()));
+                ry += 10;
+            }
+            return ry + 2;
     }
 
     private static int header(DrawContext ctx, TextRenderer tr, String text, int x, int y) {

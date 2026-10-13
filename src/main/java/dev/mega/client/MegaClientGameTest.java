@@ -207,6 +207,40 @@ public class MegaClientGameTest implements FabricClientGameTest {
             ctx.takeScreenshot("12-shulker-items");
             srv.runCommand("kill @e[type=!minecraft:player]");
 
+            // Portals & beds, hidden storage entities, stash memory, map memory, big map, minimap layers
+            srv.runCommand("setblock 12 -60 -2 minecraft:respawn_anchor");
+            srv.runCommand("setblock 14 -60 -1 minecraft:red_bed[part=foot,facing=north]");
+            srv.runCommand("setblock 14 -60 -2 minecraft:red_bed[part=head,facing=north]");
+            srv.runCommand("summon minecraft:chest_minecart -8 -60 2");
+            ctx.runOnClient(MegaClient::refresh);
+            ctx.waitTicks(80);
+            String pb = ctx.computeOnClient(c -> MegaClient.targets.stream()
+                .filter(t -> t.category() == MegaClient.Category.PORTAL || t.label().equals("CHEST_MINECART"))
+                .map(MegaClient.Target::label).toList().toString());
+            int remembered = ctx.computeOnClient(c -> MegaTracking.stashes(c).size());
+            int chunksKnown = ctx.computeOnClient(c -> MegaMap.chunks(c).size());
+            MegaClient.LOGGER.info("[M.E.G.A test] portals/beds/storage: {} remembered={} mapChunks={}", pb, remembered, chunksKnown);
+            check(pb.contains("RESPAWN_ANCHOR") && pb.contains("RED_BED") && pb.contains("CHEST_MINECART"), "portal/bed/minecart missing: " + pb);
+            check(pb.indexOf("RED_BED") == pb.lastIndexOf("RED_BED"), "bed counted twice: " + pb);
+            check(remembered >= 8, "stash memory empty: " + remembered);
+            check(chunksKnown >= 20, "map memory empty: " + chunksKnown);
+            ctx.takeScreenshot("13-minimap-surface");
+            ctx.runOnClient(c -> { MegaClient.config.minimapLayer = 1; });
+            ctx.waitTicks(15);
+            ctx.takeScreenshot("14-minimap-cave");
+            ctx.runOnClient(c -> { MegaClient.config.minimapLayer = 0; });
+            ctx.setScreen(MegaMapScreen::new);
+            ctx.waitTicks(10);
+            ctx.takeScreenshot("15-big-map");
+            ctx.setScreen(() -> null);
+            ctx.runOnClient(c -> MegaScreen.tab = 4);
+            ctx.setScreen(() -> new MegaScreen(null));
+            ctx.waitTicks(5);
+            ctx.takeScreenshot("16-panel-map");
+            ctx.runOnClient(c -> MegaScreen.tab = 0);
+            ctx.setScreen(() -> null);
+            srv.runCommand("kill @e[type=minecraft:chest_minecart]");
+
             // Deep scan: only buried things. The hill stash (inside 6 blocks of stone) stays; the furnace/table on the hill top go.
             ctx.runOnClient(c -> { MegaClient.config.deepScan = true; MegaClient.config.save(); MegaClient.refresh(c); });
             ctx.waitTicks(40);

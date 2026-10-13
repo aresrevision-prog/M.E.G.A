@@ -72,6 +72,7 @@ public final class MegaClient implements ClientModInitializer {
     private static KeyBinding settingsKey;
     private static KeyBinding waypointKey;
     private static KeyBinding deepKey;
+    private static KeyBinding mapKey, layerKey;
     private static int tickCounter;
 
     @Override
@@ -88,6 +89,8 @@ public final class MegaClient implements ClientModInitializer {
         waypointKey = new KeyBinding("M.E.G.A add waypoint here", GLFW.GLFW_KEY_B, KeyBinding.Category.MISC);
         // T is chat in Minecraft, so deep scan defaults to G (change it in Controls)
         deepKey = new KeyBinding("M.E.G.A deep scan (underground only)", GLFW.GLFW_KEY_G, KeyBinding.Category.MISC);
+        mapKey = new KeyBinding("M.E.G.A big map", GLFW.GLFW_KEY_M, KeyBinding.Category.MISC);
+        layerKey = new KeyBinding("M.E.G.A minimap layer", GLFW.GLFW_KEY_N, KeyBinding.Category.MISC);
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc != null && mc.options != null) mc.options.allKeys = addKeys(mc.options.allKeys); // options already made
 
@@ -98,11 +101,13 @@ public final class MegaClient implements ClientModInitializer {
     public static KeyBinding[] addKeys(KeyBinding[] keys) {
         if (settingsKey == null) return keys;
         for (KeyBinding k : keys) if (k == settingsKey) return keys;
-        KeyBinding[] out = java.util.Arrays.copyOf(keys, keys.length + 4);
+        KeyBinding[] out = java.util.Arrays.copyOf(keys, keys.length + 6);
         out[keys.length] = settingsKey;
         out[keys.length + 1] = reloadKey;
         out[keys.length + 2] = waypointKey;
         out[keys.length + 3] = deepKey;
+        out[keys.length + 4] = mapKey;
+        out[keys.length + 5] = layerKey;
         return out;
     }
 
@@ -111,6 +116,14 @@ public final class MegaClient implements ClientModInitializer {
             if (client.currentScreen == null) client.setScreen(new MegaScreen(null));
         }
         while (reloadKey.wasPressed()) refresh(client);
+        while (mapKey.wasPressed()) {
+            if (client.currentScreen == null && client.world != null) client.setScreen(new MegaMapScreen());
+        }
+        while (layerKey.wasPressed()) {
+            config.minimapLayer = (config.minimapLayer + 1) % 3;
+            config.save();
+            message(client, "Minimap: " + MegaMap.LAYERS[config.minimapLayer], Formatting.AQUA);
+        }
         while (deepKey.wasPressed()) {
             config.deepScan = !config.deepScan;
             config.save();
@@ -126,6 +139,8 @@ public final class MegaClient implements ClientModInitializer {
         }
         MegaWaypoints.tick(client);
         MegaRadar.tick(client);
+        MegaTracking.tick(client);
+        MegaMap.tick(client);
 
         MegaXray.tick(client);
         MegaXray.scanGhosts(client);
@@ -340,6 +355,8 @@ public final class MegaClient implements ClientModInitializer {
                 Category category = beBlocks.get(be.getCachedState().getBlock());
                 if (category == null || !category.enabled(config)) continue;
                 if (category == Category.LIGHT && !underground(client, be.getPos())) continue;
+                if (be.getCachedState().getOrEmpty(net.minecraft.state.property.Properties.BED_PART)
+                    .map(p -> p == net.minecraft.block.enums.BedPart.FOOT).orElse(false)) continue; // a bed counts once
                 if (isSecondChestHalf(be)) continue; // double chest = one entry
 
                 BlockPos pos = be.getPos();
@@ -360,6 +377,8 @@ public final class MegaClient implements ClientModInitializer {
         if (j.index >= j.chunks.size()) {
             scanBaseSigns(client, j.found, j.counts);
             MegaShulkers.scan(client, j.found, j.counts);
+            MegaTracking.scanStorageEntities(client, j.found, j.counts);
+            MegaTracking.remember(client, j.found);
             // Stash blocks come first (storage, spawners, shulkers, valuables...), natural ores after, so ores
             // (gold is everywhere in real worlds) don't take all the tracer lines away from a stash.
             j.found.sort(ORDER);
@@ -636,7 +655,8 @@ public final class MegaClient implements ClientModInitializer {
         FARM(0xFFFF8800, "F", "Farms", "orange"), // built plant farms (machines aimed at plants) + machines below y=0
         LIGHT(0xFFFFF59D, "L", "Lights", "pale yellow"), // torches/lanterns/glowstone buried underground
         BUILT(0xFFF2F2F2, "B", "built_block", "white"),        // blocks that never generate naturally
-        BASE(0xFFFF8FC8, "Bs", "Base signs", "pink");          // trading halls, animal pens, tamed pets, named mobs
+        BASE(0xFFFF8FC8, "Bs", "Base signs", "pink"),          // trading halls, animal pens, tamed pets, named mobs
+        PORTAL(0xFFC48CFF, "P", "Portals & beds", "violet");   // nether/end portals, gateways, beds, respawn anchors
 
         final int color;
         final String code, title, colourName;
@@ -658,6 +678,7 @@ public final class MegaClient implements ClientModInitializer {
                 case LIGHT -> c.lightBlocks;
                 case BUILT -> c.builtBlocks;
                 case BASE -> c.baseSignTypes;
+                case PORTAL -> c.portalBlocks;
             };
         }
 
@@ -673,6 +694,7 @@ public final class MegaClient implements ClientModInitializer {
                 case LIGHT -> MegaConfig.DEFAULT_LIGHTS;
                 case BUILT -> MegaConfig.defaultBuilt();
                 case BASE -> MegaConfig.DEFAULT_BASE_SIGNS;
+                case PORTAL -> MegaConfig.defaultPortals();
             };
         }
 
@@ -688,6 +710,7 @@ public final class MegaClient implements ClientModInitializer {
                 case LIGHT -> c.lights = on;
                 case BUILT -> c.built = on;
                 case BASE -> c.baseSigns = on;
+                case PORTAL -> c.portals = on;
             }
         }
 
@@ -703,6 +726,7 @@ public final class MegaClient implements ClientModInitializer {
                 case LIGHT -> c.lights;
                 case BUILT -> c.built;
                 case BASE -> c.baseSigns;
+                case PORTAL -> c.portals;
             };
         }
     }

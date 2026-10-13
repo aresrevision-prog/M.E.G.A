@@ -22,7 +22,7 @@ import java.util.function.Supplier;
  */
 final class MegaScreen extends Screen {
     static final int BTN_H = 20, GAP = 3;
-    private static final String[] TABS = {"Colours", "Display", "Players", "Waypoints"};
+    private static final String[] TABS = {"Colours", "Display", "Players", "Waypoints", "Map"};
     /** Remembered while the game runs, so the panel reopens on the tab you used last. */
     static int tab = 0;
     private final Screen parent;
@@ -104,6 +104,42 @@ final class MegaScreen extends Screen {
                 () -> c.hitboxRange, v -> c.hitboxRange = v));
             addDrawableChild(new IntSlider(x0, y, colW, "Block range", 8, 1250, () -> c.maxDistance, v -> c.maxDistance = v));
             addDrawableChild(new IntSlider(x0 + colW + GAP, y, colW, "Ore range", 8, 1250, () -> c.oreRange, v -> c.oreRange = v));
+            y += BTN_H + GAP;
+        } else if (tab == 4) {
+            // Corner slots + minimap + tracking
+            String[] slots = {"minimap", "blocks", "radars", "none"};
+            String[] names = {"Minimap", "Blocks seen", "Radars", "Empty"};
+            for (int i = 0; i < 2; i++) {
+                final int slotNo = i;
+                java.util.function.Supplier<String> get = () -> slotNo == 0 ? c.cornerSlot1 : c.cornerSlot2;
+                addDrawableChild(ButtonWidget.builder(slotText(slotNo, get.get(), slots, names), b -> {
+                    int idx = (java.util.Arrays.asList(slots).indexOf(get.get()) + 1) % slots.length;
+                    if (slotNo == 0) c.cornerSlot1 = slots[idx]; else c.cornerSlot2 = slots[idx];
+                    b.setMessage(slotText(slotNo, get.get(), slots, names));
+                }).dimensions(x0 + i * (colW + GAP), y, colW, BTN_H).build());
+            }
+            y += BTN_H + GAP;
+            addDrawableChild(ButtonWidget.builder(Text.literal("Minimap layer: §e" + MegaMap.LAYERS[c.minimapLayer]), b -> {
+                c.minimapLayer = (c.minimapLayer + 1) % 3;
+                b.setMessage(Text.literal("Minimap layer: §e" + MegaMap.LAYERS[c.minimapLayer]));
+            }).dimensions(x0, y, colW, BTN_H).build());
+            addDrawableChild(new IntSlider(x0 + colW + GAP, y, colW, "Minimap size", 48, 200, () -> c.minimapSize, v -> c.minimapSize = v));
+            y += BTN_H + GAP + 4;
+            y = toggleGrid(List.of(
+                t("Stash memory", () -> c.stashMemory, v -> c.stashMemory = v),
+                t("Join/leave alerts", () -> c.joinAlerts, v -> c.joinAlerts = v),
+                t("Player trails", () -> c.trails, v -> c.trails = v)), x0, y, colW);
+            addDrawableChild(new IntSlider(x0 + colW + GAP, y - BTN_H - GAP, colW, "Trail seconds", 10, 1800,
+                () -> c.trailSeconds, v -> c.trailSeconds = v));
+            addDrawableChild(ButtonWidget.builder(onOff("Last seen", c.lastSeen), b -> {
+                c.lastSeen = !c.lastSeen;
+                b.setMessage(onOff("Last seen", c.lastSeen));
+            }).dimensions(x0, y, colW, BTN_H).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("§eOpen big map (M)"), b -> {
+                MegaClient.config.save();
+                MegaClient.applyConfig();
+                client.setScreen(new MegaMapScreen());
+            }).dimensions(x0 + colW + GAP, y, colW, BTN_H).build());
             y += BTN_H + GAP;
         } else if (tab == 3) {
             waypointsTab(c, x0, w);
@@ -265,6 +301,11 @@ final class MegaScreen extends Screen {
             }).dimensions(x0 + (i % 2) * (colW + GAP), y + (i / 2) * (BTN_H + GAP), colW, BTN_H).build());
         }
         return y + ((toggles.size() + 1) / 2) * (BTN_H + GAP);
+    }
+
+    private static Text slotText(int slot, String v, String[] slots, String[] names) {
+        int i = Math.max(0, java.util.Arrays.asList(slots).indexOf(v));
+        return Text.literal("Corner " + (slot + 1) + ": §e" + names[i]);
     }
 
     static Text onOff(String name, boolean on) {

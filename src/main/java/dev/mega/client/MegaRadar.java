@@ -72,11 +72,17 @@ public final class MegaRadar {
     static void render(MinecraftClient client, DrawContext ctx) {
         MegaConfig cfg = MegaClient.config;
         if (!cfg.radar || client.player == null) return;
-        TextRenderer tr = client.textRenderer;
         int gap = 4, size = size(ctx);
         int sw = ctx.getScaledWindowWidth(), sh = ctx.getScaledWindowHeight();
-        int y = sh - size - 3;
-        int x0 = sw - 3 * (size + gap) - 2;
+        renderAt(client, ctx, sw - 3 * (size + gap) - 2, sh - size - 3, size);
+    }
+
+    /** Three radars in a row; (x0, y) is the top-left of the first box (labels go above it). */
+    static void renderAt(MinecraftClient client, DrawContext ctx, int x0, int y, int size) {
+        MegaConfig cfg = MegaClient.config;
+        if (!cfg.radar || client.player == null) return;
+        TextRenderer tr = client.textRenderer;
+        int gap = 4;
         for (int l = 0; l < 3; l++) {
             int x = x0 + l * (size + gap);
             ctx.fill(x, y, x + size, y + size, 0x90000000);
@@ -111,7 +117,8 @@ public final class MegaRadar {
     /** Top of the radar labels (so other HUD parts can stay above), or the screen bottom when radars are off. */
     static int top(MinecraftClient client, DrawContext ctx) {
         int sh = ctx.getScaledWindowHeight();
-        if (!MegaClient.config.radar) return sh;
+        MegaConfig cfg = MegaClient.config;
+        if (!cfg.radar || cfg.cornerSlot1.equals("radars") || cfg.cornerSlot2.equals("radars")) return sh;
         return sh - size(ctx) - 3 - 10;
     }
 
