@@ -99,7 +99,7 @@ Outlines show within 12 blocks of you, only on the sides of a block that touch a
 
 ## Shulker contents
 Placed shulker boxes: the server never sends what's inside, so no mod can see it. But shulker **items** carry their contents:
-- **Dropped, in item frames, or held by a player**: listed and lined in green with what's inside, e.g. `DROPPED_SHULKER: 128 Diamond Block +1 more`, or `EMPTY`.
+- **Dropped, in item frames, or held by a player**: listed and lined in green with what's inside, e.g. `DROPPED_SHULKER: 128 Block of Diamond +1 more`, or `EMPTY`.
 - **In any chest or inventory you open**: hover a shulker for its full contents (the game only lists 5) plus `M.E.G.A: 3/27 slots used, 133 items`.
 
 Config: `shulkerPeek` (tooltip on/off).

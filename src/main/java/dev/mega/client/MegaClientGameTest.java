@@ -201,7 +201,7 @@ public class MegaClientGameTest implements FabricClientGameTest {
                 return "none";
             });
             MegaClient.LOGGER.info("[M.E.G.A test] shulker items: {} tooltip: {}", sh, tip);
-            check(sh.contains("DROPPED_SHULKER: 128 Diamond Block +1 more"), "dropped shulker contents wrong: " + sh);
+            check(sh.contains("DROPPED_SHULKER: 128 Block of Diamond +1 more"), "dropped shulker contents wrong: " + sh);
             check(sh.contains("FRAMED_SHULKER: EMPTY"), "framed empty shulker missing: " + sh);
             check(tip.contains("M.E.G.A: 3/27 slots used, 133 items") && tip.contains("5x Netherite Ingot"), "tooltip wrong: " + tip);
             ctx.takeScreenshot("12-shulker-items");
