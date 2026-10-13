@@ -98,7 +98,10 @@ final class MegaScreen extends Screen {
                 t("X-ray", () -> c.xray, v -> { c.xray = v; MegaClient.applyConfig(); }),
                 t("X-ray outlines", () -> c.xrayGhost, v -> c.xrayGhost = v),
                 t("X-ray lava & water", () -> c.xrayFluids, v -> c.xrayFluids = v),
-                t("Ores after stashes", () -> c.oresLast, v -> c.oresLast = v)), x0, y, colW) + 4;
+                t("Ores after stashes", () -> c.oresLast, v -> c.oresLast = v),
+                t("Hitboxes", () -> c.hitboxes, v -> c.hitboxes = v)), x0, y, colW) + 4;
+            addDrawableChild(new IntSlider(x0 + colW + GAP, y - BTN_H - GAP - 4, colW, "Hitbox range", 8, 256,
+                () -> c.hitboxRange, v -> c.hitboxRange = v));
             addDrawableChild(new IntSlider(x0, y, colW, "Block range", 8, 1250, () -> c.maxDistance, v -> c.maxDistance = v));
             addDrawableChild(new IntSlider(x0 + colW + GAP, y, colW, "Ore range", 8, 1250, () -> c.oreRange, v -> c.oreRange = v));
             y += BTN_H + GAP;

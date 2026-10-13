@@ -62,7 +62,7 @@ public final class MegaTracers {
     static void render(MatrixStack matrices, VertexConsumerProvider consumers, Vec3d cam) {
         MegaConfig cfg = MegaClient.config;
         MinecraftClient client = MinecraftClient.getInstance();
-        if (cfg == null || !cfg.hudEnabled || (!cfg.tracers && !cfg.boxes && !cfg.tracePlayers && !cfg.outlineSneaky && !cfg.xray && !cfg.waypoints)) return;
+        if (cfg == null || !cfg.hudEnabled || (!cfg.tracers && !cfg.boxes && !cfg.tracePlayers && !cfg.outlineSneaky && !cfg.xray && !cfg.waypoints && !cfg.hitboxes)) return;
         if (client.player == null || client.world == null) return;
 
         Vector3fc fwd = client.gameRenderer.getCamera().getHorizontalPlane(); // look direction
@@ -131,6 +131,32 @@ public final class MegaTracers {
             int color = t.category().color;
             if (cfg.tracers) line(buf, entry, sx, sy, sz, (float) (bx + 0.5), (float) (by + 0.5), (float) (bz + 0.5), color, width);
             if (cfg.boxes && !xrayOn) VertexRendering.drawOutline(matrices, buf, VoxelShapes.fullCube(), bx, by, bz, color, width + 1.5f);
+        }
+
+        // Hitboxes: every mob / player / vehicle's real hitbox (like F3+B), through walls, coloured by type
+        if (cfg.hitboxes) {
+            float delta = client.getRenderTickCounter().getTickProgress(true);
+            double maxSq = (double) cfg.hitboxRange * cfg.hitboxRange;
+            for (net.minecraft.entity.Entity e : client.world.getEntities()) {
+                if (e == client.player || client.player.squaredDistanceTo(e) > maxSq) continue;
+                int col;
+                if (e instanceof AbstractClientPlayerEntity p) {
+                    if (MegaClient.skipPlayer(client, p)) continue;
+                    col = YELLOW;
+                } else if (e instanceof net.minecraft.entity.mob.Monster) col = 0xFFFF4444;
+                else if (e instanceof net.minecraft.entity.LivingEntity) col = 0xFF55DD55;
+                else if (e instanceof net.minecraft.entity.vehicle.VehicleEntity) col = 0xFFAAAAAA;
+                else continue;
+                Vec3d pos = e.getLerpedPos(delta);
+                VertexRendering.drawOutline(matrices, buf,
+                    VoxelShapes.cuboid(e.getBoundingBox().offset(-e.getX(), -e.getY(), -e.getZ())),
+                    pos.x - cam.x, pos.y - cam.y, pos.z - cam.z, col, width);
+                if (e instanceof AbstractClientPlayerEntity) { // where they're looking
+                    Vec3d look = e.getRotationVec(delta);
+                    float ex = (float) (pos.x - cam.x), ey = (float) (pos.y + e.getStandingEyeHeight() - cam.y), ez = (float) (pos.z - cam.z);
+                    line(buf, entry, ex, ey, ez, ex + (float) look.x * 2, ey + (float) look.y * 2, ez + (float) look.z * 2, 0xFF3F76FF, width);
+                }
+            }
         }
 
         if (cfg.outlineSneaky) {

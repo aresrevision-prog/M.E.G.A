@@ -43,7 +43,7 @@ Taken automatically on every build by the in-game test, which launches the real 
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.30.0`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.31.0`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 6. Teleporting is allowed (M.E.G.A itself has no teleport: it can't be done client-side without cheating).
 
@@ -96,6 +96,9 @@ Client-side only: nothing is installed on the server, and other players don't ne
 Outlines show within 12 blocks of you, only on the sides of a block that touch air (ground seen from above is just its top square, no vertical lines). They're drawn thicker, and blocks X-ray keeps (ores, stash blocks, bedrock) hide the outlines behind them, so nothing shows through a solid block. **Bedrock stays visible** so you can see the bottom of the world. Small shapes like torches, flowers, tall grass, rails and signs stay drawn.
 
 **Lava and water** (panel button: *X-ray lava & water*): within 12 blocks, lava hidden inside rock shows as **see-through orange** with orange edges, so you can see the whole pool. Water keeps its normal texture, with blue edges.
+
+## Hitboxes
+Panel → Display → **Hitboxes** (on by default, range 64, up to 256): every player, mob and minecart/boat near you gets its real hitbox outlined through walls, like F3+B. Yellow = players (plus a blue line where they're looking), red = hostile, green = animals, grey = vehicles. Look only: hitboxes are never made bigger (that would be a combat aid).
 
 ## Shulker contents
 Placed shulker boxes: the server never sends what's inside, so no mod can see it. But shulker **items** carry their contents:

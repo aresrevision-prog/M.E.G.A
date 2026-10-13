@@ -101,6 +101,9 @@ public final class MegaConfig {
     public boolean baseSigns = true;
     /** Shulker items: full contents in tooltips; dropped/framed/held ones listed with what is inside. */
     public boolean shulkerPeek = true;
+    /** Hitbox outlines (like F3+B) for players, mobs and vehicles near you, through walls. Look only. */
+    public boolean hitboxes = true;
+    public int hitboxRange = 64;
     public java.util.List<String> baseSignTypes = new java.util.ArrayList<>(DEFAULT_BASE_SIGNS);
     static final java.util.List<String> DEFAULT_BASE_SIGNS = java.util.List.of(
         "mega:trading_halls", "mega:animal_pens", "mega:tamed_pets", "mega:named_mobs");
@@ -267,6 +270,7 @@ public final class MegaConfig {
         if (storageBlocks == null) storageBlocks = new java.util.ArrayList<>(DEFAULT_STORAGE);
         deathsKept = Math.clamp(deathsKept, 1, 20);
         radarRange = Math.clamp(radarRange, 16, 1250);
+        hitboxRange = Math.clamp(hitboxRange, 8, 256);
         radarSize = Math.clamp(radarSize, 40, 128);
         if (lightBlocks == null) lightBlocks = new java.util.ArrayList<>(DEFAULT_LIGHTS);
         if (builtBlocks == null || builtBlocks.isEmpty() && built) builtBlocks = new java.util.ArrayList<>(defaultBuilt());
