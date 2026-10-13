@@ -67,7 +67,10 @@ public final class MegaHud {
         }
 
         // Elytra helper: speed / height / compass bar while gliding
-        if (cfg.elytraHelper && client.player.isGliding()) topPad = elytraBar(client, ctx, tr, topPad);
+        if (cfg.elytraHelper && client.player.isGliding()) {
+            topPad = elytraBar(client, ctx, tr, topPad);
+            y = cfg.hudY + topPad; // left HUD starts below the bar
+        }
 
         // Top-right corner: two slots, each Minimap / Blocks seen / Radars (panel → Map)
         int sw = ctx.getScaledWindowWidth();
