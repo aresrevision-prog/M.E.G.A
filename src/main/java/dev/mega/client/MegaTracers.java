@@ -81,14 +81,15 @@ public final class MegaTracers {
             if (MegaXray.active() && (cfg.xrayGhost || cfg.xrayFluids)) {
                 long[] gp = MegaXray.ghostPos;
                 int[] gc = MegaXray.ghostColor;
-                int gn = Math.min(MegaXray.ghostCount, Math.min(gp.length, gc.length));
+                byte[] gf = MegaXray.ghostFaces;
+                int gn = Math.min(MegaXray.ghostCount, Math.min(gp.length, Math.min(gc.length, gf.length)));
                 float gw = width + 1.0f; // thicker so the shape of caves and hidden blocks is easy to read
                 for (int i = 0; i < gn; i++) {
                     long l = gp[i];
-                    VertexRendering.drawOutline(matrices, dbuf, CUBE_OUT,
-                        net.minecraft.util.math.BlockPos.unpackLongX(l) - cam.x,
-                        net.minecraft.util.math.BlockPos.unpackLongY(l) - cam.y,
-                        net.minecraft.util.math.BlockPos.unpackLongZ(l) - cam.z, gc[i], gw);
+                    openEdges(dbuf, entry,
+                        (float) (net.minecraft.util.math.BlockPos.unpackLongX(l) - cam.x),
+                        (float) (net.minecraft.util.math.BlockPos.unpackLongY(l) - cam.y),
+                        (float) (net.minecraft.util.math.BlockPos.unpackLongZ(l) - cam.z), gf[i], gc[i], gw);
                 }
             }
 
@@ -213,6 +214,27 @@ public final class MegaTracers {
             line(buf, e, x1 + dx * a, y1 + dy * a, z1 + dz * a, x1 + dx * b, y1 + dy * b, z1 + dz * b,
                 (i & 1) == 0 ? YELLOW : BLACK, width + 1);
         }
+    }
+
+    /**
+     * Edges of a block's OPEN faces only (mask bits = Direction ordinals: down, up, north, south, west, east).
+     * Ground seen from above is just its top square: no vertical lines down the sides of buried blocks.
+     */
+    private static void openEdges(VertexConsumer b, MatrixStack.Entry e, float x, float y, float z, int mask, int c, float w) {
+        final int D = 1, U = 2, N = 4, S = 8, W = 16, E = 32;
+        float o = 0.003f, x0 = x - o, y0 = y - o, z0 = z - o, x1 = x + 1 + o, y1 = y + 1 + o, z1 = z + 1 + o;
+        if ((mask & (D | N)) != 0) line(b, e, x0, y0, z0, x1, y0, z0, c, w);
+        if ((mask & (D | S)) != 0) line(b, e, x0, y0, z1, x1, y0, z1, c, w);
+        if ((mask & (D | W)) != 0) line(b, e, x0, y0, z0, x0, y0, z1, c, w);
+        if ((mask & (D | E)) != 0) line(b, e, x1, y0, z0, x1, y0, z1, c, w);
+        if ((mask & (U | N)) != 0) line(b, e, x0, y1, z0, x1, y1, z0, c, w);
+        if ((mask & (U | S)) != 0) line(b, e, x0, y1, z1, x1, y1, z1, c, w);
+        if ((mask & (U | W)) != 0) line(b, e, x0, y1, z0, x0, y1, z1, c, w);
+        if ((mask & (U | E)) != 0) line(b, e, x1, y1, z0, x1, y1, z1, c, w);
+        if ((mask & (N | W)) != 0) line(b, e, x0, y0, z0, x0, y1, z0, c, w);
+        if ((mask & (N | E)) != 0) line(b, e, x1, y0, z0, x1, y1, z0, c, w);
+        if ((mask & (S | W)) != 0) line(b, e, x0, y0, z1, x0, y1, z1, c, w);
+        if ((mask & (S | E)) != 0) line(b, e, x1, y0, z1, x1, y1, z1, c, w);
     }
 
     private static void line(VertexConsumer buf, MatrixStack.Entry e, float x1, float y1, float z1,

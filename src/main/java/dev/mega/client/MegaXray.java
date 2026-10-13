@@ -68,6 +68,8 @@ public final class MegaXray {
     /** Ghost outlines: hidden blocks next to air (cave walls, surfaces) near you, drawn as edges in the block's colour. */
     static long[] ghostPos = new long[0];
     static int[] ghostColor = new int[0];
+    /** Which sides of each ghost block are open (bit = Direction ordinal): only those faces get outlined. */
+    static byte[] ghostFaces = new byte[0];
     static int ghostCount;
     /** Lava blocks and which sides face hidden blocks: drawn as see-through orange so lava shows inside the rock. */
     static long[] lavaPos = new long[0];
@@ -87,6 +89,7 @@ public final class MegaXray {
         BlockPos c = client.player.getBlockPos();
         long[] pos = new long[max];
         int[] col = new int[max];
+        byte[] faces = new byte[max];
         int n = 0;
         long[] lp = new long[max];
         byte[] lm = new byte[max];
@@ -103,7 +106,7 @@ public final class MegaXray {
                 if (!cfg.xrayFluids) continue;
                 boolean lava = fs.isIn(FluidTags.LAVA);
                 boolean edge = false;
-                int mask = 0;
+                int mask = 0, open = 0;
                 for (int di = 0; di < DIRS.length; di++) {
                     Direction d = DIRS[di];
                     nb.set(m.getX() + d.getOffsetX(), m.getY() + d.getOffsetY(), m.getZ() + d.getOffsetZ());
@@ -113,6 +116,7 @@ public final class MegaXray {
                         // water touching open air is just a normal water surface: no outline (stops oceans turning into a grid)
                         if (!lava && ns.isAir()) continue;
                         edge = true;
+                        open |= 1 << di;
                         // sides against hidden blocks get a see-through fill (sides open to air already show real lava)
                         if (lava && !ns.isAir() && !isVisible(ns)) mask |= 1 << di;
                     }
@@ -120,6 +124,7 @@ public final class MegaXray {
                 if (!edge) continue;
                 if (mask != 0 && ln < max) { lp[ln] = m.asLong(); lm[ln] = (byte) mask; ln++; }
                 pos[n] = m.asLong();
+                faces[n] = (byte) open;
                 col[n] = lava ? 0xFFFF5A00 : 0xFF3F76E4;
                 if (++n >= max) break outer;
                 continue;
@@ -127,19 +132,22 @@ public final class MegaXray {
             if (!cfg.xrayGhost) continue;
             // solid cubes, plus see-through full blocks (leaves, glass, stained/tinted glass, ice, slime)
             if (!st.isOpaqueFullCube() && !st.isFullCube(world, m)) continue;
-            boolean exposed = false;
-            for (Direction d : DIRS) {
+            int open = 0;
+            for (int di = 0; di < DIRS.length; di++) {
+                Direction d = DIRS[di];
                 nb.set(m.getX() + d.getOffsetX(), m.getY() + d.getOffsetY(), m.getZ() + d.getOffsetZ());
-                if (!world.getBlockState(nb).isOpaqueFullCube()) { exposed = true; break; }
+                if (!world.getBlockState(nb).isOpaqueFullCube()) open |= 1 << di;
             }
-            if (!exposed) continue;
+            if (open == 0) continue;
             pos[n] = m.asLong();
+            faces[n] = (byte) open;
             int rgb = st.getMapColor(world, m).color;
             col[n] = 0xFF000000 | (rgb == 0 ? 0xDDEEFF : rgb); // glass has no map colour: pale glass-blue
             if (++n >= max) break outer;
         }
         ghostPos = pos;
         ghostColor = col;
+        ghostFaces = faces;
         ghostCount = n;
         lavaPos = lp;
         lavaMask = lm;
