@@ -67,6 +67,11 @@ public final class MegaConfig {
     /** Where you last saw each player (HUD + big map + grey beam). */
     public boolean lastSeen = true;
     public boolean joinAlerts = true;
+    /** Player list shows armour, totem and held item. */
+    public boolean gearCheck = true;
+    /** While flying with an elytra: speed / height / compass bar with stashes and waypoints on it. */
+    public boolean elytraHelper = true;
+    public boolean signsAdded = false;
     // Portals & beds (violet)
     public boolean portals = true;
     public java.util.List<String> portalBlocks = new java.util.ArrayList<>(defaultPortals());
@@ -123,7 +128,7 @@ public final class MegaConfig {
     public int hitboxRange = 64;
     public java.util.List<String> baseSignTypes = new java.util.ArrayList<>(DEFAULT_BASE_SIGNS);
     static final java.util.List<String> DEFAULT_BASE_SIGNS = java.util.List.of(
-        "mega:trading_halls", "mega:animal_pens", "mega:tamed_pets", "mega:named_mobs");
+        "mega:trading_halls", "mega:animal_pens", "mega:tamed_pets", "mega:named_mobs", "mega:signs");
 
     // "Valuable blocks" (blue)
     public java.util.List<String> valuableBlocks = new java.util.ArrayList<>(DEFAULT_VALUABLES);
@@ -306,6 +311,7 @@ public final class MegaConfig {
         if (lightBlocks == null) lightBlocks = new java.util.ArrayList<>(DEFAULT_LIGHTS);
         if (builtBlocks == null || builtBlocks.isEmpty() && built) builtBlocks = new java.util.ArrayList<>(defaultBuilt());
         if (baseSignTypes == null) baseSignTypes = new java.util.ArrayList<>(DEFAULT_BASE_SIGNS);
+        if (!signsAdded) { if (!baseSignTypes.contains("mega:signs")) baseSignTypes.add("mega:signs"); signsAdded = true; }
         if (farmPlants == null) farmPlants = new java.util.ArrayList<>(DEFAULT_FARM_PLANTS);
     }
 }

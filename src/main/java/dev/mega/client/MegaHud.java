@@ -7,6 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.List;
 
@@ -65,6 +66,9 @@ public final class MegaHud {
             y += topPad;
         }
 
+        // Elytra helper: speed / height / compass bar while gliding
+        if (cfg.elytraHelper && client.player.isGliding()) topPad = elytraBar(client, ctx, tr, topPad);
+
         // Top-right corner: two slots, each Minimap / Blocks seen / Radars (panel → Map)
         int sw = ctx.getScaledWindowWidth();
         int cy = 6 + topPad;
@@ -101,7 +105,8 @@ public final class MegaHud {
             int shown = 0;
             for (PlayerInfo p : players) {
                 if (shown++ >= Math.min(5, cfg.maxLines)) break;
-                String line = arrow(px, pz, yaw, p.x(), p.z()) + " " + p.name() + "  " + Math.round(p.distance()) + "m";
+                String line = arrow(px, pz, yaw, p.x(), p.z()) + " " + p.name() + "  " + Math.round(p.distance()) + "m"
+                    + (p.gear().isEmpty() ? "" : "  " + p.gear());
                 y = line(ctx, tr, line, x, y, p.visible() ? YELLOW : YELLOW_DIM);
             }
             y += 4;
@@ -159,6 +164,41 @@ public final class MegaHud {
                 y = line(ctx, tr, line, x, y, MegaClient.readable(w.color));
             }
         }
+    }
+
+    /** Compass strip (±90° of where you face) with N/E/S/W, nearest stashes and waypoints; speed and height. */
+    private static int elytraBar(MinecraftClient client, DrawContext ctx, TextRenderer tr, int topPad) {
+        int sw = ctx.getScaledWindowWidth(), w = Math.min(220, sw - 260 > 120 ? sw - 260 : 120);
+        int x = sw / 2 - w / 2, y = 4 + topPad;
+        double heading = MathHelper.wrapDegrees(client.player.getYaw() + 180) ; // 0 = north, 90 = east
+        ctx.fill(x, y, x + w, y + 22, 0xB0000000);
+        ctx.fill(x + w / 2, y, x + w / 2 + 1, y + 12, 0xFFFFFFFF);
+        String[] card = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
+        for (int a = 0; a < 360; a += 15) {
+            double rel = MathHelper.wrapDegrees(a - heading);
+            if (Math.abs(rel) > 90) continue;
+            int sx = x + w / 2 + (int) (rel / 90 * (w / 2 - 6));
+            if (a % 45 == 0) ctx.drawCenteredTextWithShadow(tr, card[a / 45], sx, y + 2, a % 90 == 0 ? 0xFFFFD400 : 0xFFCCCCCC);
+            else ctx.fill(sx, y + 4, sx + 1, y + 8, 0x80FFFFFF);
+        }
+        // markers: nearest stash of each colour + waypoints
+        double px = client.player.getX(), pz = client.player.getZ();
+        java.util.List<Object[]> marks = new java.util.ArrayList<>();
+        java.util.Set<MegaClient.Category> seen = java.util.EnumSet.noneOf(MegaClient.Category.class);
+        for (Target t : MegaClient.targets) if (!MegaClient.natural(t.label(), t.category().color) && seen.add(t.category()))
+            marks.add(new Object[]{t.pos().getX() + 0.5, t.pos().getZ() + 0.5, MegaClient.readable(t.category().color)});
+        for (MegaWaypoints.Waypoint wp : MegaWaypoints.here(client)) marks.add(new Object[]{wp.x + 0.5, wp.z + 0.5, wp.color});
+        for (Object[] m : marks) {
+            double bearing = Math.toDegrees(Math.atan2((double) m[0] - px, -((double) m[1] - pz)));
+            double rel = MathHelper.wrapDegrees(bearing - heading);
+            int sx = x + w / 2 + (int) (Math.max(-90, Math.min(90, rel)) / 90 * (w / 2 - 6));
+            ctx.fill(sx - 1, y + 10, sx + 2, y + 13, (int) m[2]);
+        }
+        Vec3d v = client.player.getVelocity();
+        double speed = Math.sqrt(v.x * v.x + v.z * v.z) * 20;
+        String info = String.format("%.0f blocks/s   height %d   %s", speed, client.player.getBlockY(), card[(int) Math.round(((heading % 360) + 360) % 360 / 45) % 8]);
+        ctx.drawCenteredTextWithShadow(tr, info, x + w / 2, y + 13, 0xFFFFFFFF);
+        return topPad + 26;
     }
 
     /** "Blocks seen" list at the top-right, starting at y; returns the y below it. */

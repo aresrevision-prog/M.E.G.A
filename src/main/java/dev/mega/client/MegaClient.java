@@ -253,11 +253,32 @@ public final class MegaClient implements ClientModInitializer {
             if (sq > maxSq) continue;
             boolean visible = client.player.canSee(p);
             anyVisible |= visible;
-            found.add(new PlayerInfo(p.getName().getString(), p.getX(), p.getZ(), Math.sqrt(sq), visible));
+            found.add(new PlayerInfo(p.getName().getString(), p.getX(), p.getZ(), Math.sqrt(sq), visible, config.gearCheck ? gear(p) : ""));
         }
         found.sort(Comparator.comparingDouble(PlayerInfo::distance));
         players = found;
         playerVisible = anyVisible;
+    }
+
+    /** "[N N E N] totem · Netherite Sword": armour (N netherite, D diamond, I iron, G gold, C chain, L leather,
+     *  T turtle, E elytra, - none), a totem if they hold one, and what's in their main hand. What the server shows. */
+    static String gear(AbstractClientPlayerEntity p) {
+        StringBuilder b = new StringBuilder("[");
+        net.minecraft.entity.EquipmentSlot[] slots = {net.minecraft.entity.EquipmentSlot.HEAD, net.minecraft.entity.EquipmentSlot.CHEST,
+            net.minecraft.entity.EquipmentSlot.LEGS, net.minecraft.entity.EquipmentSlot.FEET};
+        for (int i = 0; i < 4; i++) {
+            net.minecraft.item.ItemStack s = p.getEquippedStack(slots[i]);
+            String id = s.isEmpty() ? "" : Registries.ITEM.getId(s.getItem()).getPath();
+            String c = id.isEmpty() ? "-" : id.equals("elytra") ? "E" : id.startsWith("netherite") ? "N" : id.startsWith("diamond") ? "D"
+                : id.startsWith("iron") ? "I" : id.startsWith("golden") ? "G" : id.startsWith("chainmail") ? "C"
+                : id.startsWith("leather") ? "L" : id.startsWith("turtle") ? "T" : "?";
+            b.append(c).append(i < 3 ? " " : "]");
+        }
+        boolean totem = p.getMainHandStack().isOf(net.minecraft.item.Items.TOTEM_OF_UNDYING) || p.getOffHandStack().isOf(net.minecraft.item.Items.TOTEM_OF_UNDYING);
+        if (totem) b.append(" totem");
+        if (!p.getMainHandStack().isEmpty() && !p.getMainHandStack().isOf(net.minecraft.item.Items.TOTEM_OF_UNDYING))
+            b.append(" · ").append(p.getMainHandStack().getName().getString());
+        return b.toString();
     }
 
     /** True for players the mod must ignore: you (by reference or UUID), spectators, and names in ignoredPlayers. */
@@ -352,6 +373,19 @@ public final class MegaClient implements ClientModInitializer {
             int dx = Math.abs(cp.x - j.center.x), dz = Math.abs(cp.z - j.center.z);
 
             for (BlockEntity be : chunk.getBlockEntities().values()) {
+                if (be instanceof net.minecraft.block.entity.SignBlockEntity sign && Category.BASE.enabled(config)
+                    && !disabled.contains("mega:signs")) {
+                    String text = signText(sign);
+                    if (!text.isEmpty()) {
+                        double sq = client.player.squaredDistanceTo(be.getPos().getX() + 0.5, be.getPos().getY() + 0.5, be.getPos().getZ() + 0.5);
+                        if (sq <= j.maxSq) {
+                            j.found.add(new Target(Category.BASE, "SIGN: \"" + text + "\"", be.getPos().toImmutable(), Math.sqrt(sq)));
+                            j.counts.merge(Category.BASE, 1, Integer::sum);
+                            countBlock("SIGN", Category.BASE);
+                        }
+                    }
+                    continue;
+                }
                 Category category = beBlocks.get(be.getCachedState().getBlock());
                 if (category == null || !category.enabled(config)) continue;
                 if (category == Category.LIGHT && !underground(client, be.getPos())) continue;
@@ -621,6 +655,18 @@ public final class MegaClient implements ClientModInitializer {
             config.oresLast && natural(t.label(), t.category().color) ? 1 : 0)
         .thenComparingDouble(Target::distance);
 
+    /** Both sides of a sign, non-empty lines joined with " / ", max 48 characters. */
+    static String signText(net.minecraft.block.entity.SignBlockEntity s) {
+        List<String> parts = new ArrayList<>();
+        for (net.minecraft.block.entity.SignText side : new net.minecraft.block.entity.SignText[]{s.getFrontText(), s.getBackText()})
+            for (int i = 0; i < 4; i++) {
+                String l = side.getMessage(i, false).getString().trim();
+                if (!l.isEmpty()) parts.add(l);
+            }
+        String t = String.join(" / ", parts);
+        return t.length() > 48 ? t.substring(0, 47) + "…" : t;
+    }
+
     static List<Target> everyColourFirst(List<Target> sorted) {
         List<Target> first = new ArrayList<>(), rest = new ArrayList<>();
         Set<Category> seen = java.util.EnumSet.noneOf(Category.class);
@@ -733,5 +779,5 @@ public final class MegaClient implements ClientModInitializer {
 
     record Target(Category category, String label, BlockPos pos, double distance) {}
 
-    record PlayerInfo(String name, double x, double z, double distance, boolean visible) {}
+    record PlayerInfo(String name, double x, double z, double distance, boolean visible, String gear) {}
 }

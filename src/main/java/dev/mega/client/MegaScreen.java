@@ -128,18 +128,16 @@ final class MegaScreen extends Screen {
             y = toggleGrid(List.of(
                 t("Stash memory", () -> c.stashMemory, v -> c.stashMemory = v),
                 t("Join/leave alerts", () -> c.joinAlerts, v -> c.joinAlerts = v),
+                t("Elytra helper", () -> c.elytraHelper, v -> c.elytraHelper = v),
+                t("Last seen", () -> c.lastSeen, v -> c.lastSeen = v),
                 t("Player trails", () -> c.trails, v -> c.trails = v)), x0, y, colW);
             addDrawableChild(new IntSlider(x0 + colW + GAP, y - BTN_H - GAP, colW, "Trail seconds", 10, 1800,
                 () -> c.trailSeconds, v -> c.trailSeconds = v));
-            addDrawableChild(ButtonWidget.builder(onOff("Last seen", c.lastSeen), b -> {
-                c.lastSeen = !c.lastSeen;
-                b.setMessage(onOff("Last seen", c.lastSeen));
-            }).dimensions(x0, y, colW, BTN_H).build());
             addDrawableChild(ButtonWidget.builder(Text.literal("§eOpen big map (M)"), b -> {
                 MegaClient.config.save();
                 MegaClient.applyConfig();
                 client.setScreen(new MegaMapScreen());
-            }).dimensions(x0 + colW + GAP, y, colW, BTN_H).build());
+            }).dimensions(x0, y, colW * 2 + GAP, BTN_H).build());
             y += BTN_H + GAP;
         } else if (tab == 3) {
             waypointsTab(c, x0, w);
@@ -152,10 +150,12 @@ final class MegaScreen extends Screen {
                 t("Player list", () -> c.playerList, v -> c.playerList = v),
                 t("Player lines", () -> c.tracePlayers, v -> c.tracePlayers = v),
                 t("Invisible players", () -> c.showInvisiblePlayers, v -> c.showInvisiblePlayers = v),
-                t("Outline sneaky players", () -> c.outlineSneaky, v -> c.outlineSneaky = v));
+                t("Outline sneaky players", () -> c.outlineSneaky, v -> c.outlineSneaky = v),
+                t("Gear check", () -> c.gearCheck, v -> c.gearCheck = v));
             y = toggleGrid(toggles, x0, y, colW);
-            addDrawableChild(new IntSlider(x0 + colW + GAP, y - BTN_H - GAP, colW, "Player range", 8, 1250,
+            addDrawableChild(new IntSlider(x0, y, colW, "Player range", 8, 1250,
                 () -> c.playerRange, v -> c.playerRange = v));
+            y += BTN_H + GAP;
             y += 14;
             ignoredField = new TextFieldWidget(textRenderer, x0, y, w, BTN_H, Text.literal("Ignored players"));
             ignoredField.setMaxLength(512);

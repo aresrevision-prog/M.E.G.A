@@ -43,7 +43,7 @@ Taken automatically on every build by the in-game test, which launches the real 
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.32.2`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.33.0`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 6. Teleporting is allowed (M.E.G.A itself has no teleport: it can't be done client-side without cheating).
 
@@ -106,6 +106,9 @@ Outlines show within 12 blocks of you, only on the sides of a block that touch a
 - **Stash memory**: every stash, base sign, built area, portal etc. you pass is remembered (`config/mega_memory.json`) and shown on the big map after you leave.
 - **Player trails**: a fading yellow line where each player walked or flew (default last 3 minutes).
 - **Last seen**: when a player leaves your view, the HUD shows where and how long ago (with an arrow), a dim beam marks the spot for 10 minutes, and the big map keeps it.
+- **Gear check**: the player list shows each player's armour (`[N N E N]` = netherite / elytra, D diamond, I iron, G gold, C chain, L leather, T turtle), `totem` if they hold one, and what's in their hand.
+- **Elytra helper**: while gliding, a compass bar at the top shows speed, height, N/E/S/W and the nearest stash of each colour and your waypoints as coloured marks.
+- **Sign reader** (pink, Base signs): what nearby signs say, e.g. `SIGN: "Base / here"`.
 - **Join/leave alerts**: a chat note (only you see it) when someone joins or leaves.
 - **Portals & beds** (violet): nether/end portals, end gateways, beds (counted once), respawn anchors.
 - **Hidden storage**: chest/hopper minecarts, chest boats, donkeys/mules/llamas with chests (red, Storage).

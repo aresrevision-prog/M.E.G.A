@@ -212,6 +212,7 @@ public class MegaClientGameTest implements FabricClientGameTest {
             srv.runCommand("setblock 14 -60 -1 minecraft:red_bed[part=foot,facing=north]");
             srv.runCommand("setblock 14 -60 -2 minecraft:red_bed[part=head,facing=north]");
             srv.runCommand("summon minecraft:chest_minecart -8 -60 2");
+            srv.runCommand("setblock 1 -60 -8 minecraft:oak_sign{front_text:{messages:[\"Base\",\"here\",\"\",\"\"]}}");
             ctx.runOnClient(MegaClient::refresh);
             ctx.waitTicks(80);
             String pb = ctx.computeOnClient(c -> MegaClient.targets.stream()
@@ -222,6 +223,10 @@ public class MegaClientGameTest implements FabricClientGameTest {
             MegaClient.LOGGER.info("[M.E.G.A test] portals/beds/storage: {} remembered={} mapChunks={}", pb, remembered, chunksKnown);
             check(pb.contains("RESPAWN_ANCHOR") && pb.contains("RED_BED") && pb.contains("CHEST_MINECART"), "portal/bed/minecart missing: " + pb);
             check(pb.indexOf("RED_BED") == pb.lastIndexOf("RED_BED"), "bed counted twice: " + pb);
+            String sign = ctx.computeOnClient(c -> MegaClient.targets.stream().filter(t -> t.label().startsWith("SIGN:"))
+                .map(MegaClient.Target::label).findFirst().orElse("none"));
+            MegaClient.LOGGER.info("[M.E.G.A test] sign: {}", sign);
+            check(sign.equals("SIGN: \"Base / here\""), "sign text wrong: " + sign);
             check(remembered >= 8, "stash memory empty: " + remembered);
             check(chunksKnown >= 20, "map memory empty: " + chunksKnown);
             // the flat test world's ground is grass: the remembered map colour under you must be green, not dirt-brown
