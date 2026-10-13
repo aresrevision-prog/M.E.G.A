@@ -93,6 +93,7 @@ final class MegaMapScreen extends Screen {
         }
         // stashes found right now
         for (MegaClient.Target t : MegaClient.targets) {
+            if (MegaClient.natural(t.label(), t.category().color)) continue;
             int[] s = screen(t.pos().getX() + 0.5, t.pos().getZ() + 0.5);
             if (!on(s)) continue;
             ctx.fill(s[0] - 1, s[1] - 1, s[0] + 2, s[1] + 2, MegaClient.readable(t.category().color));

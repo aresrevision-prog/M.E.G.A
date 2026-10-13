@@ -250,6 +250,7 @@ public final class MegaMap {
         }
         // stashes found now
         for (MegaClient.Target t : MegaClient.targets) {
+            if (MegaClient.natural(t.label(), t.category().color)) continue; // natural ore would bury the map
             float[] s = toScreen(t.pos().getX() + 0.5 - px, t.pos().getZ() + 0.5 - pz, cos, sin, k, cx, cy);
             if (inside(s, x, y, size)) { dot(ctx, s, 2, 0xFF000000); dot(ctx, s, 1, MegaClient.readable(t.category().color)); }
         }

@@ -43,7 +43,7 @@ Taken automatically on every build by the in-game test, which launches the real 
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.32.1`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.32.2`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 6. Teleporting is allowed (M.E.G.A itself has no teleport: it can't be done client-side without cheating).
 
@@ -99,7 +99,7 @@ Outlines show within 12 blocks of you, only on the sides of a block that touch a
 
 ## Minimap and big map
 - **Top-right corner has two slots** (panel → Map): each can be **Minimap**, **Blocks seen**, **Radars** or empty. Default: Minimap on top, Blocks seen under it. Radars go bottom-right unless you put them in a slot.
-- **Minimap** turns with you (up = where you face). Shows real terrain, stashes as dots in their colours, players as yellow arrows, mobs (red/green), waypoints and deaths (pinned to the edge when far). **N** switches layer: **SURFACE**, **CAVE** (the level you're on: open space shows its floor, rock is dark, so tunnels and rooms stand out) and **BELOW 0** (the first open space under y=0: deep bases).
+- **Minimap** turns with you (up = where you face). Shows real terrain, stashes as dots in their colours (natural ore is left off so it doesn't bury the map), players as yellow arrows, mobs (red/green), waypoints and deaths (pinned to the edge when far). **N** switches layer: **SURFACE**, **CAVE** (the level you're on: open space shows its floor, rock is dark, so tunnels and rooms stand out) and **BELOW 0** (the first open space under y=0: deep bases).
 - **Big map (M)**: full screen, drag to move, scroll to zoom. It **remembers every area you've had loaded** (saved per server and dimension in `config/mega_map/`), so it keeps growing as you fly. Shows remembered stashes, current finds, waypoints, deaths, players and where you last saw people; hover a dot for its name and coordinates.
 
 ## Tracking
