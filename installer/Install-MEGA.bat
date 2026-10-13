@@ -20,6 +20,12 @@ $UA = @{ 'User-Agent' = 'MEGA-Installer' }
 function Step($t) { Write-Host "  > $t" -ForegroundColor Cyan }
 function Ok($t)   { Write-Host "    $t" -ForegroundColor Green }
 function Fail($t) { Write-Host ""; Write-Host "  ERROR: $t" -ForegroundColor Red; exit 1 }
+# Downloads can fail for a moment (slow Wi-Fi, GitHub limits): try 4 times before giving up
+function Retry([scriptblock]$job) {
+    for ($i = 1; $i -le 4; $i++) {
+        try { return & $job } catch { if ($i -eq 4) { throw }; Start-Sleep -Seconds (3 * $i) }
+    }
+}
 
 try {
     # 1. Find .minecraft
@@ -39,13 +45,13 @@ try {
 
     # 3. Fabric Loader (latest stable for 1.21.11)
     Step "Getting Fabric Loader for $MC"
-    $loaders = Invoke-RestMethod -Uri "https://meta.fabricmc.net/v2/versions/loader/$MC" -Headers $UA
+    $loaders = Retry { Invoke-RestMethod -Uri "https://meta.fabricmc.net/v2/versions/loader/$MC" -Headers $UA }
     $loader = ($loaders | Where-Object { $_.loader.stable } | Select-Object -First 1).loader.version
     if (-not $loader) { $loader = $loaders[0].loader.version }
     $verId = "fabric-loader-$loader-$MC"
     $verDir = Join-Path $mcDir "versions\$verId"
     New-Item -ItemType Directory -Force -Path $verDir | Out-Null
-    $json = Invoke-WebRequest -UseBasicParsing -Uri "https://meta.fabricmc.net/v2/versions/loader/$MC/$loader/profile/json" -Headers $UA
+    $json = Retry { Invoke-WebRequest -UseBasicParsing -Uri "https://meta.fabricmc.net/v2/versions/loader/$MC/$loader/profile/json" -Headers $UA }
     [IO.File]::WriteAllText((Join-Path $verDir "$verId.json"), $json.Content)
     Ok "Fabric Loader $loader installed"
 
@@ -89,19 +95,34 @@ try {
     Get-ChildItem (Join-Path $mcDir 'mods') -Filter 'mega-client-*.jar' -ErrorAction SilentlyContinue | Remove-Item -Force
     $mods = Join-Path $gameDir 'mods'
     New-Item -ItemType Directory -Force -Path $mods | Out-Null
-    $rel = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/releases/latest" -Headers $UA
-    $asset = $rel.assets | Where-Object { $_.name -like 'mega-client-*.jar' -and $_.name -notlike '*-sources*' } | Select-Object -First 1
-    if (-not $asset) { Fail "No mod JAR found in the latest release ($($rel.tag_name))." }
+    # Newest release: GitHub's API first; if that's busy/limited, read the version from the release page instead
+    $jarName = $null; $jarUrl = $null
+    try {
+        $rel = Retry { Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/releases/latest" -Headers $UA }
+        $asset = $rel.assets | Where-Object { $_.name -like 'mega-client-*.jar' -and $_.name -notlike '*-sources*' } | Select-Object -First 1
+        if ($asset) { $jarName = $asset.name; $jarUrl = $asset.browser_download_url }
+    } catch { }
+    if (-not $jarUrl) {
+        $page = Retry { Invoke-WebRequest -UseBasicParsing -Uri "https://github.com/$Repo/releases/latest" -Headers $UA }
+        $final = if ($page.BaseResponse.ResponseUri) { $page.BaseResponse.ResponseUri.AbsoluteUri } else { $page.BaseResponse.RequestMessage.RequestUri.AbsoluteUri }
+        if ($final -notmatch '/tag/v([^/]+)$') { Fail "Could not find the newest M.E.G.A release. Check your internet and try again." }
+        $ver = $Matches[1]
+        $jarName = "mega-client-$ver.jar"
+        $jarUrl = "https://github.com/$Repo/releases/download/v$ver/$jarName"
+    }
+    # Download to a temp file first, so a failed download never leaves you without the mod
+    $tmp = Join-Path $env:TEMP $jarName
+    Retry { Invoke-WebRequest -UseBasicParsing -Uri $jarUrl -OutFile $tmp -Headers $UA }
     Get-ChildItem $mods -Filter 'mega-client-*.jar' -ErrorAction SilentlyContinue | Remove-Item -Force
-    Invoke-WebRequest -UseBasicParsing -Uri $asset.browser_download_url -OutFile (Join-Path $mods $asset.name) -Headers $UA
-    Ok "$($asset.name) -> $mods"
+    Move-Item $tmp (Join-Path $mods $jarName) -Force
+    Ok "$jarName -> $mods"
 
     # 6. Optional spawner texture pack
     $packs = Join-Path $gameDir 'resourcepacks'
     $ans = Read-Host "  > Also install the M.E.G.A spawner texture pack? (y/N)"
     if ($ans -match '^[yY]') {
         New-Item -ItemType Directory -Force -Path $packs | Out-Null
-        Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/$Repo/main/resourcepacks/MEGA-Spawner-Texture.zip" -OutFile (Join-Path $packs 'MEGA-Spawner-Texture.zip') -Headers $UA
+        Retry { Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/$Repo/main/resourcepacks/MEGA-Spawner-Texture.zip" -OutFile (Join-Path $packs 'MEGA-Spawner-Texture.zip') -Headers $UA }
         Ok "Pack copied. Turn it on in Options > Resource Packs."
     }
 

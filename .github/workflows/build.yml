@@ -68,11 +68,17 @@ jobs:
           echo {"profiles":{"latest-release":{"name":"","type":"latest-release","lastVersionId":"latest-release"}},"settings":{},"version":3}> "%APPDATA%\.minecraft\launcher_profiles.json"
           mkdir "%APPDATA%\.minecraft\mods"
           echo x> "%APPDATA%\.minecraft\mods\other-26.3-mod.jar"
-          echo n| installer\Install-MEGA.bat
+          echo n| installer\Install-MEGA.bat > "%RUNNER_TEMP%\installer.txt" 2>&1
+          type "%RUNNER_TEMP%\installer.txt"
       - name: Check everything was set up
         shell: pwsh
         run: |
           $mc = "$env:APPDATA\.minecraft"
+          trap {
+            $out = (Get-Content "$env:RUNNER_TEMP\installer.txt" -Raw) -replace "`r?`n", ' | '
+            Write-Host "::error::$_ -- installer said: $out"
+            exit 1
+          }
           Get-ChildItem -Recurse $mc | Select-Object FullName
           $p = (Get-Content "$mc\launcher_profiles.json" -Raw | ConvertFrom-Json).profiles
           if (-not $p.'mega-client') { throw 'M.E.G.A profile missing' }
