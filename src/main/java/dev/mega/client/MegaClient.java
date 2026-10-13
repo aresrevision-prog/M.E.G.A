@@ -125,6 +125,7 @@ public final class MegaClient implements ClientModInitializer {
             }
         }
         MegaWaypoints.tick(client);
+        MegaRadar.tick(client);
 
         MegaXray.tick(client);
         MegaXray.scanGhosts(client);

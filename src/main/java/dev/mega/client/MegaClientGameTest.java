@@ -145,6 +145,17 @@ public class MegaClientGameTest implements FabricClientGameTest {
             check(farms.contains("BAMBOO_FARM"), "real bamboo farm not found: " + farms);
             check(!farms.contains("@-5"), "pistons next to wild bamboo were called a farm: " + farms);
 
+            // Radars: a mob on the (flat, y<0) ground goes on BELOW 0, one floating high up goes on SKY
+            srv.runCommand("summon minecraft:zombie 3 -60 3 {NoAI:1b,PersistenceRequired:1b}");
+            srv.runCommand("summon minecraft:cow -4 -60 6 {NoAI:1b}");
+            srv.runCommand("summon minecraft:zombie 6 30 2 {NoAI:1b,NoGravity:1b,PersistenceRequired:1b}");
+            ctx.waitTicks(20);
+            int[] rc = ctx.computeOnClient(c -> MegaRadar.count.clone());
+            MegaClient.LOGGER.info("[M.E.G.A test] radars sky={} ground={} below0={}", rc[0], rc[1], rc[2]);
+            check(rc[0] >= 1 && rc[2] >= 2, "radars wrong: sky=" + rc[0] + " below0=" + rc[2]);
+            ctx.takeScreenshot("10-radars");
+            srv.runCommand("kill @e[type=!minecraft:player]");
+
             // Deep scan: only buried things. The hill stash (inside 6 blocks of stone) stays; the furnace/table on the hill top go.
             ctx.runOnClient(c -> { MegaClient.config.deepScan = true; MegaClient.config.save(); MegaClient.refresh(c); });
             ctx.waitTicks(40);

@@ -49,6 +49,10 @@ public final class MegaConfig {
     public boolean waypoints = true;
     /** G: only show stashes buried underground. */
     public boolean deepScan = false;
+    /** Three radars (sky / ground / below 0), bottom right. */
+    public boolean radar = true;
+    public int radarRange = 1000;
+    public int radarSize = 64;
     public int deathsKept = 3;
 
     // Block targets
@@ -220,6 +224,8 @@ public final class MegaConfig {
         if (shulkerBlocks == null) shulkerBlocks = new java.util.ArrayList<>(DEFAULT_SHULKERS);
         if (storageBlocks == null) storageBlocks = new java.util.ArrayList<>(DEFAULT_STORAGE);
         deathsKept = Math.clamp(deathsKept, 1, 20);
+        radarRange = Math.clamp(radarRange, 16, 1250);
+        radarSize = Math.clamp(radarSize, 40, 128);
         if (farmPlants == null) farmPlants = new java.util.ArrayList<>(DEFAULT_FARM_PLANTS);
     }
 }

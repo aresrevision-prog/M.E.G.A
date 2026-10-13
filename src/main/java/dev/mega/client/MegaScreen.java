@@ -79,7 +79,10 @@ final class MegaScreen extends Screen {
                 t("HUD", () -> c.hudEnabled, v -> c.hudEnabled = v),
                 t("Blocks seen panel", () -> c.blockCountPanel, v -> c.blockCountPanel = v),
                 t("Lines", () -> c.tracers, v -> c.tracers = v),
-                t("Boxes", () -> c.boxes, v -> c.boxes = v)), x0, y, colW);
+                t("Boxes", () -> c.boxes, v -> c.boxes = v),
+                t("Radars", () -> c.radar, v -> c.radar = v)), x0, y, colW);
+            addDrawableChild(new IntSlider(x0 + colW + GAP, y - BTN_H - GAP, colW, "Radar range", 16, 1250,
+                () -> c.radarRange, v -> c.radarRange = v));
             addDrawableChild(new IntSlider(x0, y, colW, "Lines shown", 0, 50, () -> c.maxTracers, v -> c.maxTracers = v));
             addDrawableChild(new IntSlider(x0 + colW + GAP, y, colW, "List rows", 1, 30, () -> c.maxLines, v -> c.maxLines = v));
             y += BTN_H + GAP + 4;

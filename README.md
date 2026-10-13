@@ -43,7 +43,7 @@ Taken automatically on every build by the in-game test, which launches the real 
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.27.1`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.28.0`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 6. Teleporting is allowed (M.E.G.A itself has no teleport: it can't be done client-side without cheating).
 
@@ -93,6 +93,9 @@ Client-side only: nothing is installed on the server, and other players don't ne
 Outlines show within 12 blocks of you, only on the sides of a block that touch air (ground seen from above is just its top square, no vertical lines). They're drawn thicker, and blocks X-ray keeps (ores, stash blocks, bedrock) hide the outlines behind them, so nothing shows through a solid block. **Bedrock stays visible** so you can see the bottom of the world. Small shapes like torches, flowers, tall grass, rails and signs stay drawn.
 
 **Lava and water** (panel button: *X-ray lava & water*): within 12 blocks, lava hidden inside rock shows as **see-through orange** with orange edges, so you can see the whole pool. Water keeps its normal texture, with blue edges.
+
+## Radars (bottom right)
+Three radars: **SKY** (10+ blocks above the ground under it: elytra players, phantoms), **GROUND**, and **BELOW 0** (under y=0: deep bases, caves). They turn with you (up = where you're facing). Yellow = players, red = hostile mobs, green = animals, grey = minecarts/boats. Distances are square-root scaled so nearby things spread out. Range up to 1250 (default 1000), but the server only sends entities that are fairly close (players within your view distance, mobs ~100 blocks), so that's the real limit. On/off and range: panel → Display.
 
 ## Deep scan (G)
 Press **G** to show only stashes **buried underground** (at least 4 blocks under the surface above them). It rescans straight away; surface builds (houses, bases) drop out of the list and lines, and the HUD shows `DEEP`. Press G again for everything. (T is chat in Minecraft, so it's on G; change it in Controls → Key Binds → Miscellaneous.)

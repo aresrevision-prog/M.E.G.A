@@ -25,6 +25,7 @@ public final class MegaHud {
         MegaConfig cfg = MegaClient.config;
         if (cfg == null || !cfg.hudEnabled || client.player == null || client.world == null) return;
         if (client.getDebugHud().shouldShowDebugHud()) return;
+        MegaRadar.render(client, ctx);
 
         TextRenderer tr = client.textRenderer;
         int x = cfg.hudX;
