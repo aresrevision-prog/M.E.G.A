@@ -162,6 +162,27 @@ public class MegaClientGameTest implements FabricClientGameTest {
             ctx.takeScreenshot("10-radars");
             srv.runCommand("kill @e[type=!minecraft:player]");
 
+            // Underground lights (inside the hill), a lone torch on the surface (ignored), built blocks, base signs
+            srv.runCommand("setblock 10 -59 7 minecraft:glowstone");
+            srv.runCommand("setblock 10 -59 8 minecraft:sea_lantern");
+            srv.runCommand("setblock 0 -60 -6 minecraft:torch");
+            srv.runCommand("fill -10 -60 -8 -3 -60 -8 minecraft:white_concrete");
+            for (int v = 0; v < 7; v++) srv.runCommand("summon minecraft:villager " + (-15 + v % 3) + " -60 " + (-12 + v / 3) + " {NoAI:1b}");
+            srv.runCommand("summon minecraft:cow -6 -60 -14 {NoAI:1b,CustomName:\"Bessie\"}");
+            ctx.runOnClient(MegaClient::refresh);
+            ctx.waitTicks(60);
+            String signs = ctx.computeOnClient(c -> MegaClient.targets.stream()
+                .filter(t -> t.category() == MegaClient.Category.LIGHT || t.category() == MegaClient.Category.BUILT
+                    || t.category() == MegaClient.Category.BASE).map(MegaClient.Target::label).toList().toString());
+            MegaClient.LOGGER.info("[M.E.G.A test] lights/built/base signs: {}", signs);
+            check(signs.contains("LIGHTS_UNDERGROUND"), "underground lights not found: " + signs);
+            check(signs.contains("BUILT_BLOCKS"), "built blocks not found: " + signs);
+            check(signs.contains("TRADING_HALL"), "trading hall not found: " + signs);
+            check(signs.contains("NAMED_COW"), "named mob not found: " + signs);
+            ctx.takeScreenshot("11-base-hunting");
+            srv.runCommand("kill @e[type=!minecraft:player]");
+            srv.runCommand("fill -10 -60 -8 -3 -60 -8 minecraft:air");
+
             // Deep scan: only buried things. The hill stash (inside 6 blocks of stone) stays; the furnace/table on the hill top go.
             ctx.runOnClient(c -> { MegaClient.config.deepScan = true; MegaClient.config.save(); MegaClient.refresh(c); });
             ctx.waitTicks(40);

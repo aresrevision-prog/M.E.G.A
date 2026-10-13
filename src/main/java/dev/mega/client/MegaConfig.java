@@ -84,6 +84,25 @@ public final class MegaConfig {
     static final java.util.List<String> DEFAULT_ORES = java.util.List.of(
         "minecraft:diamond_ore", "minecraft:deepslate_diamond_ore", "minecraft:emerald_ore",
         "minecraft:gold_ore", "minecraft:deepslate_gold_ore");
+    // Lights underground (pale yellow): only counted when buried 4+ blocks under the surface
+    public boolean lights = true;
+    public java.util.List<String> lightBlocks = new java.util.ArrayList<>(DEFAULT_LIGHTS);
+    static final java.util.List<String> DEFAULT_LIGHTS = java.util.List.of(
+        "minecraft:torch", "minecraft:wall_torch", "minecraft:soul_torch", "minecraft:soul_wall_torch",
+        "minecraft:copper_torch", "minecraft:copper_wall_torch",
+        "minecraft:lantern", "minecraft:soul_lantern", "minecraft:glowstone", "minecraft:sea_lantern",
+        "minecraft:jack_o_lantern", "minecraft:redstone_lamp", "minecraft:end_rod", "minecraft:copper_lantern",
+        "minecraft:ochre_froglight", "minecraft:verdant_froglight", "minecraft:pearlescent_froglight",
+        "minecraft:campfire", "minecraft:soul_campfire");
+    // built_block (white): blocks that never generate naturally
+    public boolean built = true;
+    public java.util.List<String> builtBlocks = new java.util.ArrayList<>(defaultBuilt());
+    // Base signs (pink): trading halls, animal pens, tamed pets, named mobs
+    public boolean baseSigns = true;
+    public java.util.List<String> baseSignTypes = new java.util.ArrayList<>(DEFAULT_BASE_SIGNS);
+    static final java.util.List<String> DEFAULT_BASE_SIGNS = java.util.List.of(
+        "mega:trading_halls", "mega:animal_pens", "mega:tamed_pets", "mega:named_mobs");
+
     // "Valuable blocks" (blue)
     public java.util.List<String> valuableBlocks = new java.util.ArrayList<>(DEFAULT_VALUABLES);
     static final java.util.List<String> DEFAULT_VALUABLES = java.util.List.of(
@@ -102,6 +121,27 @@ public final class MegaConfig {
         "minecraft:stonecutter", "minecraft:loom", "minecraft:cartography_table", "minecraft:fletching_table",
         "minecraft:furnace", "minecraft:smoker", "minecraft:blast_furnace");
     static final int CURRENT_VERSION = 9;
+
+    /** Every block id that never generates in the world on its own (checked against the game's block list). */
+    static java.util.List<String> defaultBuilt() {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        try {
+            for (net.minecraft.util.Identifier id : net.minecraft.registry.Registries.BLOCK.getIds()) {
+                if (!id.getNamespace().equals("minecraft")) continue;
+                String p = id.getPath();
+                boolean b = p.endsWith("_concrete") || p.endsWith("_concrete_powder") || p.endsWith("_glazed_terracotta")
+                    || p.endsWith("_wool") || p.endsWith("_carpet") && !p.equals("moss_carpet") && !p.equals("pale_moss_carpet")
+                    || p.equals("glass") || p.equals("glass_pane") || p.equals("tinted_glass") || p.endsWith("_stained_glass")
+                    || p.endsWith("_stained_glass_pane")
+                    || p.startsWith("polished_andesite") || p.startsWith("polished_diorite") || p.startsWith("polished_granite")
+                    || p.startsWith("polished_deepslate") || p.startsWith("polished_tuff")
+                    || p.startsWith("smooth_stone");
+                if (b) out.add(id.toString());
+            }
+        } catch (Throwable t) { /* registry not ready: start empty, Reset fills it */ }
+        java.util.Collections.sort(out);
+        return out;
+    }
 
     private static java.util.List<String> shulkers() {
         java.util.List<String> l = new java.util.ArrayList<>(java.util.List.of("minecraft:shulker_box"));
@@ -226,6 +266,9 @@ public final class MegaConfig {
         deathsKept = Math.clamp(deathsKept, 1, 20);
         radarRange = Math.clamp(radarRange, 16, 1250);
         radarSize = Math.clamp(radarSize, 40, 128);
+        if (lightBlocks == null) lightBlocks = new java.util.ArrayList<>(DEFAULT_LIGHTS);
+        if (builtBlocks == null || builtBlocks.isEmpty() && built) builtBlocks = new java.util.ArrayList<>(defaultBuilt());
+        if (baseSignTypes == null) baseSignTypes = new java.util.ArrayList<>(DEFAULT_BASE_SIGNS);
         if (farmPlants == null) farmPlants = new java.util.ArrayList<>(DEFAULT_FARM_PLANTS);
     }
 }

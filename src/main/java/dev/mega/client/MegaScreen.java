@@ -59,20 +59,28 @@ final class MegaScreen extends Screen {
         int y = contentTop = 48;
 
         if (tab == 0) {
-            // One row per colour: [■ Ores (cyan): ON] [Edit blocks (5/5) >]
-            int toggleW = (int) (w * 0.66);
-            for (Category cat : Category.values()) {
+            // One row per colour: [■ Ores  ON] [Edit 5/5 ›]. Two columns when one column won't fit the screen.
+            Category[] cats = Category.values();
+            boolean two = 48 + cats.length * (BTN_H + GAP) + BTN_H + 12 > height;
+            int perCol = two ? (cats.length + 1) / 2 : cats.length;
+            int colWidth = two ? colW : w;
+            int toggleW = (int) (colWidth * (two ? 0.62 : 0.66));
+            int startY = y;
+            for (int ci = 0; ci < cats.length; ci++) {
+                Category cat = cats[ci];
+                int cx = x0 + (ci / perCol) * (colW + GAP);
+                y = startY + (ci % perCol) * (BTN_H + GAP);
                 addDrawableChild(ButtonWidget.builder(colourText(cat, cat.enabled(c)), b -> {
                     cat.setEnabled(c, !cat.enabled(c));
                     b.setMessage(colourText(cat, cat.enabled(c)));
-                }).dimensions(x0, y, toggleW, BTN_H).build());
+                }).dimensions(cx, y, toggleW, BTN_H).build());
                 List<String> blocks = cat.blocks(c);
                 long on = blocks.stream().filter(id -> !c.disabledTargets.contains(id)).count();
-                addDrawableChild(ButtonWidget.builder(Text.literal("Edit  §7" + on + "/" + blocks.size() + " §f›"),
+                addDrawableChild(ButtonWidget.builder(Text.literal((two ? "" : "Edit  ") + "§7" + on + "/" + blocks.size() + " §f›"),
                     b -> client.setScreen(new MegaBlocksScreen(this, cat)))
-                    .dimensions(x0 + toggleW + GAP, y, w - toggleW - GAP, BTN_H).build());
-                y += BTN_H + GAP;
+                    .dimensions(cx + toggleW + GAP, y, colWidth - toggleW - GAP, BTN_H).build());
             }
+            y = startY + perCol * (BTN_H + GAP);
         } else if (tab == 1) {
             // Screen | Lines | X-ray | Range, two per row
             y = toggleGrid(List.of(

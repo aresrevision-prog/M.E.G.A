@@ -90,9 +90,16 @@ final class MegaBlocksScreen extends Screen {
         field.setText(typed);
         field.setPlaceholder(Text.literal("Type a block, e.g. diamond_block"));
         field.setChangedListener(s -> { typed = s; updateMatches(); });
+        if (cat == Category.BASE) { // base signs are fixed types: just switch them on/off
+            field.setText("");
+            field.setPlaceholder(Text.literal("Switch each base sign on/off above"));
+            field.setEditable(false);
+        }
         addDrawableChild(field);
-        addDrawableChild(ButtonWidget.builder(Text.literal("§aAdd"), b -> add())
-            .dimensions(x0 + w - 2 * btnW - GAP, fieldY, btnW, BTN_H).build());
+        ButtonWidget addB = ButtonWidget.builder(Text.literal("§aAdd"), b -> add())
+            .dimensions(x0 + w - 2 * btnW - GAP, fieldY, btnW, BTN_H).build();
+        addB.active = cat != Category.BASE;
+        addDrawableChild(addB);
         addDrawableChild(ButtonWidget.builder(Text.literal("Reset"), b -> {
             list.clear();
             list.addAll(cat.defaults());
@@ -195,7 +202,7 @@ final class MegaBlocksScreen extends Screen {
     }
 
     private static Text blockText(String id, boolean on) {
-        boolean known = resolve(id) != null;
+        boolean known = resolve(id) != null || id.startsWith("mega:");
         return Text.literal((known ? pretty(id) : "§7" + pretty(id) + " (?)") + ": " + (on ? "§aON" : "§cOFF"));
     }
 
@@ -210,7 +217,7 @@ final class MegaBlocksScreen extends Screen {
         String s = (colon >= 0 ? id.substring(colon + 1) : id).replace('_', ' ');
         if (s.isEmpty()) return id;
         s = Character.toUpperCase(s.charAt(0)) + s.substring(1);
-        return ns.equals("minecraft") ? s : ns + ": " + s;
+        return ns.equals("minecraft") || ns.equals("mega") ? s : ns + ": " + s;
     }
 
     @Override

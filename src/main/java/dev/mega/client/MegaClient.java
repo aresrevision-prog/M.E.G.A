@@ -187,7 +187,7 @@ public final class MegaClient implements ClientModInitializer {
         ignored = ig;
         // Every colour's block list. A block in two lists goes to the later one.
         Map<Block, Category> all = new java.util.LinkedHashMap<>();
-        for (Category c : Category.values()) if (c != Category.FARM) addBlocks(all, c.blocks(config), c);
+        for (Category c : Category.values()) if (c != Category.FARM && c != Category.BASE) addBlocks(all, c.blocks(config), c);
         Map<Block, Category> be = new java.util.HashMap<>(), plain = new java.util.LinkedHashMap<>();
         all.forEach((b, c) -> {
             if (disabled.contains(Registries.BLOCK.getId(b).toString())) return; // switched off on its own
@@ -339,6 +339,7 @@ public final class MegaClient implements ClientModInitializer {
             for (BlockEntity be : chunk.getBlockEntities().values()) {
                 Category category = beBlocks.get(be.getCachedState().getBlock());
                 if (category == null || !category.enabled(config)) continue;
+                if (category == Category.LIGHT && !underground(client, be.getPos())) continue;
                 if (isSecondChestHalf(be)) continue; // double chest = one entry
 
                 BlockPos pos = be.getPos();
@@ -357,6 +358,7 @@ public final class MegaClient implements ClientModInitializer {
                 scanFarmBlocks(client, chunk, j.farmSq, j.found, j.counts);
         }
         if (j.index >= j.chunks.size()) {
+            scanBaseSigns(client, j.found, j.counts);
             // Stash blocks come first (storage, spawners, shulkers, valuables...), natural ores after, so ores
             // (gold is everywhere in real worlds) don't take all the tracer lines away from a stash.
             j.found.sort(ORDER);
@@ -395,6 +397,10 @@ public final class MegaClient implements ClientModInitializer {
             if (Math.abs(baseY + 8 - py) > Math.sqrt(maxSq) + 8) continue;
             if (!section.hasAny(state -> wanted.containsKey(state.getBlock()))) continue;
 
+            // Lights and built blocks: one entry per 16x16x16 area (with a count), not one per block
+            int lightN = 0, builtN = 0;
+            BlockPos lightAt = null, builtAt = null;
+            double lightSq = Double.MAX_VALUE, builtSq = Double.MAX_VALUE;
             for (int y = 0; y < 16; y++) for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++) {
                 Block block = section.getBlockState(x, y, z).getBlock();
                 Category cat = wanted.get(block);
@@ -403,8 +409,19 @@ public final class MegaClient implements ClientModInitializer {
                 double dx = wx + 0.5 - px, dy = wy + 0.5 - py, dz = wz + 0.5 - pz;
                 double sq = dx * dx + dy * dy + dz * dz;
                 if (sq > maxSq) continue;
+                if (cat == Category.LIGHT && !underground(client, new BlockPos(wx, wy, wz))) continue; // surface lights are normal
                 if (xrayOut != null) xrayOut.add(new Target(cat, "", new BlockPos(wx, wy, wz), Math.sqrt(sq)));
                 countBlock(label(block, cat == Category.ORE), cat); // every block, not per vein
+                if (cat == Category.LIGHT) {
+                    lightN++;
+                    if (sq < lightSq) { lightSq = sq; lightAt = new BlockPos(wx, wy, wz); }
+                    continue;
+                }
+                if (cat == Category.BUILT) {
+                    builtN++;
+                    if (sq < builtSq) { builtSq = sq; builtAt = new BlockPos(wx, wy, wz); }
+                    continue;
+                }
                 // one entry per vein: group ores of the same type in 4x4x4 cells
                 long cell = (((long) (wx >> 2) & 0x3FFFFF) << 42) | (((long) (wy >> 2) & 0xFFFFF) << 22)
                     | ((long) (wz >> 2) & 0x3FFFFF);
@@ -412,7 +429,69 @@ public final class MegaClient implements ClientModInitializer {
                 found.add(new Target(cat, label(block, cat == Category.ORE), new BlockPos(wx, wy, wz), Math.sqrt(sq)));
                 counts.merge(cat, 1, Integer::sum);
             }
+            if (lightN >= 2) {
+                found.add(new Target(Category.LIGHT, "LIGHTS_UNDERGROUND x" + lightN, lightAt, Math.sqrt(lightSq)));
+                counts.merge(Category.LIGHT, 1, Integer::sum);
+            }
+            if (builtN >= 6) {
+                found.add(new Target(Category.BUILT, "BUILT_BLOCKS x" + builtN, builtAt, Math.sqrt(builtSq)));
+                counts.merge(Category.BUILT, 1, Integer::sum);
+            }
         }
+    }
+
+    /**
+     * Base signs from entities: trading halls (6+ villagers within 6 blocks), animal pens (12+ of one animal within
+     * 8 blocks), tamed pets and named mobs. Each part can be switched off in the panel (mega:... keys).
+     */
+    private static void scanBaseSigns(MinecraftClient client, List<Target> found, Map<Category, Integer> counts) {
+        if (!Category.BASE.enabled(config)) return;
+        double maxSq = (double) config.maxDistance * config.maxDistance;
+        List<Entity> villagers = new ArrayList<>();
+        Map<net.minecraft.entity.EntityType<?>, List<Entity>> animals = new java.util.HashMap<>();
+        boolean halls = !disabled.contains("mega:trading_halls"), pens = !disabled.contains("mega:animal_pens");
+        boolean pets = !disabled.contains("mega:tamed_pets"), named = !disabled.contains("mega:named_mobs");
+        for (Entity e : client.world.getEntities()) {
+            if (e instanceof net.minecraft.entity.player.PlayerEntity) continue;
+            double sq = client.player.squaredDistanceTo(e);
+            if (sq > maxSq) continue;
+            String type = Registries.ENTITY_TYPE.getId(e.getType()).getPath().toUpperCase(Locale.ROOT);
+            if (halls && e instanceof net.minecraft.entity.passive.MerchantEntity) villagers.add(e);
+            if (pens && e instanceof net.minecraft.entity.passive.AnimalEntity) animals.computeIfAbsent(e.getType(), k -> new ArrayList<>()).add(e);
+            boolean tamed = e instanceof net.minecraft.entity.passive.TameableEntity t && t.isTamed()
+                || e instanceof net.minecraft.entity.passive.AbstractHorseEntity h && h.isTame();
+            if (pets && tamed) addSign(found, counts, "TAMED_" + type, e, sq);
+            else if (named && e.hasCustomName() && e.getCustomName() != null)
+                addSign(found, counts, "NAMED_" + type + " \"" + e.getCustomName().getString() + "\"", e, sq);
+        }
+        cluster(client, found, counts, villagers, 6, 6, "TRADING_HALL");
+        for (List<Entity> l : animals.values())
+            if (l.size() >= 12) cluster(client, found, counts, l, 8, 12,
+                "ANIMAL_PEN_" + Registries.ENTITY_TYPE.getId(l.get(0).getType()).getPath().toUpperCase(Locale.ROOT));
+    }
+
+    /** Groups entities that are close together; each group of at least min becomes one entry. */
+    private static void cluster(MinecraftClient client, List<Target> found, Map<Category, Integer> counts,
+                                List<Entity> list, double radius, int min, String label) {
+        boolean[] used = new boolean[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            if (used[i]) continue;
+            Entity a = list.get(i);
+            int n = 0;
+            for (int k = 0; k < list.size(); k++) {
+                if (!used[k] && list.get(k).squaredDistanceTo(a) <= radius * radius) { n++; }
+            }
+            if (n < min) continue;
+            for (int k = 0; k < list.size(); k++) if (list.get(k).squaredDistanceTo(a) <= radius * radius) used[k] = true;
+            addSign(found, counts, label + " x" + n, a, client.player.squaredDistanceTo(a));
+        }
+    }
+
+    private static void addSign(List<Target> found, Map<Category, Integer> counts, String label, Entity e, double sq) {
+        found.add(new Target(Category.BASE, label, e.getBlockPos(), Math.sqrt(sq)));
+        counts.merge(Category.BASE, 1, Integer::sum);
+        String base = label.contains(" ") ? label.substring(0, label.indexOf(' ')) : label;
+        countBlock(base, Category.BASE);
     }
 
     /** HUD name from the block id, e.g. RED_SHULKER_BOX, ENCHANTING_TABLE, DIAMOND (ore). Cached. */
@@ -553,7 +632,10 @@ public final class MegaClient implements ClientModInitializer {
         SHULKER(0xFF55DD55, "Sh", "Shulkers", "green"),
         WORKSTATION(0xFF1F8A2B, "W", "Workstations", "dark green"),
         STORAGE(0xFFFF4444, "St", "Storage", "red"),
-        FARM(0xFFFF8800, "F", "Farms", "orange"); // built plant farms (plants next to observers/pistons) + machines below y=0
+        FARM(0xFFFF8800, "F", "Farms", "orange"), // built plant farms (machines aimed at plants) + machines below y=0
+        LIGHT(0xFFFFF59D, "L", "Lights underground", "pale yellow"), // torches/lanterns/glowstone buried underground
+        BUILT(0xFFF2F2F2, "B", "built_block", "white"),        // blocks that never generate naturally
+        BASE(0xFFFF8FC8, "Bs", "Base signs", "pink");          // trading halls, animal pens, tamed pets, named mobs
 
         final int color;
         final String code, title, colourName;
@@ -572,6 +654,9 @@ public final class MegaClient implements ClientModInitializer {
                 case STORAGE -> c.storageBlocks;
                 case WORKSTATION -> c.workstationBlocks;
                 case FARM -> c.farmPlants;
+                case LIGHT -> c.lightBlocks;
+                case BUILT -> c.builtBlocks;
+                case BASE -> c.baseSignTypes;
             };
         }
 
@@ -584,6 +669,9 @@ public final class MegaClient implements ClientModInitializer {
                 case STORAGE -> MegaConfig.DEFAULT_STORAGE;
                 case WORKSTATION -> MegaConfig.DEFAULT_WORKSTATIONS;
                 case FARM -> MegaConfig.DEFAULT_FARM_PLANTS;
+                case LIGHT -> MegaConfig.DEFAULT_LIGHTS;
+                case BUILT -> MegaConfig.defaultBuilt();
+                case BASE -> MegaConfig.DEFAULT_BASE_SIGNS;
             };
         }
 
@@ -596,6 +684,9 @@ public final class MegaClient implements ClientModInitializer {
                 case STORAGE -> c.storage = on;
                 case WORKSTATION -> c.workstations = on;
                 case FARM -> c.farmAlert = on;
+                case LIGHT -> c.lights = on;
+                case BUILT -> c.built = on;
+                case BASE -> c.baseSigns = on;
             }
         }
 
@@ -608,6 +699,9 @@ public final class MegaClient implements ClientModInitializer {
                 case STORAGE -> c.storage;
                 case WORKSTATION -> c.workstations;
                 case FARM -> c.farmAlert;
+                case LIGHT -> c.lights;
+                case BUILT -> c.built;
+                case BASE -> c.baseSigns;
             };
         }
     }
