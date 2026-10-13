@@ -359,6 +359,7 @@ public final class MegaClient implements ClientModInitializer {
         }
         if (j.index >= j.chunks.size()) {
             scanBaseSigns(client, j.found, j.counts);
+            MegaShulkers.scan(client, j.found, j.counts);
             // Stash blocks come first (storage, spawners, shulkers, valuables...), natural ores after, so ores
             // (gold is everywhere in real worlds) don't take all the tracer lines away from a stash.
             j.found.sort(ORDER);

@@ -183,6 +183,30 @@ public class MegaClientGameTest implements FabricClientGameTest {
             srv.runCommand("kill @e[type=!minecraft:player]");
             srv.runCommand("fill -10 -60 -8 -3 -60 -8 minecraft:air");
 
+            // Shulker ITEMS: a dropped one and one in an item frame show what's inside; the tooltip lists everything
+            String box = "{id:\"minecraft:lime_shulker_box\",count:1,components:{\"minecraft:container\":["
+                + "{slot:0,item:{id:\"minecraft:diamond_block\",count:64}},{slot:1,item:{id:\"minecraft:diamond_block\",count:64}},"
+                + "{slot:2,item:{id:\"minecraft:netherite_ingot\",count:5}}]}}";
+            srv.runCommand("summon minecraft:item 2 -60 0 {PickupDelay:32767,Item:" + box + "}");
+            srv.runCommand("summon minecraft:item_frame -2 -60 0 {Facing:1b,Item:{id:\"minecraft:red_shulker_box\",count:1}}");
+            ctx.runOnClient(MegaClient::refresh);
+            ctx.waitTicks(60);
+            String sh = ctx.computeOnClient(c -> MegaClient.targets.stream().filter(t -> t.label().contains("SHULKER:"))
+                .map(MegaClient.Target::label).toList().toString());
+            String tip = ctx.computeOnClient(c -> {
+                for (net.minecraft.entity.Entity e : c.world.getEntities())
+                    if (e instanceof net.minecraft.entity.ItemEntity ie && MegaShulkers.isShulker(ie.getStack()))
+                        return ie.getStack().getTooltip(net.minecraft.item.Item.TooltipContext.DEFAULT, c.player,
+                            net.minecraft.item.tooltip.TooltipType.BASIC).stream().map(net.minecraft.text.Text::getString).toList().toString();
+                return "none";
+            });
+            MegaClient.LOGGER.info("[M.E.G.A test] shulker items: {} tooltip: {}", sh, tip);
+            check(sh.contains("DROPPED_SHULKER: 128 Diamond Block +1 more"), "dropped shulker contents wrong: " + sh);
+            check(sh.contains("FRAMED_SHULKER: EMPTY"), "framed empty shulker missing: " + sh);
+            check(tip.contains("M.E.G.A: 3/27 slots used, 133 items") && tip.contains("5x Netherite Ingot"), "tooltip wrong: " + tip);
+            ctx.takeScreenshot("12-shulker-items");
+            srv.runCommand("kill @e[type=!minecraft:player]");
+
             // Deep scan: only buried things. The hill stash (inside 6 blocks of stone) stays; the furnace/table on the hill top go.
             ctx.runOnClient(c -> { MegaClient.config.deepScan = true; MegaClient.config.save(); MegaClient.refresh(c); });
             ctx.waitTicks(40);

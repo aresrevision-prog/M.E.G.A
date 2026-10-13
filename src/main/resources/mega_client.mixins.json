@@ -9,7 +9,7 @@
     "InGameHudMixin",
     "GameOptionsMixin",
     "WorldRendererMixin",
-    "CameraAccessor"
+    "CameraAccessor", "ItemStackMixin"
   ],
   "injectors": {
     "defaultRequire": 1

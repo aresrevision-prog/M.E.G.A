@@ -99,6 +99,8 @@ public final class MegaConfig {
     public java.util.List<String> builtBlocks = new java.util.ArrayList<>(defaultBuilt());
     // Base signs (pink): trading halls, animal pens, tamed pets, named mobs
     public boolean baseSigns = true;
+    /** Shulker items: full contents in tooltips; dropped/framed/held ones listed with what is inside. */
+    public boolean shulkerPeek = true;
     public java.util.List<String> baseSignTypes = new java.util.ArrayList<>(DEFAULT_BASE_SIGNS);
     static final java.util.List<String> DEFAULT_BASE_SIGNS = java.util.List.of(
         "mega:trading_halls", "mega:animal_pens", "mega:tamed_pets", "mega:named_mobs");
