@@ -1,0 +1,778 @@
+[14:45:28] [main/INFO]: Loading Minecraft 1.21.11 with Fabric Loader 0.19.5
+[14:45:28] [main/INFO]: Fabric is preparing JARs on first launch, this may take a few seconds...
+[14:45:28] [main/INFO]: Loading 8 mods:
+	- fabric-api-base 1.0.5+4ebb5c083e
+	- fabric-client-gametest-api-v1 4.3.5+bfe9fcf43e
+	- fabric-resource-loader-v1 1.0.10+78c8b4663e
+	- fabricloader 0.19.5
+	   \-- mixinextras 0.5.5
+	- java 21
+	- mega_client 0.32.2
+	- minecraft 1.21.11
+[14:45:28] [main/INFO]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/home/runner/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.17.4+mixin.0.8.7/5f66cc9f59b8efaa942155a3d5a30599bf6640dd/sponge-mixin-0.17.4+mixin.0.8.7.jar Service=Knot/Fabric Env=CLIENT
+[14:45:30] [Datafixer Bootstrap/INFO]: 287 Datafixer optimizations took 429 milliseconds
+[14:45:30] [main/INFO]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.5).
+[14:45:33] [Render thread/INFO]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, profilesHost=https://api.mojang.com, name=PROD]
+[14:45:33] [Render thread/INFO]: Setting user: Player934
+[14:45:33] [Render thread/INFO]: M.E.G.A Client 0.32.2 loaded
+[14:45:33] [Render thread/ERROR]: Illegal option value 0 for Anisotropic Filtering
+[14:45:33] [Render thread/INFO]: Backend library: LWJGL version 3.3.3-snapshot
+[14:45:34] [Download-2/ERROR]: Failed to fetch user properties
+com.mojang.authlib.exceptions.InvalidCredentialsException: Status: 401
+	at knot//com.mojang.authlib.exceptions.MinecraftClientHttpException.toAuthenticationException(MinecraftClientHttpException.java:59)
+	at knot//com.mojang.authlib.yggdrasil.YggdrasilUserApiService.fetchProperties(YggdrasilUserApiService.java:150)
+	at knot//net.minecraft.class_310.method_55608(class_310.java:457)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: com.mojang.authlib.exceptions.MinecraftClientHttpException: Status: 401
+	at knot//com.mojang.authlib.minecraft.client.MinecraftClient.readInputStream(MinecraftClient.java:103)
+	at knot//com.mojang.authlib.minecraft.client.MinecraftClient.get(MinecraftClient.java:56)
+	at knot//com.mojang.authlib.yggdrasil.YggdrasilUserApiService.fetchProperties(YggdrasilUserApiService.java:121)
+	... 5 more
+[14:45:35] [Render thread/INFO]: Using optional rendering extensions: GL_ARB_buffer_storage, GL_KHR_debug, GL_ARB_vertex_attrib_binding, GL_ARB_direct_state_access, GL_EXT_texture_filter_anisotropic
+[14:45:35] [Render thread/INFO]: Reloading ResourceManager: vanilla, fabric-api-base, fabric-client-gametest-api-v1, fabric-resource-loader-v1, fabricloader
+[14:45:35] [Download-2/INFO]: Could not authorize you against Realms server: java.lang.RuntimeException: Failed to parse into SignedJWT: FabricMC
+[14:45:35] [Download-2/ERROR]: Failed to fetch Realms feature flags
+net.minecraft.class_4355: Realms authentication error with message 'java.lang.RuntimeException: Failed to parse into SignedJWT: FabricMC'
+	at knot//net.minecraft.class_4341.method_20998(class_4341.java:526)
+	at knot//net.minecraft.class_4341.method_68466(class_4341.java:186)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+[14:45:36] [Worker-Main-2/INFO]: Found unifont_pua-17.0.01.hex, loading
+[14:45:36] [Worker-Main-3/INFO]: Found unifont_all_no_pua-17.0.01.hex, loading
+[14:45:36] [Worker-Main-3/INFO]: Found unifont_jp_patch-17.0.01.hex, loading
+[14:45:37] [Render thread/ERROR]: Error starting SoundSystem. Turning off sounds & music
+java.lang.IllegalStateException: Failed to open OpenAL device
+	at knot//net.minecraft.class_4225.method_38501(class_4225.java:292)
+	at knot//net.minecraft.class_4225.method_19661(class_4225.java:150)
+	at knot//net.minecraft.class_1140.method_4846(class_1140.java:119)
+	at knot//net.minecraft.class_1140.method_4837(class_1140.java:109)
+	at knot//net.minecraft.class_1144.method_18182(class_1144.java:122)
+	at knot//net.minecraft.class_1144.method_18788(class_1144.java:41)
+	at knot//net.minecraft.class_4080.method_18790(class_4080.java:15)
+	at java.base/java.util.concurrent.CompletableFuture$UniAccept.tryFire(CompletableFuture.java:718)
+	at java.base/java.util.concurrent.CompletableFuture$Completion.run(CompletableFuture.java:482)
+	at knot//net.minecraft.class_4014.method_67574(class_4014.java:59)
+	at knot//net.minecraft.class_1255.method_18859(class_1255.java:169)
+	at knot//net.minecraft.class_4093.method_18859(class_4093.java:23)
+	at knot//net.minecraft.class_1255.method_16075(class_1255.java:143)
+	at knot//net.minecraft.class_1255.method_5383(class_1255.java:124)
+	at knot//net.minecraft.class_310.method_1523(class_310.java:1339)
+	at knot//net.minecraft.class_310.method_1514$mixinextras$wrapped$262(class_310.java:966)
+	at knot//net.minecraft.class_310.mixinextras$bridge$method_1514$mixinextras$wrapped$262$263(class_310.java)
+	at knot//net.minecraft.class_310.wrapMethod$zzl000$fabric-client-gametest-api-v1$onRun(class_310.java:4164)
+	at knot//net.minecraft.class_310.method_1514(class_310.java)
+	at knot//net.minecraft.client.main.Main.main(Main.java:250)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:517)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+[14:45:37] [Render thread/INFO]: Created: 512x256x0 minecraft:textures/atlas/particles.png-atlas
+[14:45:37] [Render thread/INFO]: Created: 128x128x0 minecraft:textures/atlas/decorated_pot.png-atlas
+[14:45:37] [Render thread/INFO]: Created: 2048x1024x0 minecraft:textures/atlas/armor_trims.png-atlas
+[14:45:37] [Render thread/INFO]: Created: 512x256x0 minecraft:textures/atlas/paintings.png-atlas
+[14:45:37] [Render thread/INFO]: Created: 1024x512x0 minecraft:textures/atlas/shield_patterns.png-atlas
+[14:45:37] [Render thread/INFO]: Created: 2048x2048x4 minecraft:textures/atlas/blocks.png-atlas
+[14:45:38] [Render thread/INFO]: Created: 512x512x0 minecraft:textures/atlas/chest.png-atlas
+[14:45:38] [Render thread/INFO]: Created: 256x128x0 minecraft:textures/atlas/celestials.png-atlas
+[14:45:38] [Render thread/INFO]: Created: 1024x512x0 minecraft:textures/atlas/banner_patterns.png-atlas
+[14:45:38] [Render thread/INFO]: Created: 512x512x0 minecraft:textures/atlas/beds.png-atlas
+[14:45:38] [Render thread/INFO]: Created: 1024x512x0 minecraft:textures/atlas/items.png-atlas
+[14:45:38] [Render thread/INFO]: Created: 1024x1024x0 minecraft:textures/atlas/gui.png-atlas
+[14:45:38] [Render thread/INFO]: Created: 128x64x0 minecraft:textures/atlas/map_decorations.png-atlas
+[14:45:38] [Render thread/INFO]: Created: 512x256x0 minecraft:textures/atlas/signs.png-atlas
+[14:45:38] [Render thread/INFO]: Created: 512x512x0 minecraft:textures/atlas/shulker_boxes.png-atlas
+[14:45:38] [IO-Worker-1/INFO]: Could not authorize you against Realms server: java.lang.RuntimeException: Failed to parse into SignedJWT: FabricMC
+[14:45:38] [IO-Worker-1/ERROR]: Couldn't connect to realms
+net.minecraft.class_4355: Realms authentication error with message 'java.lang.RuntimeException: Failed to parse into SignedJWT: FabricMC'
+	at knot//net.minecraft.class_4341.method_20998(class_4341.java:526)
+	at knot//net.minecraft.class_4341.method_21027(class_4341.java:307)
+	at knot//net.minecraft.class_8647.method_52627(class_8647.java:48)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+[14:45:41] [Render thread/INFO]: Loaded 1470 recipes
+[14:45:41] [Render thread/INFO]: Loaded 1584 advancements
+[14:45:41] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_424@205b48a5
+[14:45:41] [Server thread/INFO]: Starting integrated minecraft server version 1.21.11
+[14:45:41] [Server thread/INFO]: Generating keypair
+[14:45:42] [Server thread/INFO]: Selecting global world spawn...
+[14:45:46] [Server thread/INFO]: Loading 0 persistent chunks...
+[14:45:46] [Server thread/INFO]: Preparing spawn area: 16%
+[14:45:46] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:46] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:46] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:46] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:46] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:46] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:47] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:47] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:47] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:47] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:47] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:47] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:47] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:47] [Server thread/INFO]: Loading 47 chunks for player spawn...
+[14:45:47] [Server thread/INFO]: Preparing spawn area: 16%
+[14:45:47] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:47] [Server thread/INFO]: Preparing spawn area: 16%
+[14:45:47] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:47] [Server thread/INFO]: Preparing spawn area: 16%
+[14:45:47] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:47] [Server thread/INFO]: Preparing spawn area: 16%
+[14:45:47] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:47] [Server thread/INFO]: Preparing spawn area: 16%
+[14:45:48] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:48] [Server thread/INFO]: Preparing spawn area: 16%
+[14:45:48] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:48] [Server thread/INFO]: Preparing spawn area: 16%
+[14:45:48] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:48] [Server thread/INFO]: Preparing spawn area: 16%
+[14:45:48] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:48] [Server thread/INFO]: Preparing spawn area: 16%
+[14:45:48] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:48] [Server thread/INFO]: Preparing spawn area: 16%
+[14:45:48] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:48] [Server thread/INFO]: Preparing spawn area: 16%
+[14:45:48] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:48] [Server thread/INFO]: Preparing spawn area: 16%
+[14:45:48] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:48] [Server thread/INFO]: Preparing spawn area: 25%
+[14:45:49] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:49] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:49] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:49] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:49] [Server thread/INFO]: Preparing spawn area: 29%
+[14:45:49] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:49] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:49] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:49] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:49] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:49] [Server thread/INFO]: Preparing spawn area: 29%
+[14:45:49] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:50] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:50] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:50] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:50] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:50] [Server thread/INFO]: Preparing spawn area: 57%
+[14:45:50] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:50] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:50] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:50] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:50] [Server thread/INFO]: Preparing spawn area: 57%
+[14:45:50] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:51] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:51] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:51] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:51] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:51] [Server thread/INFO]: Preparing spawn area: 57%
+[14:45:51] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:51] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:51] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:51] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:51] [Server thread/INFO]: Time elapsed: 9330 ms
+[14:45:51] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:51] [Server thread/WARN]: Can't keep up! Is the server overloaded? Running 2683ms or 53 ticks behind
+[14:45:51] [Server thread/INFO]: Player934[local:E:e34bbe3b] logged in with entity id 10 at (314.5, 81.0, 701.5)
+[14:45:51] [Server thread/INFO]: Player934 joined the game
+[14:45:51] [Server thread/INFO]: Changing view distance to 5, from 10
+[14:45:51] [Server thread/INFO]: Changing simulation distance to 12, from 0
+[14:45:51] [Render thread/INFO]: World loading finished: null screen: net.minecraft.class_3928@1080d57d
+[14:45:52] [Render thread/INFO]: Loaded 2 advancements
+[14:45:52] [Render thread/INFO]: World loading finished: ClientLevel screen: net.minecraft.class_3928@1080d57d
+[14:45:52] [Render thread/INFO]: Resizing Dynamic Transforms UBO, capacity limit of 2 reached during a single frame. New capacity will be 4.
+[14:45:52] [Render thread/INFO]: World loading finished: ClientLevel screen: net.minecraft.class_3928@1080d57d
+[14:45:52] [Render thread/INFO]: Resizing Dynamic Transforms UBO, capacity limit of 4 reached during a single frame. New capacity will be 8.
+[14:45:52] [Render thread/INFO]: World loading finished: ClientLevel screen: net.minecraft.class_3928@1080d57d
+[14:45:52] [Render thread/INFO]: Resizing Chunk Sections UBO, capacity limit of 2 reached during a single frame. New capacity will be 4.
+[14:45:53] [Render thread/INFO]: World loading finished: ClientLevel screen: net.minecraft.class_3928@1080d57d
+[14:45:53] [Render thread/INFO]: Resizing Chunk Sections UBO, capacity limit of 4 reached during a single frame. New capacity will be 8.
+[14:45:53] [Render thread/INFO]: World loading finished: ClientLevel screen: net.minecraft.class_3928@1080d57d
+[14:45:53] [Render thread/INFO]: World loading finished: ClientLevel screen: net.minecraft.class_3928@1080d57d
+[14:45:53] [Render thread/INFO]: World loading finished: ClientLevel screen: net.minecraft.class_3928@1080d57d
+[14:45:53] [Render thread/INFO]: World loading finished: ClientLevel screen: net.minecraft.class_3928@1080d57d
+[14:45:53] [Render thread/INFO]: Resizing Chunk Sections UBO, capacity limit of 8 reached during a single frame. New capacity will be 16.
+[14:45:53] [Render thread/INFO]: World loading finished: ClientLevel screen: null
+[14:45:53] [Server thread/INFO]: Set Player934's game mode to Creative Mode
+[14:45:53] [Server thread/INFO]: Set the time to 6000
+[14:45:53] [Server thread/INFO]: Incorrect argument for command
+[14:45:53] [Server thread/INFO]: gamerule doDaylightCycle false<--[HERE]
+[14:45:53] [Server thread/INFO]: Incorrect argument for command
+[14:45:53] [Server thread/INFO]: gamerule doWeatherCycle false<--[HERE]
+[14:45:53] [Server thread/INFO]: Set the weather to clear
+[14:45:53] [Server thread/INFO]: Incorrect argument for command
+[14:45:53] [Server thread/INFO]: gamerule doMobSpawning false<--[HERE]
+[14:45:53] [Server thread/INFO]: Player934 has reached the goal [Sky's the Limit]
+[14:45:53] [Server thread/INFO]: Replaced a slot on Player934 with [Elytra]
+[14:45:53] [Server thread/INFO]: Replaced a slot on Player934 with [Firework Rocket]
+[14:46:42] [Test thread/INFO]: [M.E.G.A scenario] stashes: [Stash[pos=class_2338{x=-2870, y=61, z=-3935}, top=75], Stash[pos=class_2338{x=-2292, y=41, z=-2956}, top=55], Stash[pos=class_2338{x=1991, y=42, z=3202}, top=56], Stash[pos=class_2338{x=-3830, y=55, z=4831}, top=69], Stash[pos=class_2338{x=835, y=66, z=1812}, top=80], Stash[pos=class_2338{x=3719, y=54, z=-551}, top=68], Stash[pos=class_2338{x=-4364, y=33, z=4432}, top=47], Stash[pos=class_2338{x=1095, y=34, z=-951}, top=48]]
+[14:46:42] [Server thread/INFO]: Teleported Player934 to -2858.650000, 109.000000, -3865.930000
+[14:46:42] [Render thread/INFO]: [System] [CHAT] Your game mode has been updated to Creative Mode
+[14:46:42] [Render thread/INFO]: [System] [CHAT] Player934 has reached the goal [Sky's the Limit]
+[14:46:42] [Render thread/INFO]: Loaded 7 advancements
+[14:46:46] [Render thread/INFO]: Loaded 17 advancements
+[14:46:47] [Render thread/INFO]: Resizing Chunk Sections UBO, capacity limit of 16 reached during a single frame. New capacity will be 32.
+[14:46:48] [Render thread/INFO]: Resizing Chunk Sections UBO, capacity limit of 32 reached during a single frame. New capacity will be 64.
+[14:46:50] [Render thread/INFO]: Resizing Chunk Sections UBO, capacity limit of 64 reached during a single frame. New capacity will be 128.
+[14:46:53] [Render thread/INFO]: Resizing Chunk Sections UBO, capacity limit of 128 reached during a single frame. New capacity will be 256.
+[14:46:54] [Server thread/INFO]: Teleported Player934 to -2858.650000, 109.000000, -3865.930000
+[14:46:55] [Render thread/INFO]: Resizing Dynamic Transforms UBO, capacity limit of 8 reached during a single frame. New capacity will be 16.
+[14:46:55] [Server thread/INFO]: Teleported Player934 to -2858.810000, 108.710000, -3866.900000
+[14:46:55] [Server thread/INFO]: Teleported Player934 to -2858.970000, 108.430000, -3867.870000
+[14:46:55] [Server thread/INFO]: Teleported Player934 to -2859.120000, 108.140000, -3868.840000
+[14:46:55] [Server thread/INFO]: Teleported Player934 to -2859.280000, 107.860000, -3869.810000
+[14:46:55] [Server thread/INFO]: Teleported Player934 to -2859.440000, 107.570000, -3870.780000
+[14:46:56] [Render thread/INFO]: Resizing Chunk Sections UBO, capacity limit of 256 reached during a single frame. New capacity will be 512.
+[14:46:56] [Server thread/INFO]: Teleported Player934 to -2859.600000, 107.290000, -3871.750000
+[14:46:56] [Server thread/INFO]: Teleported Player934 to -2859.760000, 107.000000, -3872.720000
+[14:46:56] [Server thread/INFO]: Teleported Player934 to -2859.920000, 106.710000, -3873.700000
+[14:46:56] [Server thread/INFO]: Teleported Player934 to -2860.080000, 106.430000, -3874.670000
+[14:46:57] [Server thread/INFO]: Teleported Player934 to -2860.240000, 106.140000, -3875.640000
+[14:46:57] [Server thread/INFO]: Teleported Player934 to -2860.400000, 105.860000, -3876.610000
+[14:46:57] [Server thread/INFO]: Teleported Player934 to -2860.560000, 105.570000, -3877.580000
+[14:46:57] [Server thread/INFO]: Teleported Player934 to -2860.720000, 105.290000, -3878.550000
+[14:46:58] [Server thread/INFO]: Teleported Player934 to -2860.880000, 105.000000, -3879.520000
+[14:46:58] [Server thread/INFO]: Teleported Player934 to -2861.040000, 104.710000, -3880.490000
+[14:46:58] [Server thread/INFO]: Teleported Player934 to -2861.200000, 104.430000, -3881.460000
+[14:46:58] [Server thread/INFO]: Teleported Player934 to -2861.360000, 104.140000, -3882.440000
+[14:46:58] [Server thread/INFO]: Teleported Player934 to -2861.520000, 103.860000, -3883.410000
+[14:46:59] [Server thread/INFO]: Teleported Player934 to -2861.680000, 103.570000, -3884.380000
+[14:46:59] [Server thread/INFO]: Teleported Player934 to -2861.840000, 103.290000, -3885.350000
+[14:46:59] [Server thread/INFO]: Teleported Player934 to -2862.000000, 103.000000, -3886.320000
+[14:46:59] [Server thread/INFO]: Teleported Player934 to -2862.160000, 102.710000, -3887.290000
+[14:47:00] [Server thread/INFO]: Teleported Player934 to -2862.320000, 102.430000, -3888.260000
+[14:47:00] [Server thread/INFO]: Teleported Player934 to -2862.480000, 102.140000, -3889.230000
+[14:47:00] [Server thread/INFO]: Teleported Player934 to -2862.640000, 101.860000, -3890.200000
+[14:47:01] [Server thread/INFO]: Teleported Player934 to -2862.800000, 101.570000, -3891.180000
+[14:47:01] [Server thread/INFO]: Teleported Player934 to -2862.960000, 101.290000, -3892.150000
+[14:47:01] [Server thread/INFO]: Teleported Player934 to -2863.120000, 101.000000, -3893.120000
+[14:47:01] [Server thread/INFO]: Teleported Player934 to -2863.280000, 100.710000, -3894.090000
+[14:47:02] [Server thread/INFO]: Teleported Player934 to -2863.430000, 100.430000, -3895.060000
+[14:47:02] [Server thread/INFO]: Teleported Player934 to -2863.590000, 100.140000, -3896.030000
+[14:47:03] [Server thread/INFO]: Teleported Player934 to -2863.750000, 99.860000, -3897.000000
+[14:47:03] [Server thread/INFO]: Teleported Player934 to -2863.910000, 99.570000, -3897.970000
+[14:47:03] [Server thread/INFO]: Teleported Player934 to -2864.070000, 99.290000, -3898.940000
+[14:47:03] [Server thread/INFO]: Teleported Player934 to -2864.230000, 99.000000, -3899.920000
+[14:47:03] [Server thread/INFO]: Teleported Player934 to -2864.390000, 98.710000, -3900.890000
+[14:47:04] [Server thread/INFO]: Teleported Player934 to -2864.550000, 98.430000, -3901.860000
+[14:47:04] [Server thread/INFO]: Teleported Player934 to -2864.710000, 98.140000, -3902.830000
+[14:47:04] [Server thread/INFO]: Teleported Player934 to -2864.870000, 97.860000, -3903.800000
+[14:47:04] [Server thread/INFO]: Teleported Player934 to -2865.030000, 97.570000, -3904.770000
+[14:47:04] [Server thread/INFO]: Teleported Player934 to -2865.190000, 97.290000, -3905.740000
+[14:47:04] [Server thread/INFO]: Teleported Player934 to -2865.350000, 97.000000, -3906.710000
+[14:47:05] [Server thread/INFO]: Teleported Player934 to -2865.510000, 96.710000, -3907.680000
+[14:47:05] [Server thread/INFO]: Teleported Player934 to -2865.670000, 96.430000, -3908.660000
+[14:47:05] [Server thread/INFO]: Teleported Player934 to -2865.830000, 96.140000, -3909.630000
+[14:47:05] [Server thread/INFO]: Teleported Player934 to -2865.990000, 95.860000, -3910.600000
+[14:47:05] [Server thread/INFO]: Teleported Player934 to -2866.150000, 95.570000, -3911.570000
+[14:47:05] [Server thread/INFO]: Teleported Player934 to -2866.310000, 95.290000, -3912.540000
+[14:47:06] [Server thread/INFO]: Teleported Player934 to -2866.470000, 95.000000, -3913.510000
+[14:47:06] [Server thread/INFO]: Teleported Player934 to -2866.630000, 94.710000, -3914.480000
+[14:47:06] [Server thread/INFO]: Teleported Player934 to -2866.790000, 94.430000, -3915.450000
+[14:47:06] [Server thread/INFO]: Teleported Player934 to -2866.950000, 94.140000, -3916.420000
+[14:47:06] [Server thread/INFO]: Teleported Player934 to -2867.110000, 93.860000, -3917.390000
+[14:47:06] [Server thread/INFO]: Teleported Player934 to -2867.270000, 93.570000, -3918.370000
+[14:47:07] [Server thread/INFO]: Teleported Player934 to -2867.430000, 93.290000, -3919.340000
+[14:47:07] [Server thread/INFO]: Teleported Player934 to -2867.580000, 93.000000, -3920.310000
+[14:47:07] [Server thread/INFO]: Teleported Player934 to -2867.740000, 92.710000, -3921.280000
+[14:47:07] [Server thread/INFO]: Teleported Player934 to -2867.900000, 92.430000, -3922.250000
+[14:47:07] [Server thread/INFO]: Teleported Player934 to -2868.060000, 92.140000, -3923.220000
+[14:47:08] [Server thread/INFO]: Teleported Player934 to -2868.220000, 91.860000, -3924.190000
+[14:47:08] [Server thread/INFO]: Teleported Player934 to -2868.380000, 91.570000, -3925.160000
+[14:47:08] [Server thread/INFO]: Teleported Player934 to -2868.540000, 91.290000, -3926.130000
+[14:47:08] [Server thread/INFO]: Teleported Player934 to -2868.700000, 91.000000, -3927.110000
+[14:47:08] [Test thread/INFO]: [M.E.G.A scenario] stash 1 at class_2338{x=-2870, y=61, z=-3935} -> blocks seen 6325
+[14:47:08] [Server thread/INFO]: Teleported Player934 to -2272.280000, 89.000000, -3023.160000
+[14:47:08] [Server thread/WARN]: Can't keep up! Is the server overloaded? Running 62165ms or 1243 ticks behind
+[14:47:21] [Server thread/INFO]: Teleported Player934 to -2272.280000, 89.000000, -3023.160000
+[14:47:21] [Server thread/INFO]: Teleported Player934 to -2272.560000, 88.710000, -3022.220000
+[14:47:21] [Server thread/INFO]: Teleported Player934 to -2272.830000, 88.430000, -3021.280000
+[14:47:21] [Server thread/INFO]: Teleported Player934 to -2273.110000, 88.140000, -3020.330000
+[14:47:22] [Server thread/INFO]: Teleported Player934 to -2273.390000, 87.860000, -3019.390000
+[14:47:22] [Server thread/INFO]: Teleported Player934 to -2273.660000, 87.570000, -3018.440000
+[14:47:22] [Server thread/INFO]: Teleported Player934 to -2273.940000, 87.290000, -3017.500000
+[14:47:22] [Server thread/INFO]: Teleported Player934 to -2274.220000, 87.000000, -3016.550000
+[14:47:22] [Server thread/INFO]: Teleported Player934 to -2274.500000, 86.710000, -3015.610000
+[14:47:23] [Server thread/INFO]: Teleported Player934 to -2274.770000, 86.430000, -3014.670000
+[14:47:23] [Server thread/INFO]: Teleported Player934 to -2275.050000, 86.140000, -3013.720000
+[14:47:23] [Server thread/INFO]: Teleported Player934 to -2275.330000, 85.860000, -3012.780000
+[14:47:23] [Server thread/INFO]: Teleported Player934 to -2275.610000, 85.570000, -3011.830000
+[14:47:23] [Server thread/INFO]: Teleported Player934 to -2275.880000, 85.290000, -3010.890000
+[14:47:24] [Server thread/INFO]: Teleported Player934 to -2276.160000, 85.000000, -3009.940000
+[14:47:24] [Server thread/INFO]: Teleported Player934 to -2276.440000, 84.710000, -3009.000000
+[14:47:24] [Server thread/INFO]: Teleported Player934 to -2276.710000, 84.430000, -3008.060000
+[14:47:24] [Server thread/INFO]: Teleported Player934 to -2276.990000, 84.140000, -3007.110000
+[14:47:24] [Server thread/INFO]: Teleported Player934 to -2277.270000, 83.860000, -3006.170000
+[14:47:25] [Server thread/INFO]: Teleported Player934 to -2277.550000, 83.570000, -3005.220000
+[14:47:25] [Server thread/INFO]: Teleported Player934 to -2277.820000, 83.290000, -3004.280000
+[14:47:25] [Server thread/INFO]: Teleported Player934 to -2278.100000, 83.000000, -3003.330000
+[14:47:25] [Server thread/INFO]: Teleported Player934 to -2278.380000, 82.710000, -3002.390000
+[14:47:25] [Server thread/INFO]: Teleported Player934 to -2278.660000, 82.430000, -3001.450000
+[14:47:26] [Server thread/INFO]: Teleported Player934 to -2278.930000, 82.140000, -3000.500000
+[14:47:26] [Server thread/INFO]: Teleported Player934 to -2279.210000, 81.860000, -2999.560000
+[14:47:26] [Server thread/INFO]: Teleported Player934 to -2279.490000, 81.570000, -2998.610000
+[14:47:26] [Server thread/INFO]: Teleported Player934 to -2279.760000, 81.290000, -2997.670000
+[14:47:27] [Server thread/INFO]: Teleported Player934 to -2280.040000, 81.000000, -2996.730000
+[14:47:27] [Server thread/INFO]: Teleported Player934 to -2280.320000, 80.710000, -2995.780000
+[14:47:27] [Server thread/INFO]: Teleported Player934 to -2280.600000, 80.430000, -2994.840000
+[14:47:27] [Server thread/INFO]: Teleported Player934 to -2280.870000, 80.140000, -2993.890000
+[14:47:28] [Server thread/INFO]: Teleported Player934 to -2281.150000, 79.860000, -2992.950000
+[14:47:28] [Server thread/WARN]: Can't keep up! Is the server overloaded? Running 4646ms or 92 ticks behind
+[14:47:28] [Server thread/INFO]: Teleported Player934 to -2281.430000, 79.570000, -2992.000000
+[14:47:28] [Server thread/INFO]: Teleported Player934 to -2281.710000, 79.290000, -2991.060000
+[14:47:28] [Server thread/INFO]: Teleported Player934 to -2281.980000, 79.000000, -2990.120000
+[14:47:29] [Server thread/INFO]: Teleported Player934 to -2282.260000, 78.710000, -2989.170000
+[14:47:29] [Server thread/INFO]: Teleported Player934 to -2282.540000, 78.430000, -2988.230000
+[14:47:29] [Server thread/INFO]: Teleported Player934 to -2282.810000, 78.140000, -2987.280000
+[14:47:29] [Server thread/INFO]: Teleported Player934 to -2283.090000, 77.860000, -2986.340000
+[14:47:29] [Server thread/INFO]: Teleported Player934 to -2283.370000, 77.570000, -2985.390000
+[14:47:29] [Server thread/INFO]: Teleported Player934 to -2283.650000, 77.290000, -2984.450000
+[14:47:30] [Server thread/INFO]: Teleported Player934 to -2283.920000, 77.000000, -2983.510000
+[14:47:30] [Server thread/INFO]: Teleported Player934 to -2284.200000, 76.710000, -2982.560000
+[14:47:30] [Server thread/INFO]: Teleported Player934 to -2284.480000, 76.430000, -2981.620000
+[14:47:30] [Server thread/INFO]: Teleported Player934 to -2284.760000, 76.140000, -2980.670000
+[14:47:30] [Server thread/INFO]: Teleported Player934 to -2285.030000, 75.860000, -2979.730000
+[14:47:30] [Server thread/INFO]: Teleported Player934 to -2285.310000, 75.570000, -2978.780000
+[14:47:31] [Server thread/INFO]: Teleported Player934 to -2285.590000, 75.290000, -2977.840000
+[14:47:31] [Server thread/INFO]: Teleported Player934 to -2285.860000, 75.000000, -2976.900000
+[14:47:31] [Server thread/INFO]: Teleported Player934 to -2286.140000, 74.710000, -2975.950000
+[14:47:31] [Server thread/INFO]: Teleported Player934 to -2286.420000, 74.430000, -2975.010000
+[14:47:31] [Server thread/INFO]: Teleported Player934 to -2286.700000, 74.140000, -2974.060000
+[14:47:32] [Server thread/INFO]: Teleported Player934 to -2286.970000, 73.860000, -2973.120000
+[14:47:32] [Server thread/INFO]: Teleported Player934 to -2287.250000, 73.570000, -2972.170000
+[14:47:32] [Server thread/INFO]: Teleported Player934 to -2287.530000, 73.290000, -2971.230000
+[14:47:32] [Server thread/INFO]: Teleported Player934 to -2287.810000, 73.000000, -2970.290000
+[14:47:32] [Server thread/INFO]: Teleported Player934 to -2288.080000, 72.710000, -2969.340000
+[14:47:32] [Server thread/INFO]: Teleported Player934 to -2288.360000, 72.430000, -2968.400000
+[14:47:33] [Server thread/INFO]: Teleported Player934 to -2288.640000, 72.140000, -2967.450000
+[14:47:33] [Server thread/INFO]: Teleported Player934 to -2288.910000, 71.860000, -2966.510000
+[14:47:33] [Server thread/INFO]: Teleported Player934 to -2289.190000, 71.570000, -2965.560000
+[14:47:33] [Server thread/INFO]: Teleported Player934 to -2289.470000, 71.290000, -2964.620000
+[14:47:33] [Server thread/INFO]: Teleported Player934 to -2289.750000, 71.000000, -2963.680000
+[14:47:34] [Test thread/INFO]: [M.E.G.A scenario] stash 2 at class_2338{x=-2292, y=41, z=-2956} -> blocks seen 6045
+[14:47:34] [Server thread/INFO]: Teleported Player934 to 2057.530000, 90.000000, 3223.760000
+[14:47:42] [Server thread/INFO]: Teleported Player934 to 2057.530000, 90.000000, 3223.760000
+[14:47:42] [Server thread/INFO]: Teleported Player934 to 2056.600000, 89.710000, 3223.460000
+[14:47:43] [Server thread/INFO]: Teleported Player934 to 2055.660000, 89.430000, 3223.150000
+[14:47:43] [Server thread/INFO]: Teleported Player934 to 2054.720000, 89.140000, 3222.850000
+[14:47:43] [Server thread/INFO]: Teleported Player934 to 2053.790000, 88.860000, 3222.540000
+[14:47:43] [Server thread/INFO]: Teleported Player934 to 2052.850000, 88.570000, 3222.230000
+[14:47:43] [Server thread/INFO]: Teleported Player934 to 2051.920000, 88.290000, 3221.930000
+[14:47:44] [Server thread/INFO]: Teleported Player934 to 2050.980000, 88.000000, 3221.620000
+[14:47:44] [Server thread/INFO]: Teleported Player934 to 2050.050000, 87.710000, 3221.320000
+[14:47:44] [Server thread/INFO]: Teleported Player934 to 2049.110000, 87.430000, 3221.010000
+[14:47:44] [Server thread/INFO]: Teleported Player934 to 2048.180000, 87.140000, 3220.700000
+[14:47:44] [Server thread/INFO]: Teleported Player934 to 2047.240000, 86.860000, 3220.400000
+[14:47:44] [Server thread/INFO]: Teleported Player934 to 2046.310000, 86.570000, 3220.090000
+[14:47:45] [Server thread/INFO]: Teleported Player934 to 2045.370000, 86.290000, 3219.790000
+[14:47:45] [Server thread/INFO]: Teleported Player934 to 2044.440000, 86.000000, 3219.480000
+[14:47:45] [Server thread/INFO]: Teleported Player934 to 2043.500000, 85.710000, 3219.170000
+[14:47:45] [Server thread/INFO]: Teleported Player934 to 2042.560000, 85.430000, 3218.870000
+[14:47:45] [Server thread/INFO]: Teleported Player934 to 2041.630000, 85.140000, 3218.560000
+[14:47:45] [Server thread/INFO]: Teleported Player934 to 2040.690000, 84.860000, 3218.260000
+[14:47:46] [Server thread/INFO]: Teleported Player934 to 2039.760000, 84.570000, 3217.950000
+[14:47:46] [Server thread/INFO]: Teleported Player934 to 2038.820000, 84.290000, 3217.640000
+[14:47:46] [Server thread/INFO]: Teleported Player934 to 2037.890000, 84.000000, 3217.340000
+[14:47:46] [Server thread/INFO]: Teleported Player934 to 2036.950000, 83.710000, 3217.030000
+[14:47:46] [Server thread/INFO]: Teleported Player934 to 2036.020000, 83.430000, 3216.730000
+[14:47:47] [Server thread/INFO]: Teleported Player934 to 2035.080000, 83.140000, 3216.420000
+[14:47:47] [Server thread/INFO]: Teleported Player934 to 2034.150000, 82.860000, 3216.110000
+[14:47:47] [Server thread/INFO]: Teleported Player934 to 2033.210000, 82.570000, 3215.810000
+[14:47:47] [Server thread/INFO]: Teleported Player934 to 2032.280000, 82.290000, 3215.500000
+[14:47:47] [Server thread/INFO]: Teleported Player934 to 2031.340000, 82.000000, 3215.200000
+[14:47:48] [Server thread/INFO]: Teleported Player934 to 2030.410000, 81.710000, 3214.890000
+[14:47:48] [Server thread/INFO]: Teleported Player934 to 2029.470000, 81.430000, 3214.580000
+[14:47:48] [Server thread/INFO]: Teleported Player934 to 2028.530000, 81.140000, 3214.280000
+[14:47:49] [Server thread/WARN]: Can't keep up! Is the server overloaded? Running 5739ms or 114 ticks behind
+[14:47:55] [Server thread/INFO]: Teleported Player934 to 2027.600000, 80.860000, 3213.970000
+[14:47:55] [Server thread/INFO]: Teleported Player934 to 2026.660000, 80.570000, 3213.670000
+[14:47:55] [Server thread/INFO]: Teleported Player934 to 2025.730000, 80.290000, 3213.360000
+[14:47:56] [Server thread/INFO]: Teleported Player934 to 2024.790000, 80.000000, 3213.060000
+[14:47:56] [Server thread/INFO]: Teleported Player934 to 2023.860000, 79.710000, 3212.750000
+[14:47:56] [Server thread/INFO]: Teleported Player934 to 2022.920000, 79.430000, 3212.440000
+[14:47:56] [Server thread/INFO]: Teleported Player934 to 2021.990000, 79.140000, 3212.140000
+[14:47:56] [Server thread/INFO]: Teleported Player934 to 2021.050000, 78.860000, 3211.830000
+[14:47:56] [Server thread/INFO]: Teleported Player934 to 2020.120000, 78.570000, 3211.530000
+[14:47:57] [Server thread/INFO]: Teleported Player934 to 2019.180000, 78.290000, 3211.220000
+[14:47:57] [Server thread/INFO]: Teleported Player934 to 2018.250000, 78.000000, 3210.910000
+[14:47:57] [Server thread/INFO]: Teleported Player934 to 2017.310000, 77.710000, 3210.610000
+[14:47:57] [Server thread/INFO]: Teleported Player934 to 2016.380000, 77.430000, 3210.300000
+[14:47:57] [Server thread/INFO]: Teleported Player934 to 2015.440000, 77.140000, 3210.000000
+[14:47:57] [Server thread/INFO]: Teleported Player934 to 2014.500000, 76.860000, 3209.690000
+[14:47:58] [Server thread/INFO]: Teleported Player934 to 2013.570000, 76.570000, 3209.380000
+[14:47:58] [Server thread/INFO]: Teleported Player934 to 2012.630000, 76.290000, 3209.080000
+[14:47:58] [Server thread/INFO]: Teleported Player934 to 2011.700000, 76.000000, 3208.770000
+[14:47:58] [Server thread/INFO]: Teleported Player934 to 2010.760000, 75.710000, 3208.470000
+[14:47:58] [Server thread/INFO]: Teleported Player934 to 2009.830000, 75.430000, 3208.160000
+[14:47:59] [Server thread/INFO]: Teleported Player934 to 2008.890000, 75.140000, 3207.850000
+[14:47:59] [Server thread/INFO]: Teleported Player934 to 2007.960000, 74.860000, 3207.550000
+[14:47:59] [Server thread/INFO]: Teleported Player934 to 2007.020000, 74.570000, 3207.240000
+[14:47:59] [Server thread/INFO]: Teleported Player934 to 2006.090000, 74.290000, 3206.940000
+[14:47:59] [Server thread/INFO]: Teleported Player934 to 2005.150000, 74.000000, 3206.630000
+[14:47:59] [Server thread/INFO]: Teleported Player934 to 2004.220000, 73.710000, 3206.320000
+[14:48:00] [Server thread/INFO]: Teleported Player934 to 2003.280000, 73.430000, 3206.020000
+[14:48:00] [Server thread/INFO]: Teleported Player934 to 2002.340000, 73.140000, 3205.710000
+[14:48:00] [Server thread/INFO]: Teleported Player934 to 2001.410000, 72.860000, 3205.410000
+[14:48:00] [Server thread/INFO]: Teleported Player934 to 2000.470000, 72.570000, 3205.100000
+[14:48:00] [Server thread/INFO]: Teleported Player934 to 1999.540000, 72.290000, 3204.790000
+[14:48:00] [Server thread/INFO]: Teleported Player934 to 1998.600000, 72.000000, 3204.490000
+[14:48:01] [Test thread/INFO]: [M.E.G.A scenario] stash 3 at class_2338{x=1991, y=42, z=3202} -> blocks seen 6127
+[14:48:01] [Server thread/INFO]: Teleported Player934 to -3845.700000, 103.000000, 4899.220000
+[14:48:06] [Server thread/WARN]: Can't keep up! Is the server overloaded? Running 2582ms or 51 ticks behind
+[14:48:08] [Server thread/INFO]: Teleported Player934 to -3845.700000, 103.000000, 4899.220000
+[14:48:08] [Server thread/INFO]: Teleported Player934 to -3845.480000, 102.710000, 4898.260000
+[14:48:08] [Server thread/INFO]: Teleported Player934 to -3845.260000, 102.430000, 4897.300000
+[14:48:08] [Server thread/INFO]: Teleported Player934 to -3845.040000, 102.140000, 4896.340000
+[14:48:08] [Server thread/INFO]: Teleported Player934 to -3844.820000, 101.860000, 4895.380000
+[14:48:08] [Server thread/INFO]: Teleported Player934 to -3844.600000, 101.570000, 4894.420000
+[14:48:09] [Server thread/INFO]: Teleported Player934 to -3844.370000, 101.290000, 4893.460000
+[14:48:09] [Server thread/INFO]: Teleported Player934 to -3844.150000, 101.000000, 4892.500000
+[14:48:09] [Server thread/INFO]: Teleported Player934 to -3843.930000, 100.710000, 4891.540000
+[14:48:09] [Server thread/INFO]: Teleported Player934 to -3843.710000, 100.430000, 4890.590000
+[14:48:09] [Server thread/INFO]: Teleported Player934 to -3843.490000, 100.140000, 4889.630000
+[14:48:09] [Server thread/INFO]: Teleported Player934 to -3843.270000, 99.860000, 4888.670000
+[14:48:09] [Server thread/INFO]: Teleported Player934 to -3843.050000, 99.570000, 4887.710000
+[14:48:09] [Server thread/INFO]: Teleported Player934 to -3842.830000, 99.290000, 4886.750000
+[14:48:09] [Server thread/INFO]: Teleported Player934 to -3842.610000, 99.000000, 4885.790000
+[14:48:09] [Server thread/INFO]: Teleported Player934 to -3842.390000, 98.710000, 4884.830000
+[14:48:10] [Server thread/INFO]: Teleported Player934 to -3842.170000, 98.430000, 4883.870000
+[14:48:10] [Server thread/INFO]: Teleported Player934 to -3841.950000, 98.140000, 4882.910000
+[14:48:10] [Server thread/INFO]: Teleported Player934 to -3841.730000, 97.860000, 4881.950000
+[14:48:10] [Server thread/INFO]: Teleported Player934 to -3841.510000, 97.570000, 4880.990000
+[14:48:10] [Server thread/INFO]: Teleported Player934 to -3841.280000, 97.290000, 4880.040000
+[14:48:10] [Server thread/INFO]: Teleported Player934 to -3841.060000, 97.000000, 4879.080000
+[14:48:10] [Server thread/INFO]: Teleported Player934 to -3840.840000, 96.710000, 4878.120000
+[14:48:10] [Server thread/INFO]: Teleported Player934 to -3840.620000, 96.430000, 4877.160000
+[14:48:10] [Server thread/INFO]: Teleported Player934 to -3840.400000, 96.140000, 4876.200000
+[14:48:10] [Server thread/INFO]: Teleported Player934 to -3840.180000, 95.860000, 4875.240000
+[14:48:11] [Server thread/INFO]: Teleported Player934 to -3839.960000, 95.570000, 4874.280000
+[14:48:11] [Server thread/INFO]: Teleported Player934 to -3839.740000, 95.290000, 4873.320000
+[14:48:11] [Server thread/INFO]: Teleported Player934 to -3839.520000, 95.000000, 4872.360000
+[14:48:11] [Server thread/INFO]: Teleported Player934 to -3839.300000, 94.710000, 4871.400000
+[14:48:11] [Server thread/INFO]: Teleported Player934 to -3839.080000, 94.430000, 4870.450000
+[14:48:11] [Server thread/INFO]: Teleported Player934 to -3838.860000, 94.140000, 4869.490000
+[14:48:16] [Server thread/INFO]: Teleported Player934 to -3838.640000, 93.860000, 4868.530000
+[14:48:16] [Server thread/INFO]: Teleported Player934 to -3838.420000, 93.570000, 4867.570000
+[14:48:16] [Server thread/INFO]: Teleported Player934 to -3838.190000, 93.290000, 4866.610000
+[14:48:17] [Server thread/INFO]: Teleported Player934 to -3837.970000, 93.000000, 4865.650000
+[14:48:17] [Server thread/INFO]: Teleported Player934 to -3837.750000, 92.710000, 4864.690000
+[14:48:17] [Server thread/INFO]: Teleported Player934 to -3837.530000, 92.430000, 4863.730000
+[14:48:17] [Server thread/INFO]: Teleported Player934 to -3837.310000, 92.140000, 4862.770000
+[14:48:17] [Server thread/INFO]: Teleported Player934 to -3837.090000, 91.860000, 4861.810000
+[14:48:17] [Server thread/INFO]: Teleported Player934 to -3836.870000, 91.570000, 4860.850000
+[14:48:17] [Server thread/INFO]: Teleported Player934 to -3836.650000, 91.290000, 4859.900000
+[14:48:18] [Server thread/INFO]: Teleported Player934 to -3836.430000, 91.000000, 4858.940000
+[14:48:18] [Server thread/INFO]: Teleported Player934 to -3836.210000, 90.710000, 4857.980000
+[14:48:18] [Render thread/INFO]: Resizing Chunk Sections UBO, capacity limit of 512 reached during a single frame. New capacity will be 1024.
+[14:48:18] [Server thread/INFO]: Teleported Player934 to -3835.990000, 90.430000, 4857.020000
+[14:48:18] [Server thread/INFO]: Teleported Player934 to -3835.770000, 90.140000, 4856.060000
+[14:48:18] [Server thread/INFO]: Teleported Player934 to -3835.550000, 89.860000, 4855.100000
+[14:48:18] [Server thread/INFO]: Teleported Player934 to -3835.330000, 89.570000, 4854.140000
+[14:48:18] [Server thread/INFO]: Teleported Player934 to -3835.100000, 89.290000, 4853.180000
+[14:48:18] [Server thread/INFO]: Teleported Player934 to -3834.880000, 89.000000, 4852.220000
+[14:48:19] [Server thread/INFO]: Teleported Player934 to -3834.660000, 88.710000, 4851.260000
+[14:48:19] [Server thread/INFO]: Teleported Player934 to -3834.440000, 88.430000, 4850.300000
+[14:48:19] [Server thread/INFO]: Teleported Player934 to -3834.220000, 88.140000, 4849.350000
+[14:48:19] [Server thread/INFO]: Teleported Player934 to -3834.000000, 87.860000, 4848.390000
+[14:48:19] [Server thread/INFO]: Teleported Player934 to -3833.780000, 87.570000, 4847.430000
+[14:48:19] [Server thread/INFO]: Teleported Player934 to -3833.560000, 87.290000, 4846.470000
+[14:48:20] [Server thread/INFO]: Teleported Player934 to -3833.340000, 87.000000, 4845.510000
+[14:48:20] [Server thread/INFO]: Teleported Player934 to -3833.120000, 86.710000, 4844.550000
+[14:48:20] [Server thread/INFO]: Teleported Player934 to -3832.900000, 86.430000, 4843.590000
+[14:48:20] [Server thread/INFO]: Teleported Player934 to -3832.680000, 86.140000, 4842.630000
+[14:48:20] [Server thread/INFO]: Teleported Player934 to -3832.460000, 85.860000, 4841.670000
+[14:48:21] [Server thread/INFO]: Teleported Player934 to -3832.240000, 85.570000, 4840.710000
+[14:48:21] [Server thread/INFO]: Teleported Player934 to -3832.010000, 85.290000, 4839.760000
+[14:48:21] [Server thread/INFO]: Teleported Player934 to -3831.790000, 85.000000, 4838.800000
+[14:48:21] [Test thread/INFO]: [M.E.G.A scenario] stash 4 at class_2338{x=-3830, y=55, z=4831} -> blocks seen 6197
+[14:48:21] [Server thread/INFO]: Teleported Player934 to 779.360000, 114.000000, 1769.530000
+[14:48:23] [Server thread/WARN]: Can't keep up! Is the server overloaded? Running 2088ms or 41 ticks behind
+[14:48:28] [Server thread/INFO]: Teleported Player934 to 779.360000, 114.000000, 1769.530000
+[14:48:28] [Server thread/INFO]: Teleported Player934 to 780.140000, 113.710000, 1770.120000
+[14:48:29] [Server thread/INFO]: Teleported Player934 to 780.920000, 113.430000, 1770.720000
+[14:48:29] [Server thread/INFO]: Teleported Player934 to 781.700000, 113.140000, 1771.320000
+[14:48:29] [Server thread/INFO]: Teleported Player934 to 782.490000, 112.860000, 1771.920000
+[14:48:29] [Server thread/INFO]: Teleported Player934 to 783.270000, 112.570000, 1772.510000
+[14:48:29] [Server thread/INFO]: Teleported Player934 to 784.050000, 112.290000, 1773.110000
+[14:48:29] [Server thread/INFO]: Teleported Player934 to 784.830000, 112.000000, 1773.710000
+[14:48:30] [Server thread/INFO]: Teleported Player934 to 785.620000, 111.710000, 1774.300000
+[14:48:30] [Server thread/INFO]: Teleported Player934 to 786.400000, 111.430000, 1774.900000
+[14:48:30] [Server thread/INFO]: Teleported Player934 to 787.180000, 111.140000, 1775.500000
+[14:48:30] [Server thread/INFO]: Teleported Player934 to 787.960000, 110.860000, 1776.100000
+[14:48:30] [Server thread/INFO]: Teleported Player934 to 788.740000, 110.570000, 1776.690000
+[14:48:31] [Server thread/INFO]: Teleported Player934 to 789.530000, 110.290000, 1777.290000
+[14:48:31] [Server thread/INFO]: Teleported Player934 to 790.310000, 110.000000, 1777.890000
+[14:48:31] [Server thread/INFO]: Teleported Player934 to 791.090000, 109.710000, 1778.480000
+[14:48:31] [Server thread/INFO]: Teleported Player934 to 791.870000, 109.430000, 1779.080000
+[14:48:32] [Server thread/INFO]: Teleported Player934 to 792.660000, 109.140000, 1779.680000
+[14:48:32] [Server thread/INFO]: Teleported Player934 to 793.440000, 108.860000, 1780.280000
+[14:48:32] [Server thread/INFO]: Teleported Player934 to 794.220000, 108.570000, 1780.870000
+[14:48:32] [Server thread/INFO]: Teleported Player934 to 795.000000, 108.290000, 1781.470000
+[14:48:32] [Server thread/INFO]: Teleported Player934 to 795.790000, 108.000000, 1782.070000
+[14:48:33] [Server thread/INFO]: Teleported Player934 to 796.570000, 107.710000, 1782.660000
+[14:48:33] [Server thread/INFO]: Teleported Player934 to 797.350000, 107.430000, 1783.260000
+[14:48:33] [Server thread/INFO]: Teleported Player934 to 798.130000, 107.140000, 1783.860000
+[14:48:33] [Server thread/INFO]: Teleported Player934 to 798.910000, 106.860000, 1784.460000
+[14:48:33] [Server thread/INFO]: Teleported Player934 to 799.700000, 106.570000, 1785.050000
+[14:48:34] [Server thread/INFO]: Teleported Player934 to 800.480000, 106.290000, 1785.650000
+[14:48:34] [Server thread/INFO]: Teleported Player934 to 801.260000, 106.000000, 1786.250000
+[14:48:34] [Server thread/INFO]: Teleported Player934 to 802.040000, 105.710000, 1786.840000
+[14:48:34] [Server thread/INFO]: Teleported Player934 to 802.830000, 105.430000, 1787.440000
+[14:48:35] [Server thread/INFO]: Teleported Player934 to 803.610000, 105.140000, 1788.040000
+[14:48:35] [Server thread/INFO]: Teleported Player934 to 804.390000, 104.860000, 1788.640000
+[14:48:36] [Server thread/INFO]: Teleported Player934 to 805.170000, 104.570000, 1789.230000
+[14:48:36] [Server thread/INFO]: Teleported Player934 to 805.950000, 104.290000, 1789.830000
+[14:48:36] [Server thread/INFO]: Teleported Player934 to 806.740000, 104.000000, 1790.430000
+[14:48:36] [Server thread/INFO]: Teleported Player934 to 807.520000, 103.710000, 1791.020000
+[14:48:36] [Server thread/INFO]: Teleported Player934 to 808.300000, 103.430000, 1791.620000
+[14:48:36] [Server thread/INFO]: Teleported Player934 to 809.080000, 103.140000, 1792.220000
+[14:48:36] [Server thread/INFO]: Teleported Player934 to 809.870000, 102.860000, 1792.820000
+[14:48:36] [Server thread/INFO]: Teleported Player934 to 810.650000, 102.570000, 1793.410000
+[14:48:36] [Server thread/INFO]: Teleported Player934 to 811.430000, 102.290000, 1794.010000
+[14:48:37] [Server thread/INFO]: Teleported Player934 to 812.210000, 102.000000, 1794.610000
+[14:48:37] [Server thread/INFO]: Teleported Player934 to 813.000000, 101.710000, 1795.200000
+[14:48:37] [Server thread/INFO]: Teleported Player934 to 813.780000, 101.430000, 1795.800000
+[14:48:37] [Server thread/INFO]: Teleported Player934 to 814.560000, 101.140000, 1796.400000
+[14:48:37] [Server thread/INFO]: Teleported Player934 to 815.340000, 100.860000, 1797.000000
+[14:48:37] [Server thread/INFO]: Teleported Player934 to 816.120000, 100.570000, 1797.590000
+[14:48:37] [Server thread/INFO]: Teleported Player934 to 816.910000, 100.290000, 1798.190000
+[14:48:38] [Server thread/INFO]: Teleported Player934 to 817.690000, 100.000000, 1798.790000
+[14:48:38] [Server thread/INFO]: Teleported Player934 to 818.470000, 99.710000, 1799.380000
+[14:48:38] [Server thread/INFO]: Teleported Player934 to 819.250000, 99.430000, 1799.980000
+[14:48:38] [Server thread/INFO]: Teleported Player934 to 820.040000, 99.140000, 1800.580000
+[14:48:38] [Server thread/INFO]: Teleported Player934 to 820.820000, 98.860000, 1801.170000
+[14:48:38] [Server thread/INFO]: Teleported Player934 to 821.600000, 98.570000, 1801.770000
+[14:48:38] [Server thread/INFO]: Teleported Player934 to 822.380000, 98.290000, 1802.370000
+[14:48:39] [Server thread/INFO]: Teleported Player934 to 823.160000, 98.000000, 1802.970000
+[14:48:39] [Server thread/INFO]: Teleported Player934 to 823.950000, 97.710000, 1803.560000
+[14:48:39] [Server thread/INFO]: Teleported Player934 to 824.730000, 97.430000, 1804.160000
+[14:48:39] [Server thread/INFO]: Teleported Player934 to 825.510000, 97.140000, 1804.760000
+[14:48:39] [Server thread/INFO]: Teleported Player934 to 826.290000, 96.860000, 1805.350000
+[14:48:39] [Server thread/INFO]: Teleported Player934 to 827.080000, 96.570000, 1805.950000
+[14:48:39] [Server thread/INFO]: Teleported Player934 to 827.860000, 96.290000, 1806.550000
+[14:48:39] [Server thread/INFO]: Teleported Player934 to 828.640000, 96.000000, 1807.150000
+[14:48:40] [Test thread/INFO]: [M.E.G.A scenario] stash 5 at class_2338{x=835, y=66, z=1812} -> blocks seen 6149
+[14:48:40] [Server thread/INFO]: Teleported Player934 to 3676.590000, 102.000000, -606.690000
+[14:48:43] [Server thread/WARN]: Can't keep up! Is the server overloaded? Running 4555ms or 91 ticks behind
+[14:48:46] [Server thread/INFO]: Teleported Player934 to 3676.590000, 102.000000, -606.690000
+[14:48:47] [Server thread/INFO]: Teleported Player934 to 3677.190000, 101.710000, -605.910000
+[14:48:47] [Server thread/INFO]: Teleported Player934 to 3677.790000, 101.430000, -605.130000
+[14:48:47] [Server thread/INFO]: Teleported Player934 to 3678.380000, 101.140000, -604.340000
+[14:48:47] [Server thread/INFO]: Teleported Player934 to 3678.980000, 100.860000, -603.560000
+[14:48:47] [Server thread/INFO]: Teleported Player934 to 3679.570000, 100.570000, -602.780000
+[14:48:47] [Server thread/INFO]: Teleported Player934 to 3680.170000, 100.290000, -601.990000
+[14:48:48] [Server thread/INFO]: Teleported Player934 to 3680.770000, 100.000000, -601.210000
+[14:48:48] [Server thread/INFO]: Teleported Player934 to 3681.360000, 99.710000, -600.430000
+[14:48:48] [Server thread/INFO]: Teleported Player934 to 3681.960000, 99.430000, -599.650000
+[14:48:48] [Server thread/INFO]: Teleported Player934 to 3682.560000, 99.140000, -598.860000
+[14:48:48] [Server thread/INFO]: Teleported Player934 to 3683.150000, 98.860000, -598.080000
+[14:48:48] [Server thread/INFO]: Teleported Player934 to 3683.750000, 98.570000, -597.300000
+[14:48:48] [Server thread/INFO]: Teleported Player934 to 3684.340000, 98.290000, -596.510000
+[14:48:49] [Server thread/INFO]: Teleported Player934 to 3684.940000, 98.000000, -595.730000
+[14:48:49] [Server thread/INFO]: Teleported Player934 to 3685.540000, 97.710000, -594.950000
+[14:48:49] [Server thread/INFO]: Teleported Player934 to 3686.130000, 97.430000, -594.170000
+[14:48:49] [Server thread/INFO]: Teleported Player934 to 3686.730000, 97.140000, -593.380000
+[14:48:49] [Server thread/INFO]: Teleported Player934 to 3687.320000, 96.860000, -592.600000
+[14:48:49] [Server thread/INFO]: Teleported Player934 to 3687.920000, 96.570000, -591.820000
+[14:48:50] [Server thread/INFO]: Teleported Player934 to 3688.520000, 96.290000, -591.030000
+[14:48:50] [Server thread/INFO]: Teleported Player934 to 3689.110000, 96.000000, -590.250000
+[14:48:50] [Server thread/INFO]: Teleported Player934 to 3689.710000, 95.710000, -589.470000
+[14:48:50] [Server thread/INFO]: Teleported Player934 to 3690.310000, 95.430000, -588.680000
+[14:48:50] [Server thread/INFO]: Teleported Player934 to 3690.900000, 95.140000, -587.900000
+[14:48:50] [Server thread/INFO]: Teleported Player934 to 3691.500000, 94.860000, -587.120000
+[14:48:51] [Server thread/INFO]: Teleported Player934 to 3692.090000, 94.570000, -586.340000
+[14:48:51] [Server thread/INFO]: Teleported Player934 to 3692.690000, 94.290000, -585.550000
+[14:48:51] [Server thread/INFO]: Teleported Player934 to 3693.290000, 94.000000, -584.770000
+[14:48:51] [Server thread/INFO]: Teleported Player934 to 3693.880000, 93.710000, -583.990000
+[14:48:51] [Server thread/INFO]: Teleported Player934 to 3694.480000, 93.430000, -583.200000
+[14:48:51] [Server thread/INFO]: Teleported Player934 to 3695.080000, 93.140000, -582.420000
+[14:48:52] [Server thread/INFO]: Teleported Player934 to 3695.670000, 92.860000, -581.640000
+[14:48:52] [Server thread/INFO]: Teleported Player934 to 3696.270000, 92.570000, -580.850000
+[14:48:52] [Server thread/INFO]: Teleported Player934 to 3696.860000, 92.290000, -580.070000
+[14:48:53] [Server thread/INFO]: Teleported Player934 to 3697.460000, 92.000000, -579.290000
+[14:48:53] [Server thread/INFO]: Teleported Player934 to 3698.060000, 91.710000, -578.510000
+[14:48:53] [Server thread/INFO]: Teleported Player934 to 3698.650000, 91.430000, -577.720000
+[14:48:53] [Server thread/INFO]: Teleported Player934 to 3699.250000, 91.140000, -576.940000
+[14:48:53] [Server thread/INFO]: Teleported Player934 to 3699.840000, 90.860000, -576.160000
+[14:48:53] [Server thread/INFO]: Teleported Player934 to 3700.440000, 90.570000, -575.370000
+[14:48:53] [Server thread/INFO]: Teleported Player934 to 3701.040000, 90.290000, -574.590000
+[14:48:54] [Server thread/INFO]: Teleported Player934 to 3701.630000, 90.000000, -573.810000
+[14:48:54] [Server thread/INFO]: Teleported Player934 to 3702.230000, 89.710000, -573.020000
+[14:48:54] [Server thread/INFO]: Teleported Player934 to 3702.830000, 89.430000, -572.240000
+[14:48:54] [Server thread/INFO]: Teleported Player934 to 3703.420000, 89.140000, -571.460000
+[14:48:54] [Server thread/INFO]: Teleported Player934 to 3704.020000, 88.860000, -570.680000
+[14:48:54] [Server thread/INFO]: Teleported Player934 to 3704.610000, 88.570000, -569.890000
+[14:48:54] [Server thread/INFO]: Teleported Player934 to 3705.210000, 88.290000, -569.110000
+[14:48:55] [Server thread/INFO]: Teleported Player934 to 3705.810000, 88.000000, -568.330000
+[14:48:55] [Server thread/INFO]: Teleported Player934 to 3706.400000, 87.710000, -567.540000
+[14:48:55] [Server thread/INFO]: Teleported Player934 to 3707.000000, 87.430000, -566.760000
+[14:48:55] [Server thread/INFO]: Teleported Player934 to 3707.600000, 87.140000, -565.980000
+[14:48:55] [Server thread/INFO]: Teleported Player934 to 3708.190000, 86.860000, -565.190000
+[14:48:55] [Server thread/INFO]: Teleported Player934 to 3708.790000, 86.570000, -564.410000
+[14:48:55] [Server thread/INFO]: Teleported Player934 to 3709.380000, 86.290000, -563.630000
+[14:48:56] [Server thread/INFO]: Teleported Player934 to 3709.980000, 86.000000, -562.850000
+[14:48:56] [Server thread/INFO]: Teleported Player934 to 3710.580000, 85.710000, -562.060000
+[14:48:56] [Server thread/INFO]: Teleported Player934 to 3711.170000, 85.430000, -561.280000
+[14:48:56] [Server thread/INFO]: Teleported Player934 to 3711.770000, 85.140000, -560.500000
+[14:48:56] [Server thread/INFO]: Teleported Player934 to 3712.360000, 84.860000, -559.710000
+[14:48:56] [Server thread/INFO]: Teleported Player934 to 3712.960000, 84.570000, -558.930000
+[14:48:56] [Server thread/INFO]: Teleported Player934 to 3713.560000, 84.290000, -558.150000
+[14:48:57] [Server thread/INFO]: Teleported Player934 to 3714.150000, 84.000000, -557.360000
+[14:48:57] [Test thread/INFO]: [M.E.G.A scenario] stash 6 at class_2338{x=3719, y=54, z=-551} -> blocks seen 6789
+[14:48:57] [Server thread/INFO]: Teleported Player934 to -4427.500000, 81.000000, 4461.450000
+[14:49:02] [Server thread/WARN]: Can't keep up! Is the server overloaded? Running 3724ms or 74 ticks behind
+[14:49:04] [Server thread/INFO]: Teleported Player934 to -4427.500000, 81.000000, 4461.450000
+[14:49:04] [Server thread/INFO]: Teleported Player934 to -4426.610000, 80.710000, 4461.030000
+[14:49:04] [Server thread/INFO]: Teleported Player934 to -4425.720000, 80.430000, 4460.620000
+[14:49:04] [Server thread/INFO]: Teleported Player934 to -4424.830000, 80.140000, 4460.210000
+[14:49:05] [Server thread/INFO]: Teleported Player934 to -4423.930000, 79.860000, 4459.790000
+[14:49:05] [Server thread/INFO]: Teleported Player934 to -4423.040000, 79.570000, 4459.380000
+[14:49:05] [Server thread/INFO]: Teleported Player934 to -4422.150000, 79.290000, 4458.960000
+[14:49:05] [Server thread/INFO]: Teleported Player934 to -4421.250000, 79.000000, 4458.550000
+[14:49:05] [Server thread/INFO]: Teleported Player934 to -4420.360000, 78.710000, 4458.140000
+[14:49:06] [Server thread/INFO]: Teleported Player934 to -4419.470000, 78.430000, 4457.720000
+[14:49:06] [Server thread/INFO]: Teleported Player934 to -4418.580000, 78.140000, 4457.310000
+[14:49:06] [Server thread/INFO]: Teleported Player934 to -4417.680000, 77.860000, 4456.890000
+[14:49:06] [Server thread/INFO]: Teleported Player934 to -4416.790000, 77.570000, 4456.480000
+[14:49:06] [Server thread/INFO]: Teleported Player934 to -4415.900000, 77.290000, 4456.070000
+[14:49:07] [Server thread/INFO]: Teleported Player934 to -4415.000000, 77.000000, 4455.650000
+[14:49:07] [Server thread/INFO]: Teleported Player934 to -4414.110000, 76.710000, 4455.240000
+[14:49:07] [Server thread/INFO]: Teleported Player934 to -4413.220000, 76.430000, 4454.820000
+[14:49:07] [Server thread/INFO]: Teleported Player934 to -4412.330000, 76.140000, 4454.410000
+[14:49:07] [Server thread/INFO]: Teleported Player934 to -4411.430000, 75.860000, 4454.000000
+[14:49:08] [Server thread/INFO]: Teleported Player934 to -4410.540000, 75.570000, 4453.580000
+[14:49:08] [Server thread/INFO]: Teleported Player934 to -4409.650000, 75.290000, 4453.170000
+[14:49:08] [Server thread/INFO]: Teleported Player934 to -4408.760000, 75.000000, 4452.750000
+[14:49:08] [Server thread/INFO]: Teleported Player934 to -4407.860000, 74.710000, 4452.340000
+[14:49:08] [Server thread/INFO]: Teleported Player934 to -4406.970000, 74.430000, 4451.930000
+[14:49:09] [Server thread/INFO]: Teleported Player934 to -4406.080000, 74.140000, 4451.510000
+[14:49:09] [Server thread/INFO]: Teleported Player934 to -4405.180000, 73.860000, 4451.100000
+[14:49:09] [Server thread/INFO]: Teleported Player934 to -4404.290000, 73.570000, 4450.680000
+[14:49:09] [Server thread/INFO]: Teleported Player934 to -4403.400000, 73.290000, 4450.270000
+[14:49:09] [Server thread/INFO]: Teleported Player934 to -4402.510000, 73.000000, 4449.860000
+[14:49:10] [Server thread/INFO]: Teleported Player934 to -4401.610000, 72.710000, 4449.440000
+[14:49:10] [Server thread/INFO]: Teleported Player934 to -4400.720000, 72.430000, 4449.030000
+[14:49:10] [Server thread/INFO]: Teleported Player934 to -4399.830000, 72.140000, 4448.610000
+[14:49:17] [Server thread/INFO]: Teleported Player934 to -4398.930000, 71.860000, 4448.200000
+[14:49:17] [Server thread/INFO]: Teleported Player934 to -4398.040000, 71.570000, 4447.790000
+[14:49:17] [Server thread/INFO]: Teleported Player934 to -4397.150000, 71.290000, 4447.370000
+[14:49:17] [Server thread/INFO]: Teleported Player934 to -4396.260000, 71.000000, 4446.960000
+[14:49:17] [Server thread/INFO]: Teleported Player934 to -4395.360000, 70.710000, 4446.540000
+[14:49:18] [Server thread/INFO]: Teleported Player934 to -4394.470000, 70.430000, 4446.130000
+[14:49:18] [Server thread/INFO]: Teleported Player934 to -4393.580000, 70.140000, 4445.720000
+[14:49:18] [Server thread/INFO]: Teleported Player934 to -4392.680000, 69.860000, 4445.300000
+[14:49:18] [Server thread/INFO]: Teleported Player934 to -4391.790000, 69.570000, 4444.890000
+[14:49:18] [Server thread/INFO]: Teleported Player934 to -4390.900000, 69.290000, 4444.470000
+[14:49:18] [Server thread/INFO]: Teleported Player934 to -4390.010000, 69.000000, 4444.060000
+[14:49:19] [Server thread/INFO]: Teleported Player934 to -4389.110000, 68.710000, 4443.650000
+[14:49:19] [Server thread/INFO]: Teleported Player934 to -4388.220000, 68.430000, 4443.230000
+[14:49:19] [Server thread/INFO]: Teleported Player934 to -4387.330000, 68.140000, 4442.820000
+[14:49:19] [Server thread/INFO]: Teleported Player934 to -4386.440000, 67.860000, 4442.400000
+[14:49:19] [Server thread/INFO]: Teleported Player934 to -4385.540000, 67.570000, 4441.990000
+[14:49:19] [Server thread/INFO]: Teleported Player934 to -4384.650000, 67.290000, 4441.580000
+[14:49:20] [Server thread/INFO]: Teleported Player934 to -4383.760000, 67.000000, 4441.160000
+[14:49:20] [Server thread/INFO]: Teleported Player934 to -4382.860000, 66.710000, 4440.750000
+[14:49:20] [Server thread/INFO]: Teleported Player934 to -4381.970000, 66.430000, 4440.330000
+[14:49:20] [Server thread/INFO]: Teleported Player934 to -4381.080000, 66.140000, 4439.920000
+[14:49:20] [Server thread/INFO]: Teleported Player934 to -4380.190000, 65.860000, 4439.510000
+[14:49:21] [Server thread/INFO]: Teleported Player934 to -4379.290000, 65.570000, 4439.090000
+[14:49:21] [Server thread/INFO]: Teleported Player934 to -4378.400000, 65.290000, 4438.680000
+[14:49:21] [Server thread/INFO]: Teleported Player934 to -4377.510000, 65.000000, 4438.260000
+[14:49:21] [Server thread/INFO]: Teleported Player934 to -4376.610000, 64.710000, 4437.850000
+[14:49:21] [Server thread/INFO]: Teleported Player934 to -4375.720000, 64.430000, 4437.440000
+[14:49:21] [Server thread/INFO]: Teleported Player934 to -4374.830000, 64.140000, 4437.020000
+[14:49:21] [Server thread/INFO]: Teleported Player934 to -4373.940000, 63.860000, 4436.610000
+[14:49:22] [Server thread/INFO]: Teleported Player934 to -4373.040000, 63.570000, 4436.190000
+[14:49:22] [Server thread/INFO]: Teleported Player934 to -4372.150000, 63.290000, 4435.780000
+[14:49:22] [Server thread/INFO]: Teleported Player934 to -4371.260000, 63.000000, 4435.370000
+[14:49:22] [Server thread/WARN]: Can't keep up! Is the server overloaded? Running 5298ms or 105 ticks behind
+[14:49:22] [Test thread/INFO]: [M.E.G.A scenario] stash 7 at class_2338{x=-4364, y=33, z=4432} -> blocks seen 6294
+[14:49:22] [Server thread/INFO]: Teleported Player934 to 1164.350000, 82.000000, -941.490000
+[14:49:31] [Server thread/INFO]: Teleported Player934 to 1164.350000, 82.000000, -941.490000
+[14:49:31] [Server thread/INFO]: Teleported Player934 to 1163.380000, 81.710000, -941.630000
+[14:49:32] [Server thread/INFO]: Teleported Player934 to 1162.400000, 81.430000, -941.760000
+[14:49:32] [Server thread/INFO]: Teleported Player934 to 1161.430000, 81.140000, -941.900000
+[14:49:32] [Server thread/INFO]: Teleported Player934 to 1160.450000, 80.860000, -942.030000
+[14:49:32] [Server thread/INFO]: Teleported Player934 to 1159.480000, 80.570000, -942.160000
+[14:49:32] [Server thread/INFO]: Teleported Player934 to 1158.500000, 80.290000, -942.300000
+[14:49:32] [Server thread/INFO]: Teleported Player934 to 1157.530000, 80.000000, -942.430000
+[14:49:33] [Server thread/INFO]: Teleported Player934 to 1156.550000, 79.710000, -942.560000
+[14:49:33] [Server thread/INFO]: Teleported Player934 to 1155.580000, 79.430000, -942.700000
+[14:49:33] [Server thread/INFO]: Teleported Player934 to 1154.600000, 79.140000, -942.830000
+[14:49:33] [Server thread/INFO]: Teleported Player934 to 1153.630000, 78.860000, -942.960000
+[14:49:33] [Server thread/INFO]: Teleported Player934 to 1152.650000, 78.570000, -943.100000
+[14:49:34] [Server thread/INFO]: Teleported Player934 to 1151.680000, 78.290000, -943.230000
+[14:49:34] [Server thread/INFO]: Teleported Player934 to 1150.700000, 78.000000, -943.370000
+[14:49:34] [Server thread/INFO]: Teleported Player934 to 1149.730000, 77.710000, -943.500000
+[14:49:34] [Server thread/INFO]: Teleported Player934 to 1148.750000, 77.430000, -943.630000
+[14:49:34] [Server thread/INFO]: Teleported Player934 to 1147.780000, 77.140000, -943.770000
+[14:49:35] [Server thread/INFO]: Teleported Player934 to 1146.800000, 76.860000, -943.900000
+[14:49:35] [Server thread/INFO]: Teleported Player934 to 1145.830000, 76.570000, -944.030000
+[14:49:35] [Server thread/INFO]: Teleported Player934 to 1144.850000, 76.290000, -944.170000
+[14:49:35] [Server thread/INFO]: Teleported Player934 to 1143.880000, 76.000000, -944.300000
+[14:49:36] [Server thread/INFO]: Teleported Player934 to 1142.900000, 75.710000, -944.430000
+[14:49:36] [Server thread/INFO]: Teleported Player934 to 1141.930000, 75.430000, -944.570000
+[14:49:36] [Server thread/INFO]: Teleported Player934 to 1140.950000, 75.140000, -944.700000
+[14:49:36] [Server thread/INFO]: Teleported Player934 to 1139.980000, 74.860000, -944.840000
+[14:49:36] [Server thread/INFO]: Teleported Player934 to 1139.000000, 74.570000, -944.970000
+[14:49:37] [Server thread/INFO]: Teleported Player934 to 1138.030000, 74.290000, -945.100000
+[14:49:37] [Server thread/INFO]: Teleported Player934 to 1137.050000, 74.000000, -945.240000
+[14:49:37] [Server thread/INFO]: Teleported Player934 to 1136.080000, 73.710000, -945.370000
+[14:49:37] [Server thread/INFO]: Teleported Player934 to 1135.100000, 73.430000, -945.500000
+[14:49:37] [Server thread/INFO]: Teleported Player934 to 1134.130000, 73.140000, -945.640000
+[14:49:38] [Server thread/INFO]: Teleported Player934 to 1133.150000, 72.860000, -945.770000
+[14:49:38] [Server thread/INFO]: Teleported Player934 to 1132.180000, 72.570000, -945.900000
+[14:49:39] [Server thread/INFO]: Teleported Player934 to 1131.200000, 72.290000, -946.040000
+[14:49:39] [Server thread/INFO]: Teleported Player934 to 1130.230000, 72.000000, -946.170000
+[14:49:39] [Server thread/INFO]: Teleported Player934 to 1129.250000, 71.710000, -946.310000
+[14:49:39] [Server thread/INFO]: Teleported Player934 to 1128.280000, 71.430000, -946.440000
+[14:49:39] [Server thread/INFO]: Teleported Player934 to 1127.300000, 71.140000, -946.570000
+[14:49:39] [Server thread/INFO]: Teleported Player934 to 1126.330000, 70.860000, -946.710000
+[14:49:39] [Server thread/INFO]: Teleported Player934 to 1125.350000, 70.570000, -946.840000
+[14:49:40] [Server thread/INFO]: Teleported Player934 to 1124.380000, 70.290000, -946.970000
+[14:49:40] [Server thread/INFO]: Teleported Player934 to 1123.400000, 70.000000, -947.110000
+[14:49:40] [Server thread/INFO]: Teleported Player934 to 1122.430000, 69.710000, -947.240000
+[14:49:40] [Server thread/INFO]: Teleported Player934 to 1121.450000, 69.430000, -947.370000
+[14:49:40] [Server thread/INFO]: Teleported Player934 to 1120.480000, 69.140000, -947.510000
+[14:49:40] [Server thread/INFO]: Teleported Player934 to 1119.500000, 68.860000, -947.640000
+[14:49:41] [Server thread/INFO]: Teleported Player934 to 1118.530000, 68.570000, -947.780000
+[14:49:41] [Server thread/INFO]: Teleported Player934 to 1117.550000, 68.290000, -947.910000
+[14:49:41] [Server thread/INFO]: Teleported Player934 to 1116.580000, 68.000000, -948.040000
+[14:49:41] [Server thread/INFO]: Teleported Player934 to 1115.600000, 67.710000, -948.180000
+[14:49:41] [Server thread/INFO]: Teleported Player934 to 1114.630000, 67.430000, -948.310000
+[14:49:41] [Server thread/INFO]: Teleported Player934 to 1113.650000, 67.140000, -948.440000
+[14:49:42] [Server thread/INFO]: Teleported Player934 to 1112.680000, 66.860000, -948.580000
+[14:49:42] [Server thread/WARN]: Can't keep up! Is the server overloaded? Running 4860ms or 97 ticks behind
+[14:49:42] [Server thread/INFO]: Teleported Player934 to 1111.700000, 66.570000, -948.710000
+[14:49:42] [Server thread/INFO]: Teleported Player934 to 1110.730000, 66.290000, -948.840000
+[14:49:42] [Server thread/INFO]: Teleported Player934 to 1109.750000, 66.000000, -948.980000
+[14:49:42] [Server thread/INFO]: Teleported Player934 to 1108.780000, 65.710000, -949.110000
+[14:49:42] [Server thread/INFO]: Teleported Player934 to 1107.800000, 65.430000, -949.250000
+[14:49:43] [Server thread/INFO]: Teleported Player934 to 1106.830000, 65.140000, -949.380000
+[14:49:43] [Server thread/INFO]: Teleported Player934 to 1105.850000, 64.860000, -949.510000
+[14:49:43] [Server thread/INFO]: Teleported Player934 to 1104.880000, 64.570000, -949.650000
+[14:49:43] [Server thread/INFO]: Teleported Player934 to 1103.900000, 64.290000, -949.780000
+[14:49:43] [Server thread/INFO]: Teleported Player934 to 1102.930000, 64.000000, -949.910000
+[14:49:43] [Test thread/INFO]: [M.E.G.A scenario] stash 8 at class_2338{x=1095, y=34, z=-951} -> blocks seen 6346
+[14:49:43] [Test thread/INFO]: [M.E.G.A scenario] DONE, 512 frames
+[14:49:43] [Server thread/INFO]: Player934 lost connection: Disconnected
+[14:49:43] [Server thread/INFO]: Player934 left the game
+[14:49:43] [Server thread/INFO]: Stopping singleplayer server as player logged out
+[14:49:43] [Server thread/INFO]: Stopping server
+[14:49:43] [Server thread/INFO]: Saving players
+[14:49:43] [Server thread/INFO]: Saving worlds
+[14:49:44] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld
+[14:49:44] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end
+[14:49:44] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether
+[14:49:44] [Server thread/INFO]: ThreadedAnvilChunkStorage (New World): All chunks are saved
+[14:49:44] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[14:49:44] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[14:49:44] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved
+[14:49:45] [Render thread/ERROR]: ########## GL ERROR ##########
+[14:49:45] [Render thread/ERROR]: @ Render
+[14:49:45] [Render thread/ERROR]: 65547: X11: Standard cursor shape unavailable
+[14:49:45] [Render thread/INFO]: Stopping!
