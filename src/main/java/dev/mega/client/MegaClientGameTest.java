@@ -245,6 +245,19 @@ public class MegaClientGameTest implements FabricClientGameTest {
             ctx.waitTicks(10);
             ctx.takeScreenshot("15-big-map");
             ctx.setScreen(() -> null);
+            // Elytra helper: glide for a moment and take a picture of the compass bar
+            srv.runCommand("item replace entity @a armor.chest with minecraft:elytra");
+            srv.runCommand("gamemode survival @a");
+            srv.runCommand("tp @a 0 -20 -3 0 10");
+            ctx.waitTicks(10);
+            ctx.runOnClient(c -> { c.player.startGliding(); c.player.setVelocity(0, -0.2, 1.2); });
+            ctx.waitTicks(3);
+            boolean gliding = ctx.computeOnClient(c -> c.player.isGliding());
+            MegaClient.LOGGER.info("[M.E.G.A test] gliding for elytra bar: {}", gliding);
+            ctx.takeScreenshot("17-elytra-helper");
+            srv.runCommand("gamemode spectator @a");
+            srv.runCommand("tp @a 0 -60 -3 0 15");
+            ctx.waitTicks(10);
             ctx.runOnClient(c -> MegaScreen.tab = 4);
             ctx.setScreen(() -> new MegaScreen(null));
             ctx.waitTicks(5);
