@@ -85,7 +85,9 @@ public final class MegaMap {
         int bx = ch.getPos().getStartX(), bz = ch.getPos().getStartZ(), bottom = client.world.getBottomY();
         BlockPos.Mutable m = new BlockPos.Mutable();
         for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++) {
-            int y = ch.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z) - 1;
+            // start one above the heightmap value and step down past air, so it works whether the value is the
+            // top block or the space above it
+            int y = ch.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z) + 1;
             MapColor mc = MapColor.CLEAR;
             while (y > bottom) {
                 BlockState st = ch.getBlockState(m.set(bx + x, y, bz + z));

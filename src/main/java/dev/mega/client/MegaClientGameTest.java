@@ -224,6 +224,13 @@ public class MegaClientGameTest implements FabricClientGameTest {
             check(pb.indexOf("RED_BED") == pb.lastIndexOf("RED_BED"), "bed counted twice: " + pb);
             check(remembered >= 8, "stash memory empty: " + remembered);
             check(chunksKnown >= 20, "map memory empty: " + chunksKnown);
+            // the flat test world's ground is grass: the remembered map colour under you must be green, not dirt-brown
+            int under = ctx.computeOnClient(c -> {
+                byte[] ch = MegaMap.chunks(c).get(net.minecraft.util.math.ChunkPos.toLong(0, 0));
+                return ch == null ? 0 : MegaMap.colour(ch[5 * 16 + 5]);
+            });
+            MegaClient.LOGGER.info("[M.E.G.A test] map colour at 5,5 = {}", Integer.toHexString(under));
+            check(((under >> 8) & 255) > ((under >> 16) & 255), "map ground should be green (grass), got " + Integer.toHexString(under));
             ctx.takeScreenshot("13-minimap-surface");
             ctx.runOnClient(c -> { MegaClient.config.minimapLayer = 1; });
             ctx.waitTicks(15);
