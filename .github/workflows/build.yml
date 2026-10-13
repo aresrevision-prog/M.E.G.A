@@ -68,7 +68,9 @@ jobs:
           echo {"profiles":{"latest-release":{"name":"","type":"latest-release","lastVersionId":"latest-release"}},"settings":{},"version":3}> "%APPDATA%\.minecraft\launcher_profiles.json"
           mkdir "%APPDATA%\.minecraft\mods"
           echo x> "%APPDATA%\.minecraft\mods\other-26.3-mod.jar"
-          echo n| installer\Install-MEGA.bat > "%RUNNER_TEMP%\installer.txt" 2>&1
+          mkdir "%RUNNER_TEMP%\Bob's Downloads"
+          copy installer\Install-MEGA.bat "%RUNNER_TEMP%\Bob's Downloads\Install-MEGA.bat"
+          echo n| "%RUNNER_TEMP%\Bob's Downloads\Install-MEGA.bat" > "%RUNNER_TEMP%\installer.txt" 2>&1
           type "%RUNNER_TEMP%\installer.txt"
       - name: Check everything was set up
         shell: pwsh

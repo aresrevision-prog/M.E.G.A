@@ -4,7 +4,11 @@ title M.E.G.A Client installer
 echo.
 echo  M.E.G.A Client installer for Minecraft 1.21.11
 echo  ----------------------------------------------
-powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((Get-Content -LiteralPath '%~f0' -Raw))"
+rem Run the PowerShell part as a real script file (works from any folder, even names with spaces or ')
+set "MEGA_PS=%TEMP%\Install-MEGA-%RANDOM%.ps1"
+copy /y "%~f0" "%MEGA_PS%" >nul
+powershell -NoProfile -ExecutionPolicy Bypass -File "%MEGA_PS%"
+del "%MEGA_PS%" >nul 2>&1
 echo.
 pause
 exit /b
@@ -19,7 +23,14 @@ $UA = @{ 'User-Agent' = 'MEGA-Installer' }
 
 function Step($t) { Write-Host "  > $t" -ForegroundColor Cyan }
 function Ok($t)   { Write-Host "    $t" -ForegroundColor Green }
-function Fail($t) { Write-Host ""; Write-Host "  ERROR: $t" -ForegroundColor Red; exit 1 }
+$Log = Join-Path ([Environment]::GetFolderPath('Desktop')) 'MEGA-install-log.txt'
+try { Start-Transcript -Path $Log -Force | Out-Null } catch { }
+function Fail($t) {
+    Write-Host ""; Write-Host "  ERROR: $t" -ForegroundColor Red
+    Write-Host "  A log was saved on your Desktop: MEGA-install-log.txt (send it if you need help)." -ForegroundColor Yellow
+    try { Stop-Transcript | Out-Null } catch { }
+    exit 1
+}
 # Downloads can fail for a moment (slow Wi-Fi, GitHub limits): try 4 times before giving up
 function Retry([scriptblock]$job) {
     for ($i = 1; $i -le 4; $i++) {
@@ -133,6 +144,7 @@ try {
     Write-Host "  3. In game press 0 to open the M.E.G.A settings panel."
     Write-Host ""
     Write-Host "  Run this installer again any time to update to the newest version."
+    try { Stop-Transcript | Out-Null } catch { }
 }
 catch {
     Fail $_.Exception.Message
