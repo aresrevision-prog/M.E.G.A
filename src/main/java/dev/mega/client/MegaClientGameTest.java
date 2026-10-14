@@ -312,6 +312,20 @@ public class MegaClientGameTest implements FabricClientGameTest {
             check(allFarms.contains("MELON_FARM (below y=0)@"), "melon farm (no melons yet) not found: " + allFarms);
             // x 50..66 = wild cane, wild cactus and the piston door: none of them may be a farm
             check(!allFarms.matches(".*@(5[0-9]|6[0-9])\\b.*"), "wild plants / piston door called a farm: " + allFarms);
+            // pictures: the three farms, then the look-alikes (no farm label)
+            srv.runCommand("gamemode spectator @a");
+            srv.runCommand("tp @a 20 -52 30 0 35");
+            ctx.waitTicks(40);
+            ctx.runOnClient(c -> { c.player.setYaw(0); c.player.setPitch(35); });
+            ctx.waitTicks(5);
+            ctx.takeScreenshot("18-farms");
+            srv.runCommand("tp @a 57 -55 33 0 40");
+            ctx.waitTicks(20);
+            ctx.runOnClient(c -> { c.player.setYaw(0); c.player.setPitch(40); });
+            ctx.waitTicks(5);
+            ctx.takeScreenshot("19-not-farms");
+            srv.runCommand("tp @a 0 -60 -3 0 15");
+            ctx.waitTicks(20);
 
             // Deep scan: only buried things. The hill stash (inside 6 blocks of stone) stays; the furnace/table on the hill top go.
             ctx.runOnClient(c -> { MegaClient.config.deepScan = true; MegaClient.config.save(); MegaClient.refresh(c); });
