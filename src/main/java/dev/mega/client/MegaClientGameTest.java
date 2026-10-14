@@ -276,12 +276,12 @@ public class MegaClientGameTest implements FabricClientGameTest {
                 srv.runCommand("setblock " + x + " -59 40 minecraft:sugar_cane");
                 srv.runCommand("setblock " + x + " -59 39 minecraft:observer[facing=south]");
             }
-            // cactus farm with no machines: cactus with fences touching it
+            // cactus farm with no machines: fences beside the spot each cactus grows into (snaps it off)
             for (int k = 0; k < 4; k++) {
                 int x = 18 + k * 3;
                 srv.runCommand("setblock " + x + " -61 40 minecraft:sand");
                 srv.runCommand("setblock " + x + " -60 40 minecraft:cactus");
-                srv.runCommand("setblock " + (x + 1) + " -60 40 minecraft:oak_fence");
+                srv.runCommand("setblock " + (x + 1) + " -59 40 minecraft:oak_fence"); // beside where it grows next
             }
             // melon farm with no melons grown yet: stems, observers watching the empty spots
             for (int k = 0; k < 3; k++) {
@@ -296,7 +296,9 @@ public class MegaClientGameTest implements FabricClientGameTest {
                 srv.runCommand("setblock " + x + " -61 40 minecraft:sand");
                 srv.runCommand("setblock " + x + " -61 41 minecraft:water");
                 srv.runCommand("setblock " + x + " -60 40 minecraft:sugar_cane");
+                srv.runCommand("setblock " + x + " -61 44 minecraft:sand");
                 srv.runCommand("setblock " + x + " -60 44 minecraft:cactus");
+                srv.runCommand("setblock " + (x + 1) + " -59 44 minecraft:sand"); // dune beside it: natural, not a farm
             }
             srv.runCommand("setblock 66 -60 40 minecraft:sticky_piston[facing=east]");
             srv.runCommand("setblock 66 -59 40 minecraft:sticky_piston[facing=east]");

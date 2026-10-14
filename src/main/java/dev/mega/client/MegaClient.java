@@ -589,10 +589,15 @@ public final class MegaClient implements ClientModInitializer {
                 BlockState st = section.getBlockState(x, y, z);
                 int wx = baseX + x, wy = baseY + y, wz = baseZ + z;
                 if (cactusOn && st.isOf(Blocks.CACTUS)) {
-                    for (net.minecraft.util.math.Direction d : net.minecraft.util.math.Direction.Type.HORIZONTAL) {
-                        BlockState n = client.world.getBlockState(q.set(wx + d.getOffsetX(), wy, wz + d.getOffsetZ()));
-                        if (!n.isAir() && !n.isOf(Blocks.CACTUS)) { cactusFarm++; cx += x; cy += y; cz += z; break; }
-                    }
+                    // the top cactus of a column, with a player-placed "breaker" beside it or beside the space it grows into
+                    if (client.world.getBlockState(q.set(wx, wy + 1, wz)).isOf(Blocks.CACTUS)) continue;
+                    search:
+                    for (int up = 0; up <= 1; up++)
+                        for (net.minecraft.util.math.Direction d : net.minecraft.util.math.Direction.Type.HORIZONTAL)
+                            if (cactusBreaker(client.world.getBlockState(q.set(wx + d.getOffsetX(), wy + up, wz + d.getOffsetZ())))) {
+                                cactusFarm++; cx += x; cy += y; cz += z;
+                                break search;
+                            }
                     continue;
                 }
                 if (!MACHINES.contains(st.getBlock())) continue;
@@ -632,6 +637,15 @@ public final class MegaClient implements ClientModInitializer {
             counts.merge(Category.FARM, 1, Integer::sum);
             countBlock(label, Category.FARM);
         }
+    }
+
+    /** Blocks players put next to cactus to snap it off as it grows (never natural desert terrain). */
+    private static boolean cactusBreaker(BlockState st) {
+        if (st.isAir()) return false;
+        String p = Registries.BLOCK.getId(st.getBlock()).getPath();
+        return p.endsWith("_fence") || p.endsWith("_fence_gate") || p.endsWith("_wall") || p.contains("glass")
+            || p.equals("iron_bars") || p.equals("tripwire") || p.endsWith("_slab") || p.endsWith("_stairs")
+            || p.endsWith("_trapdoor") || p.endsWith("chain") || p.equals("end_rod") || p.endsWith("_sign");
     }
 
     /** An empty spot next to a melon/pumpkin stem is where the fruit grows: returns "MELON"/"PUMPKIN" or null. */
