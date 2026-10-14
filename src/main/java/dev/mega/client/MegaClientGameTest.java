@@ -148,7 +148,7 @@ public class MegaClientGameTest implements FabricClientGameTest {
             String farms = ctx.computeOnClient(c -> MegaClient.targets.stream().filter(t -> t.category() == MegaClient.Category.FARM)
                 .map(t -> t.label() + "@" + t.pos().getX()).toList().toString());
             MegaClient.LOGGER.info("[M.E.G.A test] farms: {}", farms);
-            check(farms.contains("BAMBOO_FARM"), "real bamboo farm not found: " + farms);
+            check(farms.contains("BAMBOO_FARM (below y=0)"), "real bamboo farm not found: " + farms);
             check(!farms.contains("@-5"), "pistons next to wild bamboo were called a farm: " + farms);
 
             // Radars: a mob on the (flat, y<0) ground goes on BELOW 0, one floating high up goes on SKY
@@ -265,6 +265,51 @@ public class MegaClientGameTest implements FabricClientGameTest {
             ctx.runOnClient(c -> MegaScreen.tab = 0);
             ctx.setScreen(() -> null);
             srv.runCommand("kill @e[type=minecraft:chest_minecart]");
+
+            // Every farm type, each in its own chunk, plus look-alikes that must NOT count
+            // sugar cane: cane on sand by water, observers aimed at the second block
+            for (int k = 0; k < 3; k++) {
+                int x = 2 + k * 2;
+                srv.runCommand("setblock " + x + " -61 40 minecraft:sand");
+                srv.runCommand("setblock " + x + " -61 41 minecraft:water");
+                srv.runCommand("setblock " + x + " -60 40 minecraft:sugar_cane");
+                srv.runCommand("setblock " + x + " -59 40 minecraft:sugar_cane");
+                srv.runCommand("setblock " + x + " -59 39 minecraft:observer[facing=south]");
+            }
+            // cactus farm with no machines: cactus with fences touching it
+            for (int k = 0; k < 4; k++) {
+                int x = 18 + k * 3;
+                srv.runCommand("setblock " + x + " -61 40 minecraft:sand");
+                srv.runCommand("setblock " + x + " -60 40 minecraft:cactus");
+                srv.runCommand("setblock " + (x + 1) + " -60 40 minecraft:oak_fence");
+            }
+            // melon farm with no melons grown yet: stems, observers watching the empty spots
+            for (int k = 0; k < 3; k++) {
+                int x = 34 + k * 3;
+                srv.runCommand("setblock " + x + " -61 40 minecraft:farmland");
+                srv.runCommand("setblock " + x + " -60 40 minecraft:melon_stem[age=7]");
+                srv.runCommand("setblock " + (x + 1) + " -59 40 minecraft:observer[facing=down]");
+            }
+            // look-alikes: wild cane by water, lone wild cactus, a piston door with nothing to farm
+            for (int k = 0; k < 4; k++) {
+                int x = 50 + k * 2;
+                srv.runCommand("setblock " + x + " -61 40 minecraft:sand");
+                srv.runCommand("setblock " + x + " -61 41 minecraft:water");
+                srv.runCommand("setblock " + x + " -60 40 minecraft:sugar_cane");
+                srv.runCommand("setblock " + x + " -60 44 minecraft:cactus");
+            }
+            srv.runCommand("setblock 66 -60 40 minecraft:sticky_piston[facing=east]");
+            srv.runCommand("setblock 66 -59 40 minecraft:sticky_piston[facing=east]");
+            ctx.runOnClient(MegaClient::refresh);
+            ctx.waitTicks(80);
+            String allFarms = ctx.computeOnClient(c -> MegaClient.targets.stream().filter(t -> t.category() == MegaClient.Category.FARM)
+                .map(t -> t.label() + "@" + t.pos().getX()).toList().toString());
+            MegaClient.LOGGER.info("[M.E.G.A test] all farms: {}", allFarms);
+            check(allFarms.contains("SUGAR_CANE_FARM (below y=0)@"), "sugar cane farm not found: " + allFarms);
+            check(allFarms.contains("CACTUS_FARM (below y=0)@"), "cactus farm (no machines) not found: " + allFarms);
+            check(allFarms.contains("MELON_FARM (below y=0)@"), "melon farm (no melons yet) not found: " + allFarms);
+            // x 50..66 = wild cane, wild cactus and the piston door: none of them may be a farm
+            check(!allFarms.matches(".*@(5[0-9]|6[0-9])\\b.*"), "wild plants / piston door called a farm: " + allFarms);
 
             // Deep scan: only buried things. The hill stash (inside 6 blocks of stone) stays; the furnace/table on the hill top go.
             ctx.runOnClient(c -> { MegaClient.config.deepScan = true; MegaClient.config.save(); MegaClient.refresh(c); });

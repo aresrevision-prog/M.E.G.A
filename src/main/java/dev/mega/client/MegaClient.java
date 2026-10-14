@@ -569,36 +569,47 @@ public final class MegaClient implements ClientModInitializer {
         ChunkSection[] sections = chunk.getSectionArray();
         int baseX = chunk.getPos().getStartX();
         int baseZ = chunk.getPos().getStartZ();
+        BlockPos.Mutable q = new BlockPos.Mutable();
         for (int i = 0; i < sections.length; i++) {
             ChunkSection section = sections[i];
             if (section == null || section.isEmpty()) continue;
-            if (!section.hasAny(st -> MACHINES.contains(st.getBlock()))) continue;
+            boolean cactusOn = farmPlants.containsKey(Blocks.CACTUS);
+            if (!section.hasAny(st -> MACHINES.contains(st.getBlock()) || cactusOn && st.isOf(Blocks.CACTUS))) continue;
             int baseY = chunk.sectionIndexToCoord(i) << 4;
 
-            // A farm machine points AT a plant: an observer watching it, or a piston facing it (1-2 blocks along
-            // its facing, or just above/below that, for cane/cactus/bamboo columns). Random pistons near wild plants
-            // (jungle temples, villages) don't point at plants, so they no longer count.
-            int machines = 0, aimed = 0;
+            // 1. Machines AIMED at a plant: an observer watching it or a piston facing it, 1-2 blocks along its facing
+            //    (or just above/below that, for cane/cactus/bamboo columns). For melons/pumpkins the spot a machine
+            //    watches is often empty (fruit not grown yet), so a stem next to that spot counts too.
+            // 2. Cactus farms often have no machines: cactus with a block right beside it (fence, glass, string...)
+            //    is a farm cactus, because wild cactus can't grow touching anything.
+            int machines = 0, aimed = 0, cactusFarm = 0;
             Map<String, Integer> plants = new java.util.HashMap<>();
-            long mx = 0, my = 0, mz = 0;
-            BlockPos.Mutable q = new BlockPos.Mutable();
+            long mx = 0, my = 0, mz = 0, cx = 0, cy = 0, cz = 0;
             for (int y = 0; y < 16; y++) for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++) {
                 BlockState st = section.getBlockState(x, y, z);
+                int wx = baseX + x, wy = baseY + y, wz = baseZ + z;
+                if (cactusOn && st.isOf(Blocks.CACTUS)) {
+                    for (net.minecraft.util.math.Direction d : net.minecraft.util.math.Direction.Type.HORIZONTAL) {
+                        BlockState n = client.world.getBlockState(q.set(wx + d.getOffsetX(), wy, wz + d.getOffsetZ()));
+                        if (!n.isAir() && !n.isOf(Blocks.CACTUS)) { cactusFarm++; cx += x; cy += y; cz += z; break; }
+                    }
+                    continue;
+                }
                 if (!MACHINES.contains(st.getBlock())) continue;
                 machines++; mx += x; my += y; mz += z;
                 net.minecraft.util.math.Direction f = st.getOrEmpty(net.minecraft.state.property.Properties.FACING).orElse(null);
                 if (f == null) continue;
-                int wx = baseX + x, wy = baseY + y, wz = baseZ + z;
                 String hit = null;
                 search:
                 for (int dist = 1; dist <= 2; dist++) for (int dy = -1; dy <= 1; dy++) {
                     q.set(wx + f.getOffsetX() * dist, wy + f.getOffsetY() * dist + dy, wz + f.getOffsetZ() * dist);
-                    String plant = farmPlants.get(client.world.getBlockState(q).getBlock());
+                    BlockState at = client.world.getBlockState(q);
+                    String plant = farmPlants.get(at.getBlock());
+                    if (plant == null && at.isAir()) plant = stemNextTo(client, q);
                     if (plant != null) { hit = plant; break search; }
                 }
                 if (hit != null) { aimed++; plants.merge(hit, 1, Integer::sum); }
             }
-            if (machines == 0) continue;
 
             String best = null;
             int bestN = 0;
@@ -606,18 +617,31 @@ public final class MegaClient implements ClientModInitializer {
                 if (e.getValue() > bestN) { best = e.getKey(); bestN = e.getValue(); } // the plant most machines aim at
             }
             String key, label;
-            if (best != null && aimed >= 2) { key = "plant_farm"; label = best + "_FARM"; }
-            else if (baseY < 0 && machines >= 4) { key = "underground_farm"; label = "UNDERGROUND_FARM"; }
+            long ax, ay, az;
+            int n;
+            if (best != null && aimed >= 2) { key = "plant_farm"; label = best + "_FARM"; ax = mx; ay = my; az = mz; n = machines; }
+            else if (cactusFarm >= 4) { key = "plant_farm"; label = "CACTUS_FARM"; ax = cx; ay = cy; az = cz; n = cactusFarm; }
+            else if (baseY < 0 && machines >= 4) { key = "underground_farm"; label = "FARM_MACHINES"; ax = mx; ay = my; az = mz; n = machines; }
             else continue;
             if (disabled.contains(key)) continue;
 
-            BlockPos pos = new BlockPos(baseX + (int) (mx / machines), baseY + (int) (my / machines), baseZ + (int) (mz / machines));
+            BlockPos pos = new BlockPos(baseX + (int) (ax / n), baseY + (int) (ay / n), baseZ + (int) (az / n));
             double sq = client.player.squaredDistanceTo(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
             if (sq > maxSq) continue;
-            found.add(new Target(Category.FARM, label + (baseY < 0 && key.equals("plant_farm") ? " (y<0)" : ""), pos, Math.sqrt(sq)));
+            found.add(new Target(Category.FARM, label + (baseY < 0 ? " (below y=0)" : ""), pos, Math.sqrt(sq)));
             counts.merge(Category.FARM, 1, Integer::sum);
             countBlock(label, Category.FARM);
         }
+    }
+
+    /** An empty spot next to a melon/pumpkin stem is where the fruit grows: returns "MELON"/"PUMPKIN" or null. */
+    private static String stemNextTo(MinecraftClient client, BlockPos spot) {
+        for (net.minecraft.util.math.Direction d : net.minecraft.util.math.Direction.Type.HORIZONTAL) {
+            Block b = client.world.getBlockState(spot.offset(d)).getBlock();
+            if ((b == Blocks.MELON_STEM || b == Blocks.ATTACHED_MELON_STEM) && farmPlants.containsKey(Blocks.MELON)) return "MELON";
+            if ((b == Blocks.PUMPKIN_STEM || b == Blocks.ATTACHED_PUMPKIN_STEM) && farmPlants.containsKey(Blocks.PUMPKIN)) return "PUMPKIN";
+        }
+        return null;
     }
 
     /** Adds one to the corner-panel count for this block type (only while a scan is running). */
