@@ -327,6 +327,20 @@ public class MegaClientGameTest implements FabricClientGameTest {
             srv.runCommand("tp @a 0 -60 -3 0 15");
             ctx.waitTicks(20);
 
+            // Danger alert: a warden, an elder guardian and a ravager nearby
+            srv.runCommand("summon minecraft:warden 6 -60 -12 {NoAI:1b,PersistenceRequired:1b}");
+            srv.runCommand("summon minecraft:elder_guardian -6 -59 -14 {NoAI:1b,PersistenceRequired:1b}");
+            srv.runCommand("summon minecraft:ravager 0 -60 -18 {NoAI:1b,PersistenceRequired:1b}");
+            ctx.waitTicks(20);
+            String danger = ctx.computeOnClient(c -> MegaDanger.near.stream().map(MegaDanger.Danger::name).toList().toString());
+            MegaClient.LOGGER.info("[M.E.G.A test] danger: {}", danger);
+            check(danger.contains("WARDEN") && danger.contains("ELDER GUARDIAN") && danger.contains("RAVAGER"), "danger alert missed one: " + danger);
+            ctx.runOnClient(c -> { c.player.setYaw(180); c.player.setPitch(5); });
+            ctx.waitTicks(3);
+            ctx.takeScreenshot("20-danger");
+            srv.runCommand("kill @e[type=!minecraft:player]");
+            ctx.waitTicks(10);
+
             // Deep scan: only buried things. The hill stash (inside 6 blocks of stone) stays; the furnace/table on the hill top go.
             ctx.runOnClient(c -> { MegaClient.config.deepScan = true; MegaClient.config.save(); MegaClient.refresh(c); });
             ctx.waitTicks(40);

@@ -62,7 +62,7 @@ public final class MegaTracers {
     static void render(MatrixStack matrices, VertexConsumerProvider consumers, Vec3d cam) {
         MegaConfig cfg = MegaClient.config;
         MinecraftClient client = MinecraftClient.getInstance();
-        if (cfg == null || !cfg.hudEnabled || (!cfg.tracers && !cfg.boxes && !cfg.tracePlayers && !cfg.outlineSneaky && !cfg.xray && !cfg.waypoints && !cfg.hitboxes && !cfg.trails && !cfg.lastSeen)) return;
+        if (cfg == null || !cfg.hudEnabled || (!cfg.tracers && !cfg.boxes && !cfg.tracePlayers && !cfg.outlineSneaky && !cfg.xray && !cfg.waypoints && !cfg.hitboxes && !cfg.trails && !cfg.lastSeen && !cfg.dangerAlert)) return;
         if (client.player == null || client.world == null) return;
 
         Vector3fc fwd = client.gameRenderer.getCamera().getHorizontalPlane(); // look direction
@@ -131,6 +131,19 @@ public final class MegaTracers {
             int color = t.category().color;
             if (cfg.tracers) line(buf, entry, sx, sy, sz, (float) (bx + 0.5), (float) (by + 0.5), (float) (bz + 0.5), color, width);
             if (cfg.boxes && !xrayOn) VertexRendering.drawOutline(matrices, buf, VoxelShapes.fullCube(), bx, by, bz, color, width + 1.5f);
+        }
+
+        // Danger mobs: thick red line and box, always
+        if (cfg.dangerAlert) {
+            float delta = client.getRenderTickCounter().getTickProgress(true);
+            for (MegaDanger.Danger d : MegaDanger.near) {
+                net.minecraft.entity.Entity e = d.entity();
+                Vec3d pos = e.getLerpedPos(delta);
+                VertexRendering.drawOutline(matrices, buf, VoxelShapes.cuboid(e.getBoundingBox().offset(-e.getX(), -e.getY(), -e.getZ())),
+                    pos.x - cam.x, pos.y - cam.y, pos.z - cam.z, 0xFFFF2020, width + 2);
+                line(buf, entry, sx, sy, sz, (float) (pos.x - cam.x), (float) (pos.y + e.getHeight() / 2 - cam.y), (float) (pos.z - cam.z),
+                    0xFFFF2020, width + 2);
+            }
         }
 
         // Player trails: a line along where each player went, fading out with age

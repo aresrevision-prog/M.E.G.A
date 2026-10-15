@@ -43,7 +43,7 @@ Taken automatically on every build by the in-game test, which launches the real 
 1. No griefing
 2. No spawn camping
 3. No TP killing
-4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.34.0`) so the owner can confirm which approved build a player is running.
+4. ESPs are allowed **only after the server owner has checked them**. The HUD shows the version (`M.E.G.A v0.35.0`) so the owner can confirm which approved build a player is running.
 5. Duping is allowed **only while the server owner is watching**.
 6. Teleporting is allowed (M.E.G.A itself has no teleport: it can't be done client-side without cheating).
 
@@ -112,6 +112,9 @@ Outlines show within 12 blocks of you, only on the sides of a block that touch a
 - **Join/leave alerts**: a chat note (only you see it) when someone joins or leaves.
 - **Portals & beds** (violet): nether/end portals, end gateways, beds (counted once), respawn anchors.
 - **Hidden storage**: chest/hopper minecarts, chest boats, donkeys/mules/llamas with chests (red, Storage).
+
+## Danger alert
+Withers, wardens, elder guardians, the ender dragon, ravagers, evokers and piglin brutes within 256 blocks: a **flashing red banner** at the top (name, distance, arrow, "+N more"), a **thick red line and box** through walls, and a **bell + chat note** the first time each one is seen. On/off and sound: panel → Players. Edit the mob list in `config/mega_client.json` (`dangerMobs`).
 
 ## Hitboxes
 Panel → Display → **Hitboxes** (on by default, range 64, up to 256): every player, mob and minecart/boat near you gets its real hitbox outlined through walls, like F3+B. Yellow = players (plus a blue line where they're looking), red = hostile, green = animals, grey = vehicles. Look only: hitboxes are never made bigger (that would be a combat aid).

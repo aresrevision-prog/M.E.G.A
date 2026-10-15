@@ -38,6 +38,22 @@ public final class MegaHud {
 
         // Farm alert banner, top centre. Everything else in the top corners moves down below it.
         int topPad = 0;
+        // DANGER banner (withers, wardens...), flashing red, above everything else
+        if (cfg.dangerAlert && !MegaClient.dangerList().isEmpty()) {
+            List<MegaDanger.Danger> dl = MegaClient.dangerList();
+            MegaDanger.Danger d0 = dl.get(0);
+            String msg = "⚠ DANGER  " + d0.name() + "  " + Math.round(d0.distance()) + "m "
+                + arrow(px, pz, yaw, d0.entity().getX(), d0.entity().getZ()) + (dl.size() > 1 ? "  +" + (dl.size() - 1) + " more" : "");
+            int sw0 = ctx.getScaledWindowWidth(), w = tr.getWidth(msg) + 16;
+            int bx = Math.max(2, sw0 / 2 - w / 2);
+            boolean flash = (System.currentTimeMillis() / 400) % 2 == 0;
+            ctx.fill(bx, 4, bx + w, 22, flash ? 0xEE8B0000 : 0xEE000000);
+            ctx.fill(bx, 4, bx + w, 6, 0xFFFF2020);
+            ctx.fill(bx, 20, bx + w, 22, 0xFFFF2020);
+            ctx.drawTextWithShadow(tr, msg, bx + 8, 9, 0xFFFFFFFF);
+            topPad = 24;
+            y += 24;
+        }
         MegaClient.Target farm = cfg.farmAlert ? MegaClient.nearestFarm() : null;
         if (cfg.farmAlert && (MegaClient.farmCount > 0 || farm != null)) {
             StringBuilder m = new StringBuilder("FARM DETECTED");
@@ -57,13 +73,13 @@ public final class MegaHud {
             if (tr.getWidth(msg) + 16 > sw0 - 8) msg = msg.replace("FARM DETECTED  ", "FARM  ").replace(" moving items ", " items ");
             int w = tr.getWidth(msg) + 16;
             int bx = Math.max(2, sw0 / 2 - w / 2);
-            int by = 4;
+            int by = 4 + topPad;
             ctx.fill(bx, by, bx + w, by + 18, 0xDD000000);
             ctx.fill(bx, by, bx + w, by + 2, 0xFFFF8800);
             ctx.fill(bx, by + 16, bx + w, by + 18, 0xFFFF8800);
             ctx.drawTextWithShadow(tr, msg, bx + 8, by + 5, 0xFFFF8800);
-            topPad = 24;
-            y += topPad;
+            topPad += 24;
+            y += 24;
         }
 
         // Elytra helper: speed / height / compass bar while gliding

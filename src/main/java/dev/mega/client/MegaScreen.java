@@ -151,7 +151,9 @@ final class MegaScreen extends Screen {
                 t("Player lines", () -> c.tracePlayers, v -> c.tracePlayers = v),
                 t("Invisible players", () -> c.showInvisiblePlayers, v -> c.showInvisiblePlayers = v),
                 t("Outline sneaky players", () -> c.outlineSneaky, v -> c.outlineSneaky = v),
-                t("Gear check", () -> c.gearCheck, v -> c.gearCheck = v));
+                t("Gear check", () -> c.gearCheck, v -> c.gearCheck = v),
+                t("Danger alert", () -> c.dangerAlert, v -> c.dangerAlert = v),
+                t("Danger sound", () -> c.dangerSound, v -> c.dangerSound = v));
             y = toggleGrid(toggles, x0, y, colW);
             addDrawableChild(new IntSlider(x0, y, colW, "Player range", 8, 1250,
                 () -> c.playerRange, v -> c.playerRange = v));

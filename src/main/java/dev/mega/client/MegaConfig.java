@@ -67,6 +67,13 @@ public final class MegaConfig {
     /** Where you last saw each player (HUD + big map + grey beam). */
     public boolean lastSeen = true;
     public boolean joinAlerts = true;
+    /** Danger alert: very dangerous mobs near you (banner, red line, bell). */
+    public boolean dangerAlert = true;
+    public boolean dangerSound = true;
+    public int dangerRange = 256;
+    public java.util.List<String> dangerMobs = new java.util.ArrayList<>(java.util.List.of(
+        "minecraft:wither", "minecraft:warden", "minecraft:elder_guardian", "minecraft:ender_dragon",
+        "minecraft:ravager", "minecraft:evoker", "minecraft:piglin_brute"));
     /** Player list shows armour, totem and held item. */
     public boolean gearCheck = true;
     /** While flying with an elytra: speed / height / compass bar with stashes and waypoints on it. */
@@ -304,6 +311,8 @@ public final class MegaConfig {
         minimapSize = Math.clamp(minimapSize, 48, 200);
         minimapLayer = Math.clamp(minimapLayer, 0, 2);
         trailSeconds = Math.clamp(trailSeconds, 10, 1800);
+        dangerRange = Math.clamp(dangerRange, 16, 1250);
+        if (dangerMobs == null) dangerMobs = new java.util.ArrayList<>();
         if (!java.util.List.of("minimap", "blocks", "radars", "none").contains(cornerSlot1)) cornerSlot1 = "minimap";
         if (!java.util.List.of("minimap", "blocks", "radars", "none").contains(cornerSlot2)) cornerSlot2 = "blocks";
         if (portalBlocks == null) portalBlocks = new java.util.ArrayList<>(defaultPortals());

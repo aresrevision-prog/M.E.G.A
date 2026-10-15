@@ -140,6 +140,7 @@ public final class MegaClient implements ClientModInitializer {
         MegaWaypoints.tick(client);
         MegaRadar.tick(client);
         MegaTracking.tick(client);
+        MegaDanger.tick(client);
         MegaMap.tick(client);
 
         MegaXray.tick(client);
@@ -704,6 +705,8 @@ public final class MegaClient implements ClientModInitializer {
         String t = String.join(" / ", parts);
         return t.length() > 48 ? t.substring(0, 47) + "…" : t;
     }
+
+    static List<MegaDanger.Danger> dangerList() { return MegaDanger.near; }
 
     static List<Target> everyColourFirst(List<Target> sorted) {
         List<Target> first = new ArrayList<>(), rest = new ArrayList<>();
